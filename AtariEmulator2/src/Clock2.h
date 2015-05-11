@@ -11,6 +11,8 @@
 #include <iostream>
 #include <ctime>
 
+#define BILLION (1000000000L)
+
 namespace emulator {
 
 class Clock2 {
@@ -27,11 +29,18 @@ public:
 
 	bool tick() {
 
+		++ticks;
+		return true;
+
 		struct timespec cur_tick;
 		clock_gettime(CLOCK_MONOTONIC, &cur_tick);
 
+		double delta = ((cur_tick.tv_sec - last_tick.tv_sec) * BILLION) + (cur_tick.tv_nsec - last_tick.tv_nsec);
+
+		delta /= BILLION;
+
 		std::cout.precision(10);
-		auto delta = cur_tick.tv_sec + static_cast<double>(cur_tick.tv_nsec) / (1000 * 1000 * 1000) - last_tick.tv_sec + static_cast<double>(last_tick.tv_nsec) / (1000 * 1000 * 1000);
+		//auto delta = cur_tick.tv_sec + static_cast<double>(cur_tick.tv_nsec) / (1000 * 1000 * 1000) - last_tick.tv_sec + static_cast<double>(last_tick.tv_nsec) / (1000 * 1000 * 1000);
 		//std::cout << "Delta: " << std::fixed << delta << std::endl;
 
 		tick_time += delta;

@@ -20,19 +20,17 @@ int main(int argc, char **argv)
 
 	while( !quit ) {
 
-		if (!cpu.execute()) {
-
-			SDL_Event e;
-			while( SDL_PollEvent( &e ) != 0 )
+		cpu.execute();
+		SDL_Event e;
+		while( SDL_PollEvent( &e ) != 0 )
+		{
+			if( e.type == SDL_QUIT )
 			{
-				if( e.type == SDL_QUIT )
-				{
-					quit = true;
-				}
+				quit = true;
 			}
-
-			video.swapWindow();
 		}
+
+		video.swapWindow();
 	}
 
 	std::cout << std::fixed << "Ticks Per Second: " << cpu.ticks_per_second() << std::endl;

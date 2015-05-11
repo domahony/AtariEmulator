@@ -10,6 +10,8 @@
 
 #include "Clock.h"
 #include "Clock2.h"
+#include "OpCode.h"
+#include <vector>
 
 namespace cpu {
 
@@ -23,8 +25,19 @@ public:
 
 private:
 	int _execute();
+
+	unsigned char BCD(unsigned char);
+
 	int wait;
-	emulator::Clock clock;
+	emulator::Clock2 clock;
+
+	unsigned short PC;
+	unsigned char ACC;
+	bool N,V,B,D,I,Z,C;
+
+	std::vector<OpCode*> op;
+
+	template <class T> friend class ADC;
 };
 
 } /* namespace cpu */

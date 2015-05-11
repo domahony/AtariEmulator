@@ -31,7 +31,12 @@ Video::Video() {
 			SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
 	gContext =  SDL_GL_CreateContext( gWindow );
 
-	SDL_GL_SetSwapInterval( 0 );
+	SDL_GL_SetSwapInterval( 1 );
+
+	SDL_DisplayMode mode;
+	SDL_GetCurrentDisplayMode(0, &mode);
+
+	std::cout << "HZ: " << mode.refresh_rate << std::endl;
 }
 
 Video::~Video() {
