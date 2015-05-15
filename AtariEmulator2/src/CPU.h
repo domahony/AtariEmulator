@@ -23,9 +23,14 @@ public:
 	double ticks_per_second();
 	bool execute();
 
+	unsigned char readPCandInc() {
+		return read(PC++);
+	}
+
 private:
 	int _execute();
 
+	unsigned char read(unsigned char) const;
 	unsigned char BCD(unsigned char);
 
 	int wait;

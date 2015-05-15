@@ -10,7 +10,6 @@
 
 namespace cpu {
 
-//template <class T> int ADC<T>::
 template <class T> int ADC<T>::
 operator()(CPU* cpu) {
 

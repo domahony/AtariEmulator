@@ -61,6 +61,11 @@ execute()
 }
 
 unsigned char CPU::
+read(unsigned char addr) const {
+	return 0;
+}
+
+unsigned char CPU::
 BCD(unsigned char v)
 {
 	unsigned char tens = (v >> 4) * 10;

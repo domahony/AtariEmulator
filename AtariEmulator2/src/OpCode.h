@@ -15,10 +15,7 @@ class CPU;
 class Immediate {
 
 protected:
-	unsigned char read(CPU *) {
-		return 0;
-	}
-
+	unsigned char read(CPU *cpu);
 	int tcount() {
 		return 0;
 	}
