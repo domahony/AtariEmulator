@@ -94,7 +94,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_ae_OBJECTS = AtariEmulator2.$(OBJEXT) Video.$(OBJEXT) CPU.$(OBJEXT) \
 	Clock.$(OBJEXT) Clock2.$(OBJEXT) ADC.$(OBJEXT) \
-	OpCode.$(OBJEXT)
+	OpCode.$(OBJEXT) AND.$(OBJEXT)
 ae_OBJECTS = $(am_ae_OBJECTS)
 am__DEPENDENCIES_1 =
 ae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -256,7 +256,7 @@ top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
 AM_CXXFLAGS = -std=c++11 $(SDL_CFLAGS)
-ae_SOURCES = AtariEmulator2.cpp Video.cpp CPU.cc Clock.cpp Clock2.cpp ADC.cpp OpCode.cpp
+ae_SOURCES = AtariEmulator2.cpp Video.cpp CPU.cc Clock.cpp Clock2.cpp ADC.cpp OpCode.cpp AND.cpp
 ae_LDFLAGS = $(SDL_LDFLAGS) $(GL_LDFLAGS)
 ae_LDADD = $(SDL_LDFLAGS) $(GL_LDFLAGS)
 all: all-am
@@ -347,6 +347,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ./$(DEPDIR)/ADC.Po
+include ./$(DEPDIR)/AND.Po
 include ./$(DEPDIR)/AtariEmulator2.Po
 include ./$(DEPDIR)/CPU.Po
 include ./$(DEPDIR)/Clock.Po

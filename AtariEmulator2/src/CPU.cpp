@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "ADC.h"
+#include "AND.h"
 
 namespace cpu {
 
@@ -25,6 +26,15 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x79] = new ADC<AbsoluteWithY>();
 	op[0x61] = new ADC<ZpIdxIndirect>();
 	op[0x71] = new ADC<ZpIndirectIdxWithY>();
+
+	op[0x29] = new AND<Immediate>();
+	op[0x25] = new AND<ZeroPage>();
+	op[0x35] = new AND<ZeroPageWithXIdx>();
+	op[0x2D] = new AND<Absolute>();
+	op[0x3D] = new AND<AbsoluteWithX>();
+	op[0x39] = new AND<AbsoluteWithY>();
+	op[0x21] = new AND<ZpIdxIndirect>();
+	op[0x31] = new AND<ZpIndirectIdxWithY>();
 
 }
 

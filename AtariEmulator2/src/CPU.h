@@ -135,6 +135,7 @@ private:
 	std::vector<OpCode*> op;
 
 	template <class T> friend class ADC;
+	template <class T> friend class AND;
 };
 
 } /* namespace cpu */
