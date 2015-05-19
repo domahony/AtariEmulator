@@ -13,13 +13,68 @@ namespace cpu {
 class CPU;
 
 class Immediate {
-
 protected:
-	unsigned char read(CPU *cpu);
-	int tcount() {
-		return 0;
-	}
+	Immediate() : _tcount(1) { }
 
+	unsigned char read(CPU *cpu);
+	int _tcount;
+
+};
+
+class ZeroPage {
+protected:
+	ZeroPage() : _tcount(2) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
+};
+
+class ZeroPageWithXIdx {
+protected:
+	ZeroPageWithXIdx() : _tcount(3) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
+};
+
+class Absolute {
+protected:
+	Absolute() : _tcount(3) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
+};
+
+class AbsoluteWithX {
+protected:
+	AbsoluteWithX() : _tcount(3) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
+};
+
+class AbsoluteWithY {
+protected:
+	AbsoluteWithY() : _tcount(3) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
+};
+
+class ZpIdxIndirect {
+protected:
+	ZpIdxIndirect() : _tcount(5) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
+};
+
+class ZpIndirectIdxWithY {
+protected:
+	ZpIndirectIdxWithY() : _tcount(4) { }
+
+	unsigned char read(CPU *cpu);
+	int _tcount;
 };
 
 class OpCode {

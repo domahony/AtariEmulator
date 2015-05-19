@@ -36,6 +36,7 @@ Video::Video() {
 	SDL_DisplayMode mode;
 	SDL_GetCurrentDisplayMode(0, &mode);
 
+	refresh_rate = mode.refresh_rate;
 	std::cout << "HZ: " << mode.refresh_rate << std::endl;
 }
 

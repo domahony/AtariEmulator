@@ -67,6 +67,10 @@ public:
 			return static_cast<double>(ticks) / total;
 	}
 
+	long getHZ() const {
+		return hz;
+	}
+
 private:
 	long hz;
 	double control_rate;

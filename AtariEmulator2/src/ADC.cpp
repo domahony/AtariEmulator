@@ -30,10 +30,18 @@ operator()(CPU* cpu) {
 
 		cpu->ACC = val & 0xFF;
 
-		return 2 + this->tcount();
+		//return 1 + this->_tcount;
+		return 1 + this->_tcount;
 }
 
 template class ADC<Immediate>;
+template class ADC<ZeroPage>;
+template class ADC<ZeroPageWithXIdx>;
+template class ADC<Absolute>;
+template class ADC<AbsoluteWithX>;
+template class ADC<AbsoluteWithY>;
+template class ADC<ZpIdxIndirect>;
+template class ADC<ZpIndirectIdxWithY>;
 
 } /* namespace cpu */
 

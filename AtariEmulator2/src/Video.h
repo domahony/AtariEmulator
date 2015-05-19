@@ -24,9 +24,14 @@ public:
 		SDL_GL_SwapWindow(gWindow);
 	}
 
+	int get_refresh_rate() const {
+		return refresh_rate;
+	}
+
 private:
 	SDL_Window* gWindow;
 	SDL_GLContext gContext;
+	int refresh_rate;
 };
 
 } /* namespace video */
