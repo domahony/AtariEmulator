@@ -11,6 +11,7 @@
 #include "Clock.h"
 #include "Clock2.h"
 #include "OpCode.h"
+#include "AddressSpace.h"
 #include <vector>
 
 namespace cpu {
@@ -133,6 +134,8 @@ private:
 	bool N,V,B,D,I,Z,C;
 
 	std::vector<OpCode*> op;
+
+	address::AddressSpace address_space;
 
 	template <class T> friend class ADC;
 	template <class T> friend class AND;

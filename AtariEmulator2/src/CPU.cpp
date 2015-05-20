@@ -83,7 +83,7 @@ execute()
 
 unsigned char CPU::
 read(unsigned short addr) const {
-	return 0;
+	return address_space.read(addr);
 }
 
 unsigned char CPU::
