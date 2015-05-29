@@ -75,6 +75,11 @@ public:
 		return read(addr2);
 	}
 
+	char getRelative()
+	{
+		return static_cast<char>(readPCandInc());
+	}
+
 	unsigned char
 	getZpIdxIndirect()
 	{
@@ -105,6 +110,31 @@ public:
 		return read(addr2);
 	}
 
+	unsigned char
+	getAccumulator()
+	{
+		return ACC;
+	}
+
+	unsigned short
+	getPC() const
+	{
+		return PC;
+	}
+
+	void
+	setPC(unsigned short val)
+	{
+		PC = val;
+	}
+
+	void
+	setAccumulator(unsigned char val)
+	{
+		ACC = val;
+	}
+
+	void write(unsigned short, unsigned char val);
 
 private:
 	int acc;
@@ -122,6 +152,7 @@ private:
 	}
 
 	unsigned char read(unsigned short) const;
+
 	unsigned char BCD(unsigned char);
 
 	int wait;
@@ -139,6 +170,10 @@ private:
 
 	template <class T> friend class ADC;
 	template <class T> friend class AND;
+	template <class T> friend class ASL;
+	friend class BCC;
+	friend class BCS;
+	friend class BEQ;
 };
 
 } /* namespace cpu */

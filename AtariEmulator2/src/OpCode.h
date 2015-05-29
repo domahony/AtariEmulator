@@ -12,45 +12,69 @@ namespace cpu {
 
 class CPU;
 
+class Accumulator {
+protected:
+	Accumulator() : _tcount(0) { }
+	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
+
+private:
+	int _tcount;
+};
+
 class Immediate {
 protected:
 	Immediate() : _tcount(1) { }
 
 	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
 	int _tcount;
 
 };
 
 class ZeroPage {
 protected:
-	ZeroPage() : _tcount(2) { }
-
+	ZeroPage() : _tcount(2), addr(0) { }
 	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
 	int _tcount;
+
+private:
+	unsigned short addr;
 };
 
 class ZeroPageWithXIdx {
 protected:
-	ZeroPageWithXIdx() : _tcount(3) { }
-
+	ZeroPageWithXIdx() : _tcount(3), addr(0) { }
 	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
 	int _tcount;
+
+private:
+	unsigned short addr;
 };
 
 class Absolute {
 protected:
-	Absolute() : _tcount(3) { }
-
+	Absolute() : _tcount(3), addr(0) { }
 	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
 	int _tcount;
+
+private:
+	unsigned short addr;
 };
 
 class AbsoluteWithX {
 protected:
-	AbsoluteWithX() : _tcount(3) { }
-
+	AbsoluteWithX() : _tcount(3), addr(0) { }
 	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
 	int _tcount;
+
+private:
+	unsigned short addr;
+
 };
 
 class AbsoluteWithY {

@@ -8,6 +8,8 @@
 #include "CPU.h"
 #include "ADC.h"
 #include "AND.h"
+#include "ASL.h"
+#include "Branch.h"
 
 namespace cpu {
 
@@ -36,6 +38,15 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x21] = new AND<ZpIdxIndirect>();
 	op[0x31] = new AND<ZpIndirectIdxWithY>();
 
+	op[0x0A] = new ASL<Accumulator>();
+	op[0x06] = new ASL<ZeroPage>();
+	op[0x16] = new ASL<ZeroPageWithXIdx>();
+	op[0x0E] = new ASL<Absolute>();
+	op[0x1E] = new ASL<AbsoluteWithX>();
+
+	op[0x90] = new BCC();
+	op[0xB0] = new BCS();
+	op[0xF0] = new BEQ();
 }
 
 CPU::~CPU() {
@@ -84,6 +95,11 @@ execute()
 unsigned char CPU::
 read(unsigned short addr) const {
 	return address_space.read(addr);
+}
+
+void CPU::
+write(unsigned short addr, unsigned char val) {
+	return address_space.write(addr, val);
 }
 
 unsigned char CPU::
