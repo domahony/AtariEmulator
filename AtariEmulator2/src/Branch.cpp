@@ -73,4 +73,67 @@ operator()(CPU* cpu)
 	return ret;
 }
 
+int BMI::
+operator()(CPU* cpu)
+{
+	char offset = cpu->getRelative();
+	int ret = 2;
+
+	if (cpu->N) {
+		ret++;
+		unsigned short opc = cpu->getPC();
+		unsigned short npc = opc + offset;
+
+		if ((opc >> 8) != (npc >> 8)) {
+			ret++;
+		}
+
+		cpu->setPC(npc);
+	}
+
+	return ret;
+}
+
+int BNE::
+operator()(CPU* cpu)
+{
+	char offset = cpu->getRelative();
+	int ret = 2;
+
+	if (!cpu->Z) {
+		ret++;
+		unsigned short opc = cpu->getPC();
+		unsigned short npc = opc + offset;
+
+		if ((opc >> 8) != (npc >> 8)) {
+			ret++;
+		}
+
+		cpu->setPC(npc);
+	}
+
+	return ret;
+}
+
+int BPL::
+operator()(CPU* cpu)
+{
+	char offset = cpu->getRelative();
+	int ret = 2;
+
+	if (!cpu->N) {
+		ret++;
+		unsigned short opc = cpu->getPC();
+		unsigned short npc = opc + offset;
+
+		if ((opc >> 8) != (npc >> 8)) {
+			ret++;
+		}
+
+		cpu->setPC(npc);
+	}
+
+	return ret;
+}
+
 } /* namespace cpu */

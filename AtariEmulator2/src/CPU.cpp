@@ -9,6 +9,8 @@
 #include "ADC.h"
 #include "AND.h"
 #include "ASL.h"
+#include "BIT.h"
+#include "BRK.h"
 #include "Branch.h"
 
 namespace cpu {
@@ -47,6 +49,15 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x90] = new BCC();
 	op[0xB0] = new BCS();
 	op[0xF0] = new BEQ();
+
+	op[0x24] = new BIT<ZeroPage>();
+	op[0x2C] = new BIT<Absolute>();
+
+	op[0x30] = new BMI();
+	op[0xD0] = new BNE();
+	op[0x10] = new BPL();
+
+	op[0x00] = new BRK();
 }
 
 CPU::~CPU() {
@@ -111,5 +122,40 @@ BCD(unsigned char v)
 	return tens + ones;
 }
 
+void CPU::
+push(unsigned char b) {
+
+	write(0x100 | SP, b);
+	SP -= 1;
+
+}
+
+unsigned char CPU::
+pop() {
+	++SP;
+	return read(0x100 | SP);
+}
+
+unsigned char CPU::
+get_flags() const {
+
+	unsigned char ret = 0;
+
+	if (N) ret |= 1;
+	ret <<=1;
+	if (V) ret |= 1;
+	ret <<=2;
+	if (B) ret |= 1;
+	ret <<=1;
+	if (D) ret |= 1;
+	ret <<=1;
+	if (I) ret |= 1;
+	ret <<=1;
+	if (Z) ret |= 1;
+	ret <<=1;
+	if (C) ret |= 1;
+
+	return ret;
+}
 
 } /* namespace cpu */

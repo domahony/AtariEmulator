@@ -152,6 +152,9 @@ private:
 	}
 
 	unsigned char read(unsigned short) const;
+	unsigned char pop();
+	void push(unsigned char);
+	unsigned char get_flags() const;
 
 	unsigned char BCD(unsigned char);
 
@@ -159,6 +162,7 @@ private:
 	emulator::Clock2 clock;
 
 	unsigned short PC;
+	unsigned short SP;
 	unsigned char ACC;
 	unsigned char X;
 	unsigned char Y;
@@ -174,6 +178,11 @@ private:
 	friend class BCC;
 	friend class BCS;
 	friend class BEQ;
+	template <class T> friend class BIT;
+	friend class BMI;
+	friend class BNE;
+	friend class BPL;
+	friend class BRK;
 };
 
 } /* namespace cpu */

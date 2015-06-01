@@ -33,6 +33,27 @@ public:
 	virtual int operator()(CPU*);
 };
 
+class BMI : public OpCode {
+public:
+	BMI() {};
+	virtual ~BMI() {};
+	virtual int operator()(CPU*);
+};
+
+class BNE : public OpCode {
+public:
+	BNE() {};
+	virtual ~BNE() {};
+	virtual int operator()(CPU*);
+};
+
+class BPL : public OpCode {
+public:
+	BPL() {};
+	virtual ~BPL() {};
+	virtual int operator()(CPU*);
+};
+
 } /* namespace cpu */
 
 #endif /* BCC_H_ */
