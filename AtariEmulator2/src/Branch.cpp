@@ -136,4 +136,46 @@ operator()(CPU* cpu)
 	return ret;
 }
 
+int BVC::
+operator()(CPU* cpu)
+{
+	char offset = cpu->getRelative();
+	int ret = 2;
+
+	if (!cpu->V) {
+		ret++;
+		unsigned short opc = cpu->getPC();
+		unsigned short npc = opc + offset;
+
+		if ((opc >> 8) != (npc >> 8)) {
+			ret++;
+		}
+
+		cpu->setPC(npc);
+	}
+
+	return ret;
+}
+
+int BVS::
+operator()(CPU* cpu)
+{
+	char offset = cpu->getRelative();
+	int ret = 2;
+
+	if (cpu->V) {
+		ret++;
+		unsigned short opc = cpu->getPC();
+		unsigned short npc = opc + offset;
+
+		if ((opc >> 8) != (npc >> 8)) {
+			ret++;
+		}
+
+		cpu->setPC(npc);
+	}
+
+	return ret;
+}
+
 } /* namespace cpu */

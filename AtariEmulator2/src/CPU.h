@@ -183,6 +183,10 @@ private:
 	friend class BNE;
 	friend class BPL;
 	friend class BRK;
+	friend class BVC;
+	friend class BVS;
+	friend class CLC;
+	friend class CLD;
 };
 
 } /* namespace cpu */

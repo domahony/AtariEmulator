@@ -12,6 +12,7 @@
 #include "BIT.h"
 #include "BRK.h"
 #include "Branch.h"
+#include "SetFlags.h"
 
 namespace cpu {
 
@@ -58,6 +59,13 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x10] = new BPL();
 
 	op[0x00] = new BRK();
+
+	op[0x50] = new BVC();
+	op[0x70] = new BVS();
+
+	op[0x18] = new CLC();
+	op[0xD8] = new CLD();
+
 }
 
 CPU::~CPU() {

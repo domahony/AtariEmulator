@@ -54,6 +54,20 @@ public:
 	virtual int operator()(CPU*);
 };
 
+class BVC : public OpCode {
+public:
+	BVC() {};
+	virtual ~BVC() {};
+	virtual int operator()(CPU*);
+};
+
+class BVS : public OpCode {
+public:
+	BVS() {};
+	virtual ~BVS() {};
+	virtual int operator()(CPU*);
+};
+
 } /* namespace cpu */
 
 #endif /* BCC_H_ */
