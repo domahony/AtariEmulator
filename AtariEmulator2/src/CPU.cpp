@@ -13,6 +13,7 @@
 #include "BRK.h"
 #include "Branch.h"
 #include "SetFlags.h"
+#include "CMP.h"
 
 namespace cpu {
 
@@ -65,6 +66,17 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 
 	op[0x18] = new CLC();
 	op[0xD8] = new CLD();
+	op[0x58] = new CLI();
+	op[0xB8] = new CLV();
+
+	op[0xC9] = new CMP<Immediate>();
+	op[0xC5] = new CMP<ZeroPage>();
+	op[0xD5] = new CMP<ZeroPageWithXIdx>();
+	op[0xCD] = new CMP<Absolute>();
+	op[0xDD] = new CMP<AbsoluteWithX>();
+	op[0xD9] = new CMP<AbsoluteWithY>();
+	op[0xC1] = new CMP<ZpIdxIndirect>();
+	op[0xD1] = new CMP<ZpIndirectIdxWithY>();
 
 }
 

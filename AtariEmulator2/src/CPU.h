@@ -187,6 +187,9 @@ private:
 	friend class BVS;
 	friend class CLC;
 	friend class CLD;
+	friend class CLI;
+	friend class CLV;
+	template <class T> friend class CMP;
 };
 
 } /* namespace cpu */

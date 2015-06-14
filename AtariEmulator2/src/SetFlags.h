@@ -26,6 +26,20 @@ public:
 	virtual int operator()(CPU*);
 };
 
+class CLI : public OpCode {
+public:
+	CLI() {};
+	virtual ~CLI() {};
+	virtual int operator()(CPU*);
+};
+
+class CLV : public OpCode {
+public:
+	CLV() {};
+	virtual ~CLV() {};
+	virtual int operator()(CPU*);
+};
+
 } /* namespace cpu */
 
 #endif /* SETFLAGS_H_ */
