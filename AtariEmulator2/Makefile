@@ -82,7 +82,7 @@ subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) COPYING \
-	config.guess config.sub depcomp install-sh missing
+	config.guess config.sub install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -190,17 +190,17 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing aclocal-1.14
+ACLOCAL = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing autoconf
-AUTOHEADER = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing autoheader
-AUTOMAKE = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing automake-1.14
+AUTOCONF = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing autoconf
+AUTOHEADER = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing autoheader
+AUTOMAKE = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing automake-1.14
 AWK = gawk
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -ggdb3
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"AtariEmulator2\" -DPACKAGE_TARNAME=\"atariemulator2\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"AtariEmulator2\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"atariemulator2\" -DVERSION=\"1.0\"
 DEPDIR = .deps
@@ -218,7 +218,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing makeinfo
+MAKEINFO = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = atariemulator2
@@ -229,16 +229,16 @@ PACKAGE_TARNAME = atariemulator2
 PACKAGE_URL = 
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
-SDL_CFLAGS = -I/usr/local/include/SDL2 -D_REENTRANT
-SDL_LDFLAGS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL2 -lpthread
+SDL_CFLAGS = -I/usr/include/SDL2 -D_REENTRANT
+SDL_LDFLAGS = -L/usr/lib/x86_64-linux-gnu -lSDL2
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = 
 VERSION = 1.0
-abs_builddir = /home/domahony/git/AtariEmulator2/AtariEmulator2
-abs_srcdir = /home/domahony/git/AtariEmulator2/AtariEmulator2
-abs_top_builddir = /home/domahony/git/AtariEmulator2/AtariEmulator2
-abs_top_srcdir = /home/domahony/git/AtariEmulator2/AtariEmulator2
+abs_builddir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2
+abs_srcdir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2
+abs_top_builddir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2
+abs_top_srcdir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2
 ac_ct_CXX = g++
 am__include = include
 am__leading_dot = .
@@ -265,7 +265,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/install-sh
+install_sh = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
