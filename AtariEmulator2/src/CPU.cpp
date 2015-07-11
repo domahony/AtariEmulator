@@ -111,6 +111,7 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0xFE] = new INC<AbsoluteWithX>();
 	op[0xE8] = new INX();
 	op[0xC8] = new INY();
+
 }
 
 CPU::~CPU() {
