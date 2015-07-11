@@ -190,6 +190,18 @@ private:
 	friend class CLI;
 	friend class CLV;
 	template <class T> friend class CMP;
+	template <class T> friend class CPX;
+	template <class T> friend class CPY;
+
+	template <class T> friend class DEC;
+	friend class DEX;
+	friend class DEY;
+
+	template <class T> friend class EOR;
+
+	template <class T> friend class INC;
+	friend class INX;
+	friend class INY;
 };
 
 } /* namespace cpu */

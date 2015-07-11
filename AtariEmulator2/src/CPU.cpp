@@ -14,6 +14,9 @@
 #include "Branch.h"
 #include "SetFlags.h"
 #include "CMP.h"
+#include "DEC.h"
+#include "EOR.h"
+#include "INC.h"
 
 namespace cpu {
 
@@ -78,6 +81,36 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0xC1] = new CMP<ZpIdxIndirect>();
 	op[0xD1] = new CMP<ZpIndirectIdxWithY>();
 
+	op[0xE0] = new CPX<Immediate>();
+	op[0xE4] = new CPX<ZeroPage>();
+	op[0xEC] = new CPX<Absolute>();
+
+	op[0xC0] = new CPY<Immediate>();
+	op[0xC4] = new CPY<ZeroPage>();
+	op[0xCC] = new CPY<Absolute>();
+
+	op[0xC6] = new DEC<ZeroPage>();
+	op[0xD6] = new DEC<ZeroPageWithXIdx>();
+	op[0xCE] = new DEC<Absolute>();
+	op[0xDE] = new DEC<AbsoluteWithX>();
+	op[0xCA] = new DEX();
+	op[0x88] = new DEY();
+
+	op[0x49] = new EOR<Immediate>();
+	op[0x45] = new EOR<ZeroPage>();
+	op[0x55] = new EOR<ZeroPageWithXIdx>();
+	op[0x4D] = new EOR<Absolute>();
+	op[0x5D] = new EOR<AbsoluteWithX>();
+	op[0x59] = new EOR<AbsoluteWithY>();
+	op[0x41] = new EOR<ZpIdxIndirect>();
+	op[0x51] = new EOR<ZpIndirectIdxWithY>();
+
+	op[0xE6] = new INC<ZeroPage>();
+	op[0xF6] = new INC<ZeroPageWithXIdx>();
+	op[0xEE] = new INC<Absolute>();
+	op[0xFE] = new INC<AbsoluteWithX>();
+	op[0xE8] = new INX();
+	op[0xC8] = new INY();
 }
 
 CPU::~CPU() {

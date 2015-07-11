@@ -25,6 +25,32 @@ public:
 	virtual int operator()(CPU* cpu);
 };
 
+template <class T>
+class CPX: public OpCode, T {
+public:
+
+	CPX() {
+	}
+
+	virtual ~CPX() {
+	}
+
+	virtual int operator()(CPU* cpu);
+};
+
+template <class T>
+class CPY: public OpCode, T {
+public:
+
+	CPY() {
+	}
+
+	virtual ~CPY() {
+	}
+
+	virtual int operator()(CPU* cpu);
+};
+
 } /* namespace cpu */
 
 #endif /* CMP_H_ */
