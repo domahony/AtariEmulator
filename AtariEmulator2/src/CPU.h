@@ -33,12 +33,18 @@ public:
 		return read(make_short(low, 0));
 	}
 
+	unsigned char getIndirect() {
+		unsigned char low = readPCandInc();
+		unsigned char high = readPCandInc();
+		return read(make_short(low, high));
+	}
+
 	unsigned char zeroPageWithXIdx() {
 		unsigned char zp = readPCandInc();
 		return read(make_short(zp + X, 0));
 	}
 
-	unsigned char absoluteAddress()
+	unsigned short absoluteAddress()
 	{
 		unsigned char low = readPCandInc();
 		unsigned char high = readPCandInc();

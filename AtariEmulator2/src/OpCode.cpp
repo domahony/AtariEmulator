@@ -71,6 +71,12 @@ read(CPU* cpu)
 	return cpu->getZpIndirectIdxWithY(_tcount);
 }
 
+unsigned char Indirect::
+read(CPU* cpu)
+{
+	return cpu->getIndirect();
+}
+
 unsigned char Accumulator::
 read(CPU* cpu)
 {

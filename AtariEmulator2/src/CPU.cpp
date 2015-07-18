@@ -17,6 +17,7 @@
 #include "DEC.h"
 #include "EOR.h"
 #include "INC.h"
+#include "JMP.h"
 
 namespace cpu {
 
@@ -112,6 +113,10 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0xE8] = new INX();
 	op[0xC8] = new INY();
 
+	op[0x4C] = new JMP<Absolute>();
+	op[0x6C] = new JMP<Indirect>();
+
+	op[0x20] = new JSR<Absolute>();
 }
 
 CPU::~CPU() {
