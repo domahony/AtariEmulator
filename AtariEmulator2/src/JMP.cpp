@@ -6,14 +6,15 @@
  */
 
 #include "JMP.h"
+#include "CPU.h"
 
 namespace cpu {
 
 template <class T> int JMP<T>::
 operator()(CPU* cpu)
 {
-	cpu->PC = this->read(cpu);
-	return _tcount;
+	cpu->setPC(this->read(cpu));
+	return this->_tcount;
 }
 
 template <class T> int JSR<T>::
@@ -31,7 +32,11 @@ operator()(CPU* cpu)
 
 
 	cpu->setPC(this->read(cpu));
-	 return _tcount + 3;
+	 return this->_tcount + 3;
 }
+
+template class JMP<Absolute>;
+template class JMP<Indirect>;
+template class JSR<Absolute>;
 
 } /* namespace cpu */

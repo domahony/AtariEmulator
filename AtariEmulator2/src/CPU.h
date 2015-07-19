@@ -34,8 +34,9 @@ public:
 	}
 
 	unsigned char getIndirect() {
-		unsigned char low = readPCandInc();
-		unsigned char high = readPCandInc();
+		unsigned char zp = readPCandInc();
+		unsigned char low = read(make_short(zp, 0));
+		unsigned char high = read(make_short(zp + 1, 0));
 		return read(make_short(low, high));
 	}
 
@@ -208,6 +209,8 @@ private:
 	template <class T> friend class INC;
 	friend class INX;
 	friend class INY;
+	template <class T> friend class JMP;
+	template <class T> friend class JSR;
 };
 
 } /* namespace cpu */

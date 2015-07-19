@@ -26,9 +26,8 @@ class Indirect {
 protected:
 	Indirect() : _tcount(5) { }
 	unsigned char read(CPU *cpu);
-
-private:
 	int _tcount;
+
 };
 
 class Immediate {
@@ -64,7 +63,7 @@ private:
 };
 
 class Absolute {
-private:
+protected:
 	Absolute() : _tcount(3), addr(0) { }
 	unsigned char read(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
