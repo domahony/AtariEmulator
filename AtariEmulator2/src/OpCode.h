@@ -62,6 +62,17 @@ private:
 	unsigned short addr;
 };
 
+class ZeroPageWithYIdx {
+protected:
+	ZeroPageWithYIdx() : _tcount(3), addr(0) { }
+	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
+	int _tcount;
+
+private:
+	unsigned short addr;
+};
+
 class Absolute {
 protected:
 	Absolute() : _tcount(3), addr(0) { }

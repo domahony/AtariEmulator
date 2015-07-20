@@ -18,6 +18,7 @@
 #include "EOR.h"
 #include "INC.h"
 #include "JMP.h"
+#include "LDA.h"
 
 namespace cpu {
 
@@ -117,6 +118,28 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x6C] = new JMP<Indirect>();
 
 	op[0x20] = new JSR<Absolute>();
+
+	op[0xA9] = new LDA<Immediate>();
+	op[0xA5] = new LDA<ZeroPage>();
+	op[0xB5] = new LDA<ZeroPageWithXIdx>();
+	op[0xAD] = new LDA<Absolute>();
+	op[0xBD] = new LDA<AbsoluteWithX>();
+	op[0xB9] = new LDA<AbsoluteWithY>();
+	op[0xA1] = new LDA<ZpIdxIndirect>();
+	op[0xB1] = new LDA<ZpIndirectIdxWithY>();
+
+	op[0xA2] = new LDX<Immediate>();
+	op[0xA6] = new LDX<ZeroPage>();
+	op[0xB6] = new LDX<ZeroPageWithYIdx>();
+	op[0xAE] = new LDX<Absolute>();
+	op[0xBE] = new LDX<AbsoluteWithY>();
+
+	op[0xA0] = new LDY<Immediate>();
+	op[0xA4] = new LDY<ZeroPage>();
+	op[0xB4] = new LDY<ZeroPageWithYIdx>();
+	op[0xAC] = new LDY<Absolute>();
+	op[0xBC] = new LDY<AbsoluteWithY>();
+
 }
 
 CPU::~CPU() {

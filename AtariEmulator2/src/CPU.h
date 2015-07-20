@@ -45,6 +45,11 @@ public:
 		return read(make_short(zp + X, 0));
 	}
 
+	unsigned char zeroPageWithYIdx() {
+		unsigned char zp = readPCandInc();
+		return read(make_short(zp + Y, 0));
+	}
+
 	unsigned short absoluteAddress()
 	{
 		unsigned char low = readPCandInc();
@@ -211,6 +216,9 @@ private:
 	friend class INY;
 	template <class T> friend class JMP;
 	template <class T> friend class JSR;
+	template <class T> friend class LDA;
+	template <class T> friend class LDX;
+	template <class T> friend class LDY;
 };
 
 } /* namespace cpu */

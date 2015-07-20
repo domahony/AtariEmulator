@@ -98,7 +98,7 @@ am_ae_OBJECTS = AtariEmulator2.$(OBJEXT) Video.$(OBJEXT) CPU.$(OBJEXT) \
 	AddressSpace.$(OBJEXT) ROM.$(OBJEXT) RAM.$(OBJEXT) \
 	Pokey.$(OBJEXT) PIA.$(OBJEXT) ASL.$(OBJEXT) Branch.$(OBJEXT) \
 	BIT.$(OBJEXT) BRK.$(OBJEXT) SetFlags.$(OBJEXT) DEC.$(OBJEXT) \
-	EOR.$(OBJEXT) INC.$(OBJEXT) JMP.$(OBJEXT)
+	EOR.$(OBJEXT) INC.$(OBJEXT) JMP.$(OBJEXT) LDA.$(OBJEXT)
 ae_OBJECTS = $(am_ae_OBJECTS)
 am__DEPENDENCIES_1 =
 ae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -261,7 +261,7 @@ top_builddir = ..
 top_srcdir = ..
 AM_CXXFLAGS = -std=c++11 $(SDL_CFLAGS)
 ae_SOURCES = AtariEmulator2.cpp Video.cpp CPU.cc Clock.cpp Clock2.cpp ADC.cpp OpCode.cpp CMP.cpp AND.cpp AddressSpace.cpp \
-ROM.cpp RAM.cpp Pokey.cpp PIA.cpp ASL.cpp Branch.cpp BIT.cpp BRK.cpp SetFlags.cpp DEC.cpp EOR.cpp INC.cpp JMP.cpp
+ROM.cpp RAM.cpp Pokey.cpp PIA.cpp ASL.cpp Branch.cpp BIT.cpp BRK.cpp SetFlags.cpp DEC.cpp EOR.cpp INC.cpp JMP.cpp LDA.cpp
 
 ae_LDFLAGS = $(SDL_LDFLAGS) $(GL_LDFLAGS)
 ae_LDADD = $(SDL_LDFLAGS) $(GL_LDFLAGS)
@@ -368,6 +368,7 @@ include ./$(DEPDIR)/DEC.Po
 include ./$(DEPDIR)/EOR.Po
 include ./$(DEPDIR)/INC.Po
 include ./$(DEPDIR)/JMP.Po
+include ./$(DEPDIR)/LDA.Po
 include ./$(DEPDIR)/OpCode.Po
 include ./$(DEPDIR)/PIA.Po
 include ./$(DEPDIR)/Pokey.Po

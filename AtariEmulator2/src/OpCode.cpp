@@ -35,6 +35,16 @@ write(CPU* cpu, unsigned char val) {
 	return cpu->write(addr, val);
 }
 
+unsigned char ZeroPageWithYIdx::
+read(CPU* cpu) {
+	return cpu->zeroPageWithYIdx();
+}
+
+void ZeroPageWithYIdx::
+write(CPU* cpu, unsigned char val) {
+	return cpu->write(addr, val);
+}
+
 unsigned char Absolute::
 read(CPU* cpu) {
 	return cpu->absoluteAddress();
