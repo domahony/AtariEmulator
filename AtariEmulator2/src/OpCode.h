@@ -18,7 +18,6 @@ protected:
 	unsigned char read(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
 
-private:
 	int _tcount;
 };
 

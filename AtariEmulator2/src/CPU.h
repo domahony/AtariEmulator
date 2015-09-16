@@ -219,6 +219,8 @@ private:
 	template <class T> friend class LDA;
 	template <class T> friend class LDX;
 	template <class T> friend class LDY;
+	template <class T> friend class LSR;
+	template <class T> friend class ORA;
 };
 
 } /* namespace cpu */

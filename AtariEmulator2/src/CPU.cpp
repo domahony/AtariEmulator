@@ -19,6 +19,9 @@
 #include "INC.h"
 #include "JMP.h"
 #include "LDA.h"
+#include "Shift.h"
+#include "NOP.h"
+#include "ORA.h"
 
 namespace cpu {
 
@@ -140,6 +143,24 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0xAC] = new LDY<Absolute>();
 	op[0xBC] = new LDY<AbsoluteWithY>();
 
+	op[0x4A] = new LSR<Accumulator>();
+	op[0x46] = new LSR<ZeroPage>();
+	op[0x56] = new LSR<ZeroPageWithXIdx>();
+	op[0x4E] = new LSR<Absolute>();
+	op[0x5E] = new LSR<AbsoluteWithX>();
+
+	op[0xEA] = new NOP();
+
+	op[0x09] = new ORA<Immediate>();
+	op[0x05] = new ORA<ZeroPage>();
+	op[0x15] = new ORA<ZeroPageWithXIdx>();
+	op[0x0D] = new ORA<Absolute>();
+	op[0x1D] = new ORA<AbsoluteWithX>();
+	op[0x19] = new ORA<AbsoluteWithY>();
+	op[0x01] = new ORA<ZpIdxIndirect>();
+	op[0x11] = new ORA<ZpIndirectIdxWithY>();
+
+	//next PHA
 }
 
 CPU::~CPU() {
