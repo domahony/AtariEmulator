@@ -167,6 +167,7 @@ private:
 	unsigned char pop();
 	void push(unsigned char);
 	unsigned char get_flags() const;
+	void set_flags(unsigned char);
 
 	unsigned char BCD(unsigned char);
 
@@ -221,6 +222,12 @@ private:
 	template <class T> friend class LDY;
 	template <class T> friend class LSR;
 	template <class T> friend class ORA;
+	friend class PHA;
+	friend class PHP;
+	friend class PLA;
+	friend class PLP;
+	template <class T> friend class ROL;
+	template <class T> friend class ROR;
 };
 
 } /* namespace cpu */

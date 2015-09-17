@@ -33,4 +33,27 @@ template class LSR<ZeroPageWithXIdx>;
 template class LSR<Absolute>;
 template class LSR<AbsoluteWithX>;
 
+template <class T> int ROL<T>::
+operator()(CPU* cpu)
+{
+	fill in this method
+}
+
+template class ROL<Accumulator>;
+template class ROL<ZeroPage>;
+template class ROL<ZeroPageWithXIdx>;
+template class ROL<Absolute>;
+template class ROL<AbsoluteWithX>;
+
+template <class T> int ROR<T>::
+operator()(CPU* cpu)
+{
+	fill in this method
+}
+
+template class ROR<Accumulator>;
+template class ROR<ZeroPage>;
+template class ROR<ZeroPageWithXIdx>;
+template class ROR<Absolute>;
+template class ROR<AbsoluteWithX>;
 } /* namespace cpu */

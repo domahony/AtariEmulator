@@ -25,6 +25,32 @@ public:
 	virtual int operator()(CPU* cpu);
 };
 
+template <class T>
+class ROL : public OpCode, T {
+public:
+	ROL() {
+		// TODO Auto-generated constructor stub
+
+	}
+	virtual ~ROL() {
+		// TODO Auto-generated destructor stub
+	}
+	virtual int operator()(CPU* cpu);
+};
+
+template <class T>
+class ROR : public OpCode, T {
+public:
+	ROR() {
+		// TODO Auto-generated constructor stub
+
+	}
+	virtual ~ROR() {
+		// TODO Auto-generated destructor stub
+	}
+	virtual int operator()(CPU* cpu);
+};
+
 } /* namespace cpu */
 
 #endif /* SHIFT_H_ */

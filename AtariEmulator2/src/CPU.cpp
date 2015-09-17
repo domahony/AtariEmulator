@@ -22,6 +22,7 @@
 #include "Shift.h"
 #include "NOP.h"
 #include "ORA.h"
+#include "PHA.h"
 
 namespace cpu {
 
@@ -160,7 +161,22 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x01] = new ORA<ZpIdxIndirect>();
 	op[0x11] = new ORA<ZpIndirectIdxWithY>();
 
-	//next PHA
+	op[0x48] = new PHA();
+	op[0x08] = new PHP();
+	op[0x68] = new PLA();
+	op[0x28] = new PLP();
+
+	op[0x2A] = new ROL<Accumulator>();
+	op[0x26] = new ROL<ZeroPage>();
+	op[0x36] = new ROL<ZeroPageWithXIdx>();
+	op[0x2E] = new ROL<Absolute>();
+	op[0x3E] = new ROL<AbsoluteWithX>();
+
+	op[0x6A] = new ROR<Accumulator>();
+	op[0x66] = new ROR<ZeroPage>();
+	op[0x76] = new ROR<ZeroPageWithXIdx>();
+	op[0x6E] = new ROR<Absolute>();
+	op[0x7E] = new ROR<AbsoluteWithX>();
 }
 
 CPU::~CPU() {
@@ -259,6 +275,21 @@ get_flags() const {
 	if (C) ret |= 1;
 
 	return ret;
+}
+
+void CPU::
+set_flags(unsigned char flags) {
+
+	unsigned char ret = 0;
+
+	N = (flags >> 7) & 0x1;
+	V = (flags >> 5) & 0x1;
+	B = (flags >> 4) & 0x1;
+	D = (flags >> 3) & 0x1;
+	I = (flags >> 2) & 0x1;
+	Z = (flags >> 1) & 0x1;
+	C = (flags) & 0x1;
+
 }
 
 } /* namespace cpu */
