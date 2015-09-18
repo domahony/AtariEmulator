@@ -23,6 +23,9 @@
 #include "NOP.h"
 #include "ORA.h"
 #include "PHA.h"
+#include "RTI.h"
+#include "RTS.h"
+#include "SBC.h"
 
 namespace cpu {
 
@@ -36,7 +39,7 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x69] = new ADC<Immediate>();
 	op[0x65] = new ADC<ZeroPage>();
 	op[0x75] = new ADC<ZeroPageWithXIdx>();
-	op[0x62] = new ADC<Absolute>();
+	op[0x6D] = new ADC<Absolute>();
 	op[0x7D] = new ADC<AbsoluteWithX>();
 	op[0x79] = new ADC<AbsoluteWithY>();
 	op[0x61] = new ADC<ZpIdxIndirect>();
@@ -177,6 +180,18 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x76] = new ROR<ZeroPageWithXIdx>();
 	op[0x6E] = new ROR<Absolute>();
 	op[0x7E] = new ROR<AbsoluteWithX>();
+
+	op[0x40] = new RTI();
+	op[0x60] = new RTS();
+
+	op[0xE9] = new SBC<Immediate>();
+	op[0xE5] = new SBC<ZeroPage>();
+	op[0x75] = new SBC<ZeroPageWithXIdx>();
+	op[0xED] = new SBC<Absolute>();
+	op[0xFD] = new SBC<AbsoluteWithX>();
+	op[0xF9] = new SBC<AbsoluteWithY>();
+	op[0xE1] = new SBC<ZpIdxIndirect>();
+	op[0xF1] = new SBC<ZpIndirectIdxWithY>();
 }
 
 CPU::~CPU() {

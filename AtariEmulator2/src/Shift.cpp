@@ -36,7 +36,17 @@ template class LSR<AbsoluteWithX>;
 template <class T> int ROL<T>::
 operator()(CPU* cpu)
 {
-	fill in this method
+	unsigned char B = this->read(cpu);
+	bool t = B >> 7;
+	B = (B << 1) & 0xFE;
+	B |= cpu->C;
+	cpu->C = t;
+	cpu->Z = (B == 0);
+	cpu->N = B >> 7;
+
+	this->write(cpu, B);
+
+	return this->_tcount + 3;
 }
 
 template class ROL<Accumulator>;
@@ -48,7 +58,17 @@ template class ROL<AbsoluteWithX>;
 template <class T> int ROR<T>::
 operator()(CPU* cpu)
 {
-	fill in this method
+	unsigned char B = this->read(cpu);
+	bool t = B & 0x1;
+	B = (B >> 1) & 0x7F;
+	B = B | ((cpu->C) ? 0x80 : 0x0);
+	cpu->C = t;
+	cpu->Z = (B == 0);
+	cpu->N = B >> 7;
+
+	this->write(cpu, B);
+
+	return this->_tcount + 3;
 }
 
 template class ROR<Accumulator>;

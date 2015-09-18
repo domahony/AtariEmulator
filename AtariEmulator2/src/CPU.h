@@ -228,6 +228,9 @@ private:
 	friend class PLP;
 	template <class T> friend class ROL;
 	template <class T> friend class ROR;
+	friend class RTI;
+	friend class RTS;
+	template <class T> friend class SBC;
 };
 
 } /* namespace cpu */
