@@ -45,6 +45,11 @@ public:
 		return read(make_short(zp + X, 0));
 	}
 
+	void zeroPageWithXIdx(unsigned char val) {
+		unsigned char zp = readPCandInc();
+		return write(make_short(zp + X, 0), val);
+	}
+
 	unsigned char zeroPageWithYIdx() {
 		unsigned char zp = readPCandInc();
 		return read(make_short(zp + Y, 0));
@@ -87,6 +92,21 @@ public:
 		return read(addr2);
 	}
 
+	void absoluteAddressY(int& _tcount, unsigned char val)
+	{
+		unsigned char low = readPCandInc();
+		unsigned char high = readPCandInc();
+
+		unsigned short addr1 = make_short(low, high);
+		unsigned short addr2 = addr1 + Y;
+
+		if ((addr1 >> 8) != (addr2 >> 8)) {
+			_tcount += 1;
+		}
+
+		write(addr2, val);
+	}
+
 	char getRelative()
 	{
 		return static_cast<char>(readPCandInc());
@@ -102,6 +122,18 @@ public:
 		unsigned char high = read(zp + 1);
 
 		return read(make_short(low, high));
+	}
+
+	void
+	setZpIdxIndirect(unsigned char val)
+	{
+		unsigned char zp = readPCandInc();
+		zp += static_cast<char>(X);
+
+		unsigned char low = read(zp);
+		unsigned char high = read(zp + 1);
+
+		return write(make_short(low, high), val);
 	}
 
 	unsigned char
@@ -120,6 +152,24 @@ public:
 		}
 
 		return read(addr2);
+	}
+
+	void
+	setZpIndirectIdxWithY(int& _tcount, unsigned char val)
+	{
+		unsigned char zp = readPCandInc();
+
+		unsigned char low = read(zp);
+		unsigned char high = read(zp + 1);
+
+		unsigned short addr1 = make_short(low, high);
+		unsigned short addr2 = addr1 + static_cast<char>(Y);
+
+		if ((addr1 >> 8) != (addr2 >> 8)) {
+			_tcount += 1;
+		}
+
+		return write(addr2, val);
 	}
 
 	unsigned char
@@ -231,6 +281,13 @@ private:
 	friend class RTI;
 	friend class RTS;
 	template <class T> friend class SBC;
+	friend class SEC;
+	friend class SED;
+	friend class SEI;
+
+	template <class T> friend class STA;
+	template <class T> friend class STX;
+	template <class T> friend class STY;
 };
 
 } /* namespace cpu */

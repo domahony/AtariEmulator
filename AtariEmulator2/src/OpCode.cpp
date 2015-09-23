@@ -32,7 +32,7 @@ read(CPU* cpu) {
 
 void ZeroPageWithXIdx::
 write(CPU* cpu, unsigned char val) {
-	return cpu->write(addr, val);
+	cpu->zeroPageWithXIdx(val);
 }
 
 unsigned char ZeroPageWithYIdx::
@@ -70,15 +70,31 @@ read(CPU* cpu) {
 	return cpu->absoluteAddressY(_tcount);
 }
 
+void AbsoluteWithY::
+write(CPU* cpu, unsigned char val) {
+	return cpu->absoluteAddressY(_tcount, val);
+}
+
 unsigned char ZpIdxIndirect::
 read(CPU* cpu) {
 	return cpu->getZpIdxIndirect();
+}
+
+void ZpIdxIndirect::
+write(CPU* cpu, unsigned char val) {
+	 cpu->setZpIdxIndirect(val);
 }
 
 unsigned char ZpIndirectIdxWithY::
 read(CPU* cpu)
 {
 	return cpu->getZpIndirectIdxWithY(_tcount);
+}
+
+void ZpIndirectIdxWithY::
+write(CPU* cpu, unsigned char val)
+{
+	cpu->setZpIndirectIdxWithY(_tcount, val);
 }
 
 unsigned char Indirect::

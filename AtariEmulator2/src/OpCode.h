@@ -100,6 +100,7 @@ protected:
 	AbsoluteWithY() : _tcount(3) { }
 
 	unsigned char read(CPU *cpu);
+	void write(CPU* cpu, unsigned char val);
 	int _tcount;
 };
 
@@ -108,6 +109,7 @@ protected:
 	ZpIdxIndirect() : _tcount(5) { }
 
 	unsigned char read(CPU *cpu);
+	void write(CPU *cpu, unsigned char);
 	int _tcount;
 };
 
@@ -116,6 +118,7 @@ protected:
 	ZpIndirectIdxWithY() : _tcount(4) { }
 
 	unsigned char read(CPU *cpu);
+	void write(CPU *cpu, unsigned char);
 	int _tcount;
 };
 

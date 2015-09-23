@@ -38,4 +38,25 @@ operator()(CPU* cpu)
 	return 2;
 }
 
+int SEC::
+operator()(CPU* cpu)
+{
+	cpu->C = true;
+	return 2;
+}
+
+int SED::
+operator()(CPU* cpu)
+{
+	cpu->D = true;
+	return 2;
+}
+
+int SEI::
+operator()(CPU* cpu)
+{
+	cpu->I = true;
+	return 2;
+}
+
 } /* namespace cpu */

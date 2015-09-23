@@ -40,6 +40,27 @@ public:
 	virtual int operator()(CPU*);
 };
 
+class SEC : public OpCode {
+public:
+	SEC() {};
+	virtual ~SEC() {};
+	virtual int operator()(CPU*);
+};
+
+class SED : public OpCode {
+public:
+	SED() {};
+	virtual ~SED() {};
+	virtual int operator()(CPU*);
+};
+
+class SEI : public OpCode {
+public:
+	SEI() {};
+	virtual ~SEI() {};
+	virtual int operator()(CPU*);
+};
+
 } /* namespace cpu */
 
 #endif /* SETFLAGS_H_ */

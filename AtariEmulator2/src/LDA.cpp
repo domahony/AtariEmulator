@@ -70,7 +70,7 @@ template class LDX<AbsoluteWithY>;
 
 template class LDY<Immediate>;
 template class LDY<ZeroPage>;
-template class LDY<ZeroPageWithYIdx>;
+template class LDY<ZeroPageWithXIdx>;
 template class LDY<Absolute>;
 template class LDY<AbsoluteWithY>;
 

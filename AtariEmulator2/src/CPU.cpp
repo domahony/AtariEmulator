@@ -26,6 +26,7 @@
 #include "RTI.h"
 #include "RTS.h"
 #include "SBC.h"
+#include "STA.h"
 
 namespace cpu {
 
@@ -143,7 +144,7 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 
 	op[0xA0] = new LDY<Immediate>();
 	op[0xA4] = new LDY<ZeroPage>();
-	op[0xB4] = new LDY<ZeroPageWithYIdx>();
+	op[0xB4] = new LDY<ZeroPageWithXIdx>();
 	op[0xAC] = new LDY<Absolute>();
 	op[0xBC] = new LDY<AbsoluteWithY>();
 
@@ -192,6 +193,27 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0xF9] = new SBC<AbsoluteWithY>();
 	op[0xE1] = new SBC<ZpIdxIndirect>();
 	op[0xF1] = new SBC<ZpIndirectIdxWithY>();
+
+	op[0x38] = new SEC();
+	op[0xF8] = new SED();
+	op[0x78] = new SEI();
+
+	op[0x85] = new STA<ZeroPage>();
+	op[0x95] = new STA<ZeroPageWithXIdx>();
+	op[0x8D] = new STA<Absolute>();
+	op[0x9D] = new STA<AbsoluteWithX>();
+	op[0x99] = new STA<AbsoluteWithY>();
+	op[0x81] = new STA<ZpIdxIndirect>();
+	op[0x91] = new STA<ZpIndirectIdxWithY>();
+
+	op[0x86] = new STX<ZeroPage>();
+	op[0x96] = new STX<ZeroPageWithYIdx>();
+	op[0x8E] = new STX<Absolute>();
+
+	op[0x84] = new STY<ZeroPage>();
+	op[0x94] = new STY<ZeroPageWithXIdx>();
+	op[0x8C] = new STY<Absolute>();
+
 }
 
 CPU::~CPU() {
