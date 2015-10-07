@@ -27,6 +27,7 @@
 #include "RTS.h"
 #include "SBC.h"
 #include "STA.h"
+#include "Transfer.h"
 
 namespace cpu {
 
@@ -213,6 +214,13 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x84] = new STY<ZeroPage>();
 	op[0x94] = new STY<ZeroPageWithXIdx>();
 	op[0x8C] = new STY<Absolute>();
+
+	op[0xAA] = new TAX();
+	op[0xA8] = new TAY();
+	op[0x8A] = new TXA();
+	op[0xBA] = new TSX();
+	op[0x9A] = new TXS();
+	op[0x98] = new TYA();
 
 }
 

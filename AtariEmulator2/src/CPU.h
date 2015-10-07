@@ -288,6 +288,13 @@ private:
 	template <class T> friend class STA;
 	template <class T> friend class STX;
 	template <class T> friend class STY;
+
+	friend class TAX;
+	friend class TAY;
+	friend class TSX;
+	friend class TXA;
+	friend class TXS;
+	friend class TYA;
 };
 
 } /* namespace cpu */
