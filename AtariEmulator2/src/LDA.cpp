@@ -32,7 +32,7 @@ operator()(CPU* cpu) {
 
 /*
 */
-
+	zzz verify this operation with immediate addressing...
 	cpu->X = this->read(cpu);
 	cpu->N = (cpu->X >> 7);
 	cpu->Z = (cpu->X == 0);
