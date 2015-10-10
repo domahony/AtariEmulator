@@ -28,11 +28,6 @@ public:
 		return read(PC++);
 	}
 
-	unsigned char zeroPage() {
-		unsigned char low = readPCandInc();
-		return read(make_short(low, 0));
-	}
-
 	unsigned char getIndirect() {
 		unsigned char zp = readPCandInc();
 		unsigned char low = read(make_short(zp, 0));
@@ -197,6 +192,7 @@ public:
 	}
 
 	void write(unsigned short, unsigned char val);
+	unsigned char read(unsigned short) const;
 
 private:
 	int acc;
@@ -213,7 +209,6 @@ private:
 		return ret;
 	}
 
-	unsigned char read(unsigned short) const;
 	unsigned char pop();
 	void push(unsigned char);
 	unsigned char get_flags() const;

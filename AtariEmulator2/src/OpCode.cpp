@@ -17,12 +17,13 @@ read(CPU *cpu) {
 
 unsigned char ZeroPage::
 read(CPU* cpu) {
-	return cpu->zeroPage();
+	addr = cpu->readPCandInc();
+	return cpu->read(addr);
 }
 
 void ZeroPage::
 write(CPU* cpu, unsigned char val) {
-	return cpu->write(addr, val);
+	return cpu->write(cpu->readPCandInc(), val);
 }
 
 unsigned char ZeroPageWithXIdx::

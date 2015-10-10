@@ -231,7 +231,7 @@ int CPU::
 _execute()
 {
 	unsigned char opcode = read(PC++);
-	return (*op[0x69])(this);
+	return (*op[opcode])(this);
 }
 
 double CPU::
