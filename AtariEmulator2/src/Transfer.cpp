@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "Transfer.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -25,6 +26,12 @@ operator()(CPU* cpu)
 	  return 2;
 }
 
+std::string TAX::
+mnemonic()
+{
+	return "TAX";
+}
+
 int TAY::
 operator()(CPU* cpu)
 {
@@ -32,6 +39,12 @@ operator()(CPU* cpu)
 	cpu->N = (cpu->Y >> 7) & 0x1;
 	cpu->Z = (cpu->Y == 0);
 	return 2;
+}
+
+std::string TAY::
+mnemonic()
+{
+	return "TAY";
 }
 
 int TSX::
@@ -49,6 +62,12 @@ operator()(CPU* cpu)
 	return 2;
 }
 
+std::string TSX::
+mnemonic()
+{
+	return "TSX";
+}
+
 int TXA::
 operator()(CPU* cpu)
 {
@@ -64,6 +83,12 @@ Logic:
 	return 2;
 }
 
+std::string TXA::
+mnemonic()
+{
+	return "TXA";
+}
+
 int TXS::
 operator()(CPU* cpu)
 {
@@ -73,6 +98,15 @@ Logic:
 	*/
 	cpu->SP = cpu->X;
 	return 2;
+}
+
+std::string TXS::
+mnemonic()
+{
+	std::stringstream ret;
+	ret << "TXS";
+
+	return ret.str();
 }
 
 int TYA::
@@ -88,6 +122,16 @@ Logic:
 	cpu->N = (cpu->ACC >> 7) & 0x1;
 	cpu->Z = (cpu->ACC == 0);
 	return 2;
+}
+
+
+std::string TYA::
+mnemonic()
+{
+	std::stringstream ret;
+	ret << "TYA";
+
+	return ret.str();
 }
 
 }

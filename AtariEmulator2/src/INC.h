@@ -18,6 +18,7 @@ public:
 	INC() {};
 	virtual ~INC() {};
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic();
 };
 
 class INX: public OpCode {
@@ -25,6 +26,9 @@ public:
 	INX() {};
 	virtual ~INX() {};
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic() {
+		return "INX";
+	}
 };
 
 class INY: public OpCode {
@@ -32,6 +36,9 @@ public:
 	INY() {};
 	virtual ~INY() {};
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic() {
+		return "INY";
+	}
 };
 
 } /* namespace cpu */

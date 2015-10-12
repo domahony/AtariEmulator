@@ -18,6 +18,7 @@ public:
 	DEC() {};
 	virtual ~DEC() {};
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic();
 };
 
 class DEX: public OpCode {
@@ -25,6 +26,9 @@ public:
 	DEX() {};
 	virtual ~DEX() {};
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic() {
+		return "DEX";
+	}
 };
 
 class DEY: public OpCode {
@@ -32,6 +36,9 @@ public:
 	DEY() {};
 	virtual ~DEY() {};
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic() {
+		return "DEY";
+	}
 };
 
 } /* namespace cpu */

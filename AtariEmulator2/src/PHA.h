@@ -20,6 +20,9 @@ public:
 
 	}
 	virtual int operator() (CPU*);
+	std::string mnemonic() {
+		return "PHA";
+	}
 };
 
 class PHP: public OpCode {
@@ -30,6 +33,9 @@ public:
 
 	}
 	virtual int operator() (CPU*);
+	std::string mnemonic() {
+		return "PHP";
+	}
 };
 
 class PLA: public OpCode {
@@ -40,6 +46,9 @@ public:
 
 	}
 	virtual int operator() (CPU*);
+	std::string mnemonic() {
+		return "PLA";
+	}
 };
 
 class PLP: public OpCode {
@@ -50,6 +59,9 @@ public:
 
 	}
 	virtual int operator() (CPU*);
+	std::string mnemonic() {
+		return "PLP";
+	}
 };
 
 } /* namespace cpu */

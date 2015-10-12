@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "STA.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -17,6 +18,14 @@ operator()(CPU *cpu)
 	return this->_tcount;
 }
 
+template <class T> std::string STA<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "STA " << this->address_mode;
+	return ret.str();
+}
+
 template <class T> int STX<T>::
 operator()(CPU *cpu)
 {
@@ -24,11 +33,27 @@ operator()(CPU *cpu)
 	return this->_tcount;
 }
 
+template <class T> std::string STX<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "STX " << this->address_mode;
+	return ret.str();
+}
+
 template <class T> int STY<T>::
 operator()(CPU *cpu)
 {
 	this->write(cpu, cpu->Y);
 	return this->_tcount;
+}
+
+template <class T> std::string STY<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "STY " << this->address_mode;
+	return ret.str();
 }
 
 template class STA<ZeroPage>;

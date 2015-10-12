@@ -22,6 +22,10 @@ public:
 		// TODO Auto-generated destructor stub
 	}
 	virtual int operator() (CPU*);
+
+	std::string mnemonic() {
+		return "RTI";
+	}
 };
 
 } /* namespace cpu */

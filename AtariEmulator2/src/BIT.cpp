@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "BIT.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -21,6 +22,15 @@ operator()(CPU* cpu) {
 
 	return 1;
 }
+
+template <class T> std::string BIT<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "BIT " << this->address_mode;
+	return ret.str();
+}
+
 
 template class BIT<ZeroPage>;
 template class BIT<Absolute>;

@@ -19,6 +19,7 @@ public:
 	virtual ~LDA() { }
 	int operator() (CPU*);
 
+	std::string mnemonic();
 };
 
 template <class T>
@@ -28,6 +29,7 @@ public:
 	virtual ~LDX() { }
 	int operator() (CPU*);
 
+	std::string mnemonic();
 };
 
 template <class T>
@@ -37,6 +39,7 @@ public:
 	virtual ~LDY() { }
 	int operator() (CPU*);
 
+	std::string mnemonic();
 };
 
 } /* namespace cpu */

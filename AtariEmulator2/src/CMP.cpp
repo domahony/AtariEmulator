@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "CMP.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -30,6 +31,14 @@ operator()(CPU* cpu) {
 	return 1 + this->_tcount;
 }
 
+template <class T> std::string CMP<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "CMP " << this->address_mode;
+	return ret.str();
+}
+
 template <class T> int CPX<T>::
 operator()(CPU* cpu) {
 
@@ -50,6 +59,13 @@ operator()(CPU* cpu) {
 	return 1 + this->_tcount;
 }
 
+template <class T> std::string CPX<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "CPX " << this->address_mode;
+}
+
 template <class T> int CPY<T>::
 operator()(CPU* cpu) {
 
@@ -68,6 +84,13 @@ operator()(CPU* cpu) {
 	cpu->Z = (t == 0);
 
 	return 1 + this->_tcount;
+}
+
+template <class T> std::string CPY<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "CPY " << this->address_mode;
 }
 
 template class CMP<Immediate>;

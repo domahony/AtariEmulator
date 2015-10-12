@@ -17,6 +17,7 @@ class STA: public OpCode, T {
 public:
 	STA() { }
 	virtual ~STA() { }
+	std::string mnemonic();
 
 	int operator() (CPU*);
 };
@@ -26,6 +27,7 @@ class STX: public OpCode, T {
 public:
 	STX() { }
 	virtual ~STX() { }
+	std::string mnemonic();
 
 	int operator() (CPU*);
 };
@@ -35,6 +37,7 @@ class STY: public OpCode, T {
 public:
 	STY() { }
 	virtual ~STY() { }
+	std::string mnemonic();
 
 	int operator() (CPU*);
 };

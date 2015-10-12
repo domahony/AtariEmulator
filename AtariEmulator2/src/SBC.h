@@ -23,6 +23,8 @@ public:
 		// TODO Auto-generated destructor stub
 	}
 	virtual int operator() (CPU*);
+
+	std::string mnemonic();
 };
 
 } /* namespace cpu */

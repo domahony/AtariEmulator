@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "SBC.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -31,6 +32,14 @@ operator() (CPU* cpu)
 	cpu->ACC = t & 0xFF;
 
 	return this->_tcount + 1;
+}
+
+template <class T> std::string SBC<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "SBC " << this->address_mode;
+	return ret.str();
 }
 
 template class SBC<Immediate>;

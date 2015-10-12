@@ -10,6 +10,11 @@
 
 namespace cpu {
 
+std::string OpCode::
+to_string(CPU *cpu) {
+	return mnemonic();
+}
+
 unsigned char Immediate::
 read(CPU *cpu) {
 	return cpu->readPCandInc();
@@ -48,7 +53,8 @@ write(CPU* cpu, unsigned char val) {
 
 unsigned char Absolute::
 read(CPU* cpu) {
-	return cpu->absoluteAddress();
+	addr = cpu->absoluteAddress();
+	return cpu->read(addr);
 }
 
 void Absolute::

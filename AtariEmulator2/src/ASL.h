@@ -24,6 +24,7 @@ public:
 	}
 
 	virtual int operator()(CPU*);
+	std::string mnemonic();
 };
 
 } /* namespace cpu */

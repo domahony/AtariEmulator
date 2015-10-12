@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "Shift.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -25,6 +26,14 @@ operator()(CPU* cpu)
 	this->write(cpu, B);
 
 	return 2 + this->_tcount;
+}
+
+template <class T> std::string LSR<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "LSR " << this->address_mode;
+	return ret.str();
 }
 
 template class LSR<Accumulator>;
@@ -49,6 +58,14 @@ operator()(CPU* cpu)
 	return this->_tcount + 3;
 }
 
+template <class T> std::string ROL<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "ROL " << this->address_mode;
+	return ret.str();
+}
+
 template class ROL<Accumulator>;
 template class ROL<ZeroPage>;
 template class ROL<ZeroPageWithXIdx>;
@@ -69,6 +86,14 @@ operator()(CPU* cpu)
 	this->write(cpu, B);
 
 	return this->_tcount + 3;
+}
+
+template <class T> std::string ROR<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "ROR " << this->address_mode;
+	return ret.str();
 }
 
 template class ROR<Accumulator>;

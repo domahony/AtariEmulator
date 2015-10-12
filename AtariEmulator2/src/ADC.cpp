@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "ADC.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -32,6 +33,14 @@ operator()(CPU* cpu) {
 
 		//return 1 + this->_tcount;
 		return 1 + this->_tcount;
+}
+
+template <class T> std::string ADC<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "ADC " << this->address_mode;
+	return ret.str();
 }
 
 template class ADC<Immediate>;

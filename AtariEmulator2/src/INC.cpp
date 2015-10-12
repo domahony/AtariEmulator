@@ -7,6 +7,7 @@
 
 #include "INC.h"
 #include "CPU.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -26,6 +27,14 @@ operator()(CPU* cpu) {
 	this->write(cpu, M);
 
 	return 3 + this->_tcount;
+}
+
+template <class T> std::string INC<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "INC " << this->address_mode;
+	return ret.str();
 }
 
 int INX::

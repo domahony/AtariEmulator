@@ -54,7 +54,10 @@ public:
 	{
 		unsigned char low = readPCandInc();
 		unsigned char high = readPCandInc();
-		return read(make_short(low, high));
+
+		return make_short(low, high);
+		//should this read here? or just return the 16 bit address
+		//return read(make_short(low, high));
 	}
 
 	unsigned char absoluteAddressX(int& _tcount)
@@ -261,7 +264,7 @@ private:
 	friend class INX;
 	friend class INY;
 	template <class T> friend class JMP;
-	template <class T> friend class JSR;
+	friend class JSR;
 	template <class T> friend class LDA;
 	template <class T> friend class LDX;
 	template <class T> friend class LDY;

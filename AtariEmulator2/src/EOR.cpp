@@ -7,6 +7,7 @@
 
 #include "EOR.h"
 #include "CPU.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -24,6 +25,14 @@ operator()(CPU* cpu) {
 	cpu->Z = cpu->ACC == 0;
 
 	return 1 + this->_tcount;
+}
+
+template <class T> std::string EOR<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "EOR " << this->address_mode;
+	return ret.str();
 }
 
 template class EOR<Immediate>;

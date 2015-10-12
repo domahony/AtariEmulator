@@ -23,6 +23,7 @@ public:
 		// TODO Auto-generated destructor stub
 	}
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic();
 };
 
 template <class T>
@@ -36,6 +37,7 @@ public:
 		// TODO Auto-generated destructor stub
 	}
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic();
 };
 
 template <class T>
@@ -49,6 +51,7 @@ public:
 		// TODO Auto-generated destructor stub
 	}
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic();
 };
 
 } /* namespace cpu */

@@ -18,14 +18,17 @@ public:
 	JMP() { }
 	virtual ~JMP() { }
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic();
 };
 
-template <class T>
-class JSR: public OpCode, T {
+class JSR: public OpCode {
 public:
 	JSR() { }
 	virtual ~JSR() { }
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic() {
+		return "JSR";
+	}
 };
 
 } /* namespace cpu */

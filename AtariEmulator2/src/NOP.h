@@ -22,6 +22,9 @@ public:
 	}
 
 	virtual int operator()(CPU* cpu);
+	std::string mnemonic() {
+		return "NOP";
+	}
 };/* namespace cpu */
 }
 

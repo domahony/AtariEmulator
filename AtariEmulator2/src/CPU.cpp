@@ -126,7 +126,7 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0x4C] = new JMP<Absolute>();
 	op[0x6C] = new JMP<Indirect>();
 
-	op[0x20] = new JSR<Absolute>();
+	op[0x20] = new JSR();
 
 	op[0xA9] = new LDA<Immediate>();
 	op[0xA5] = new LDA<ZeroPage>();
@@ -230,8 +230,17 @@ CPU::~CPU() {
 int CPU::
 _execute()
 {
+	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
-	return (*op[opcode])(this);
+
+	OpCode *o = op[opcode];
+
+	int ret = (*o)(this);
+	std::cout << pc << " " << o->to_string(this) << std::endl;
+
+	return ret;
+
+	//return (*op[opcode])(this);
 }
 
 double CPU::

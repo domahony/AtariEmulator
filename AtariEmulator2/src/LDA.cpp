@@ -7,6 +7,7 @@
 
 #include "LDA.h"
 #include "CPU.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -27,17 +28,34 @@ operator()(CPU* cpu) {
 	return this->_tcount + 1;
 }
 
+template <class T> std::string LDA<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "LDA " << this->address_mode;
+
+	return ret.str();
+}
+
 template <class T> int LDX<T>::
 operator()(CPU* cpu) {
 
 /*
 */
-	zzz verify this operation with immediate addressing...
+	//zzz verify this operation with immediate addressing...
 	cpu->X = this->read(cpu);
 	cpu->N = (cpu->X >> 7);
 	cpu->Z = (cpu->X == 0);
 
 	return this->_tcount + 1;
+}
+
+template <class T> std::string LDX<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "LDX " << this->address_mode;
+	return ret.str();
 }
 
 template <class T> int LDY<T>::
@@ -51,6 +69,14 @@ operator()(CPU* cpu) {
 	cpu->Z = (cpu->Y == 0);
 
 	return this->_tcount + 1;
+}
+
+template <class T> std::string LDY<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "LDY " << this->address_mode;
+	return ret.str();
 }
 
 template class LDA<Immediate>;

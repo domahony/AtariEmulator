@@ -7,6 +7,7 @@
 
 #include "JMP.h"
 #include "CPU.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -17,7 +18,15 @@ operator()(CPU* cpu)
 	return this->_tcount;
 }
 
-template <class T> int JSR<T>::
+template <class T> std::string JMP<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "JMP " << this->address_mode;
+	return ret.str();
+}
+
+int JSR::
 operator()(CPU* cpu)
 {
 	//  t = PC - 1
@@ -31,12 +40,11 @@ operator()(CPU* cpu)
 	cpu->push(static_cast<unsigned char>(t && 0xFF));
 
 
-	cpu->setPC(this->read(cpu));
-	 return this->_tcount + 3;
+	cpu->setPC(cpu->absoluteAddress());
+	return 6;
 }
 
 template class JMP<Absolute>;
 template class JMP<Indirect>;
-template class JSR<Absolute>;
 
 } /* namespace cpu */

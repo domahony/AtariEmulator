@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "ASL.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -22,6 +23,14 @@ operator()(CPU* cpu) {
 	this->write(cpu, B);
 
 	return 2;
+}
+
+template <class T> std::string ASL<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "ASL " << this->address_mode;
+	return ret.str();
 }
 
 template class ASL<Accumulator>;

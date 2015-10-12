@@ -7,6 +7,7 @@
 
 #include "CPU.h"
 #include "ORA.h"
+#include <sstream>
 
 namespace cpu {
 
@@ -19,6 +20,14 @@ operator()(CPU* cpu) {
 	cpu->Z = (cpu->ACC == 0);
 
 	return 1 + this->_tcount;
+}
+
+template <class T> std::string ORA<T>::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "ORA " << this->address_mode;
+	return ret.str();
 }
 
 template class ORA<Immediate>;

@@ -23,6 +23,9 @@ public:
 
 	virtual int operator()(CPU* cpu);
 
+	std::string mnemonic() {
+		return "BRK";
+	}
 private:
 	int _tcount;
 };
