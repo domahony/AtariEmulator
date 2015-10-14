@@ -17,7 +17,8 @@ to_string(CPU *cpu) {
 
 unsigned char Immediate::
 read(CPU *cpu) {
-	return cpu->readPCandInc();
+	addr = cpu->readPCandInc();
+	return addr;
 }
 
 unsigned char ZeroPage::
@@ -28,26 +29,34 @@ read(CPU* cpu) {
 
 void ZeroPage::
 write(CPU* cpu, unsigned char val) {
-	return cpu->write(cpu->readPCandInc(), val);
+	addr = cpu->readPCandInc();
+	value = val;
+	return cpu->write(addr, value);
 }
 
 unsigned char ZeroPageWithXIdx::
 read(CPU* cpu) {
-	return cpu->zeroPageWithXIdx();
+	addr = cpu->zeroPageWithXIdx();
+	return cpu->read(addr);
 }
 
 void ZeroPageWithXIdx::
 write(CPU* cpu, unsigned char val) {
-	cpu->zeroPageWithXIdx(val);
+	value = val;
+	addr = cpu->zeroPageWithXIdx();
+	cpu->write(addr, value);
 }
 
 unsigned char ZeroPageWithYIdx::
 read(CPU* cpu) {
-	return cpu->zeroPageWithYIdx();
+	addr = cpu->zeroPageWithYIdx();
+	return cpu->read(addr);
 }
 
 void ZeroPageWithYIdx::
 write(CPU* cpu, unsigned char val) {
+	addr = cpu->zeroPageWithYIdx();
+	value = val;
 	return cpu->write(addr, val);
 }
 
@@ -64,7 +73,8 @@ write(CPU* cpu, unsigned char val) {
 
 unsigned char AbsoluteWithX::
 read(CPU* cpu) {
-	return cpu->absoluteAddressX(_tcount);
+	addr = cpu->absoluteAddressX(_tcount);
+	return addr;
 }
 
 void AbsoluteWithX::
@@ -74,7 +84,8 @@ write(CPU* cpu, unsigned char val) {
 
 unsigned char AbsoluteWithY::
 read(CPU* cpu) {
-	return cpu->absoluteAddressY(_tcount);
+	addr= cpu->absoluteAddressY(_tcount);
+	return addr;
 }
 
 void AbsoluteWithY::
@@ -84,7 +95,8 @@ write(CPU* cpu, unsigned char val) {
 
 unsigned char ZpIdxIndirect::
 read(CPU* cpu) {
-	return cpu->getZpIdxIndirect();
+	addr = cpu->getZpIdxIndirect();
+	return addr;
 }
 
 void ZpIdxIndirect::
@@ -95,7 +107,8 @@ write(CPU* cpu, unsigned char val) {
 unsigned char ZpIndirectIdxWithY::
 read(CPU* cpu)
 {
-	return cpu->getZpIndirectIdxWithY(_tcount);
+	addr = cpu->getZpIndirectIdxWithY(_tcount);
+	return addr;
 }
 
 void ZpIndirectIdxWithY::
@@ -107,7 +120,8 @@ write(CPU* cpu, unsigned char val)
 unsigned char Indirect::
 read(CPU* cpu)
 {
-	return cpu->getIndirect();
+	addr = cpu->getIndirect();
+	return addr;
 }
 
 unsigned char Accumulator::

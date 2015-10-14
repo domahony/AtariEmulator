@@ -22,7 +22,7 @@ template <class T> std::string STA<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "STA " << this->address_mode;
+	ret << "STA " << this->address_mode << " " << this->addr << " " << static_cast<unsigned short>(this->value);
 	return ret.str();
 }
 

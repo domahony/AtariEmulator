@@ -35,19 +35,20 @@ public:
 		return read(make_short(low, high));
 	}
 
-	unsigned char zeroPageWithXIdx() {
+	unsigned short zeroPageWithXIdx() {
 		unsigned char zp = readPCandInc();
-		return read(make_short(zp + X, 0));
+		return make_short(zp + X, 0);
 	}
 
-	void zeroPageWithXIdx(unsigned char val) {
+	void zeroPageWithXIdxx(unsigned short& addr, unsigned char val) {
 		unsigned char zp = readPCandInc();
-		return write(make_short(zp + X, 0), val);
+		addr = make_short(zp + X, 0);
+		return write(addr, val);
 	}
 
-	unsigned char zeroPageWithYIdx() {
+	unsigned short zeroPageWithYIdx() {
 		unsigned char zp = readPCandInc();
-		return read(make_short(zp + Y, 0));
+		return make_short(zp + Y, 0);
 	}
 
 	unsigned short absoluteAddress()
