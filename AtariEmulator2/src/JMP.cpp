@@ -39,9 +39,17 @@ operator()(CPU* cpu)
 	//  SP = SP - 1
 	cpu->push(static_cast<unsigned char>(t && 0xFF));
 
-
-	cpu->setPC(cpu->absoluteAddress());
+	addr = cpu->absoluteAddress();
+	cpu->setPC(addr);
 	return 6;
+}
+
+std::string JSR::
+mnemonic() {
+	std::stringstream ret;
+
+	ret << "JSR " << std::hex << addr;
+	return ret.str();
 }
 
 template class JMP<Absolute>;

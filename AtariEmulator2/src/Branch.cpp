@@ -15,16 +15,19 @@ operator()(CPU* cpu)
 {
 	char offset = cpu->getRelative();
 	int ret = 2;
+	bit = cpu->C;
 
+	addr = cpu->getPC();
 	if (!cpu->C) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
 		}
 
+		addr = npc;
 		cpu->setPC(npc);
 	}
 
@@ -34,18 +37,21 @@ operator()(CPU* cpu)
 int BCS::
 operator()(CPU* cpu)
 {
-	char offset = cpu->getRelative();
+	offset = cpu->getRelative();
 	int ret = 2;
+	bit = cpu->C;
 
+	addr = cpu->getPC();
 	if (cpu->C) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
 		}
 
+		addr = npc;
 		cpu->setPC(npc);
 	}
 
@@ -55,18 +61,21 @@ operator()(CPU* cpu)
 int BEQ::
 operator()(CPU* cpu)
 {
-	char offset = cpu->getRelative();
+	offset = cpu->getRelative();
 	int ret = 2;
 
+	bit = cpu->Z;
+	addr = cpu->getPC();
 	if (cpu->Z) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
 		}
 
+		addr = npc;
 		cpu->setPC(npc);
 	}
 
@@ -76,18 +85,21 @@ operator()(CPU* cpu)
 int BMI::
 operator()(CPU* cpu)
 {
-	char offset = cpu->getRelative();
+	offset = cpu->getRelative();
 	int ret = 2;
 
+	bit = cpu->N;
+	addr = cpu->getPC();
 	if (cpu->N) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
 		}
 
+		addr = npc;
 		cpu->setPC(npc);
 	}
 
@@ -97,18 +109,21 @@ operator()(CPU* cpu)
 int BNE::
 operator()(CPU* cpu)
 {
-	char offset = cpu->getRelative();
+	offset = cpu->getRelative();
 	int ret = 2;
 
+	bit = cpu->Z;
+	addr = cpu->getPC();
 	if (!cpu->Z) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
 		}
 
+		addr = npc;
 		cpu->setPC(npc);
 	}
 
@@ -121,9 +136,11 @@ operator()(CPU* cpu)
 	char offset = cpu->getRelative();
 	int ret = 2;
 
+	bit = cpu->N;
+	addr = cpu->getPC();
 	if (!cpu->N) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
@@ -142,9 +159,11 @@ operator()(CPU* cpu)
 	char offset = cpu->getRelative();
 	int ret = 2;
 
+	bit = cpu->V;
+	addr = cpu->getPC();
 	if (!cpu->V) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
@@ -163,9 +182,11 @@ operator()(CPU* cpu)
 	char offset = cpu->getRelative();
 	int ret = 2;
 
+	bit = cpu->V;
+	addr = cpu->getPC();
 	if (cpu->V) {
 		ret++;
-		unsigned short opc = cpu->getPC();
+		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
 
 		if ((opc >> 8) != (npc >> 8)) {
@@ -176,6 +197,12 @@ operator()(CPU* cpu)
 	}
 
 	return ret;
+}
+
+BranchOp::
+~BranchOp()
+{
+
 }
 
 } /* namespace cpu */

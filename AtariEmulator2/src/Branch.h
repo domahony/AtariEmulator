@@ -9,86 +9,110 @@
 #define BCC_H_
 
 #include "OpCode.h"
+#include <sstream>
 
 namespace cpu {
 
-class BCC : public OpCode {
+class BranchOp : public OpCode {
+public:
+	BranchOp() : addr(0), bit(0), offset(0), flags(0) {}
+	virtual ~BranchOp();
+
+	virtual std::string _mnemonic() = 0;
+
+	std::string mnemonic() {
+		std::stringstream ret;
+		ret << _mnemonic() << " " << (bit ? "1":"0") << " " << std::hex << offset << " " << offset + addr;
+		return ret.str();
+	}
+
+protected:
+	unsigned short addr;
+	unsigned short offset;
+	bool bit;
+	unsigned char flags;
+
+};
+
+class BCC : public BranchOp {
 public:
 	BCC() {};
 	virtual ~BCC() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BCC";
+	std::string _mnemonic() {
+		return "BCC C";
 	}
 };
 
-class BCS : public OpCode {
+class BCS : public BranchOp {
 public:
 	BCS() {};
 	virtual ~BCS() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BCS";
+	std::string _mnemonic() {
+		return "BCS C";
 	}
 };
 
-class BEQ : public OpCode {
+class BEQ : public BranchOp {
 public:
 	BEQ() {};
 	virtual ~BEQ() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BEQ";
+	std::string _mnemonic() {
+		return "BEQ Z";
 	}
 };
 
-class BMI : public OpCode {
+class BMI : public BranchOp {
 public:
 	BMI() {};
 	virtual ~BMI() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BMI";
+	std::string _mnemonic() {
+		return "BMI N";
 	}
 };
 
-class BNE : public OpCode {
+class BNE : public BranchOp {
 public:
 	BNE() {};
 	virtual ~BNE() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BNE";
+	std::string _mnemonic() {
+		return "BNE Z";
 	}
+private:
+	std::string str;
 };
 
-class BPL : public OpCode {
+class BPL : public BranchOp {
 public:
 	BPL() {};
 	virtual ~BPL() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BPL";
+	std::string _mnemonic() {
+		return "BPL N";
 	}
 };
 
-class BVC : public OpCode {
+class BVC : public BranchOp {
 public:
 	BVC() {};
 	virtual ~BVC() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BVC";
+	std::string _mnemonic() {
+		return "BVC V";
 	}
 };
 
-class BVS : public OpCode {
+class BVS : public BranchOp {
 public:
 	BVS() {};
 	virtual ~BVS() {};
 	virtual int operator()(CPU*);
-	std::string mnemonic() {
-		return "BVS";
+	std::string _mnemonic() {
+		return "BVS V";
 	}
 
 };
