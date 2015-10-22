@@ -79,6 +79,7 @@ read(CPU* cpu) {
 
 void AbsoluteWithX::
 write(CPU* cpu, unsigned char val) {
+	addr = cpu->absoluteAddressX(_tcount);
 	cpu->write(addr, val);
 }
 
@@ -108,13 +109,15 @@ unsigned char ZpIndirectIdxWithY::
 read(CPU* cpu)
 {
 	addr = cpu->getZpIndirectIdxWithY(_tcount);
-	return addr;
+	return cpu->read(addr);
 }
 
 void ZpIndirectIdxWithY::
 write(CPU* cpu, unsigned char val)
 {
-	cpu->setZpIndirectIdxWithY(_tcount, val);
+	addr = cpu->getZpIndirectIdxWithY(_tcount);
+	value = val;
+	cpu->write(addr, val);
 }
 
 unsigned char Indirect::

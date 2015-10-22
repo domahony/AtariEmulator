@@ -61,7 +61,7 @@ public:
 		//return read(make_short(low, high));
 	}
 
-	unsigned char absoluteAddressX(int& _tcount)
+	unsigned short absoluteAddressX(int& _tcount)
 	{
 		unsigned char low = readPCandInc();
 		unsigned char high = readPCandInc();
@@ -73,10 +73,10 @@ public:
 			_tcount += 1;
 		}
 
-		return read(addr2);
+		return addr2;
 	}
 
-	unsigned char absoluteAddressY(int& _tcount)
+	unsigned short absoluteAddressY(int& _tcount)
 	{
 		unsigned char low = readPCandInc();
 		unsigned char high = readPCandInc();
@@ -88,7 +88,7 @@ public:
 			_tcount += 1;
 		}
 
-		return read(addr2);
+		return addr2;
 	}
 
 	void absoluteAddressY(int& _tcount, unsigned char val)
@@ -135,7 +135,7 @@ public:
 		return write(make_short(low, high), val);
 	}
 
-	unsigned char
+	unsigned short
 	getZpIndirectIdxWithY(int& _tcount)
 	{
 		unsigned char zp = readPCandInc();
@@ -150,11 +150,11 @@ public:
 			_tcount += 1;
 		}
 
-		return read(addr2);
+		return addr2;
 	}
 
 	void
-	setZpIndirectIdxWithY(int& _tcount, unsigned char val)
+	setZpIndirectIdxWithYx(int& _tcount, unsigned char val)
 	{
 		unsigned char zp = readPCandInc();
 

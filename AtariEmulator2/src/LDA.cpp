@@ -32,7 +32,7 @@ template <class T> std::string LDA<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "LDA " << this->address_mode << " " << this->addr;
+	ret << "LDA " << this->address_mode << " " << std::hex << this->addr;
 
 	return ret.str();
 }
@@ -54,7 +54,7 @@ template <class T> std::string LDX<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "LDX " << this->address_mode << " " << this->addr;
+	ret << "LDX " << this->address_mode << " " << std::hex << this->addr;
 	return ret.str();
 }
 
@@ -75,7 +75,7 @@ template <class T> std::string LDY<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "LDY " << this->address_mode;
+	ret << "LDY " << this->address_mode << " " << std::hex << this->addr;
 	return ret.str();
 }
 

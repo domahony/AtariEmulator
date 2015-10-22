@@ -14,8 +14,8 @@ operator() (CPU* cpu)
 {
 	unsigned char l = cpu->pop();
 	unsigned char h = cpu->pop();
-	unsigned short PC = h << 8 | l;
-	cpu->PC = PC;
+	unsigned short PC = (h << 8) | l;
+	cpu->PC = PC + 1;
 
 	return 6;
 }

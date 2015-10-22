@@ -33,7 +33,7 @@ template <class T> std::string INC<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "INC " << this->address_mode;
+	ret << "INC " << this->address_mode << " " << std::hex << this->addr;
 	return ret.str();
 }
 

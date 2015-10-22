@@ -233,6 +233,12 @@ _execute()
 	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
 
+	//bug add f27a CLRCHP
+
+	if (pc == 0xf27a) {
+		int x = 1;
+	}
+
 	OpCode *o = op[opcode];
 
 	int ret = (*o)(this);

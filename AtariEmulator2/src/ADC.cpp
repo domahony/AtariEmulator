@@ -39,7 +39,7 @@ template <class T> std::string ADC<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "ADC " << this->address_mode;
+	ret << "ADC " << this->address_mode << std::hex << " " << this->addr;
 	return ret.str();
 }
 

@@ -33,7 +33,7 @@ template <class T> std::string DEC<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "DEC " << this->address_mode;
+	ret << "DEC " << this->address_mode << " " << std::hex << this->addr;
 	return ret.str();
 }
 

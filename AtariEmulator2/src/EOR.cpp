@@ -31,7 +31,7 @@ template <class T> std::string EOR<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "EOR " << this->address_mode;
+	ret << "EOR " << this->address_mode << " " << std::hex << this->addr;
 	return ret.str();
 }
 

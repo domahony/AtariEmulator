@@ -30,16 +30,16 @@ int JSR::
 operator()(CPU* cpu)
 {
 	//  t = PC - 1
-	unsigned short t = cpu->getPC() - 1;
+	addr = cpu->absoluteAddress();
+	return_addr = cpu->getPC() - 1;
 	//  bPoke(SP,t.h)
 	//  SP = SP - 1
-	cpu->push(static_cast<unsigned char>(t >> 8));
+	cpu->push(static_cast<unsigned char>(return_addr >> 8));
 
 	//  bPoke(SP,t.l)
 	//  SP = SP - 1
-	cpu->push(static_cast<unsigned char>(t && 0xFF));
+	cpu->push(static_cast<unsigned char>(return_addr & 0xFF));
 
-	addr = cpu->absoluteAddress();
 	cpu->setPC(addr);
 	return 6;
 }
@@ -48,7 +48,7 @@ std::string JSR::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "JSR " << std::hex << addr;
+	ret << "JSR " << std::hex << addr << " Return Addr: " << return_addr;
 	return ret.str();
 }
 

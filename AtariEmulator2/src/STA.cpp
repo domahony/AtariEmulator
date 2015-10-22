@@ -22,7 +22,7 @@ template <class T> std::string STA<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "STA " << this->address_mode << " " << this->addr << " " << static_cast<unsigned short>(this->value);
+	ret << "STA " << this->address_mode << std::hex << " " << this->addr << " " << static_cast<unsigned short>(this->value);
 	return ret.str();
 }
 
@@ -37,7 +37,7 @@ template <class T> std::string STX<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "STX " << this->address_mode;
+	ret << "STX " << this->address_mode << std::hex << " " << this->addr << " " << static_cast<unsigned short>(this->value);
 	return ret.str();
 }
 
@@ -52,7 +52,7 @@ template <class T> std::string STY<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "STY " << this->address_mode;
+	ret << "STY " << this->address_mode << std::hex << " " << this->addr << " " << static_cast<unsigned short>(this->value);
 	return ret.str();
 }
 

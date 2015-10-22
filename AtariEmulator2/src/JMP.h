@@ -23,11 +23,12 @@ public:
 
 class JSR: public OpCode {
 public:
-	JSR() : addr(0) { }
+	JSR() : addr(0), return_addr(0) { }
 	virtual ~JSR() { }
 	virtual int operator()(CPU* cpu);
 	std::string mnemonic();
 	unsigned short addr;
+	unsigned short return_addr;
 };
 
 } /* namespace cpu */

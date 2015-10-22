@@ -35,7 +35,7 @@ template <class T> std::string CMP<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "CMP " << this->address_mode;
+	ret << "CMP " << this->address_mode << std::hex << " " << this->addr;
 	return ret.str();
 }
 
