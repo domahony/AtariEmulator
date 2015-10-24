@@ -28,7 +28,7 @@ public:
 
 protected:
 	unsigned short addr;
-	unsigned short offset;
+	char offset;
 	bool bit;
 	unsigned char flags;
 

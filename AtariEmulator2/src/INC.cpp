@@ -24,7 +24,8 @@ operator()(CPU* cpu) {
 	M = (M + 1) & 0xFF;
 	cpu->N = (M >> 7);
 	cpu->Z = (M == 0);
-	this->write(cpu, M);
+
+	cpu->write(this->addr, M);
 
 	return 3 + this->_tcount;
 }
@@ -51,6 +52,11 @@ operator()(CPU* cpu) {
 	M = (M + 1) & 0xFF;
 	cpu->N = (M >> 7);
 	cpu->Z = (M == 0);
+
+	if (cpu->Z) {
+		cpu->breakpoint();
+	}
+
 	cpu->X = M;
 
 	return 2;

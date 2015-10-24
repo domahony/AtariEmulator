@@ -235,7 +235,7 @@ _execute()
 
 	//bug add f27a CLRCHP
 
-	if (pc == 0xf27a) {
+	if (pc == 0xf2ad) { //JSR EDITRV+$C... jumps to 0xf3e4, need to find this PWRONA I think
 		int x = 1;
 	}
 
@@ -351,5 +351,12 @@ set_flags(unsigned char flags) {
 	C = (flags) & 0x1;
 
 }
+
+void CPU::
+breakpoint()
+{
+	int x = 1;
+}
+
 
 } /* namespace cpu */

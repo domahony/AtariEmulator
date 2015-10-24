@@ -14,7 +14,7 @@ namespace cpu {
 template <class T> int JMP<T>::
 operator()(CPU* cpu)
 {
-	cpu->setPC(this->read(cpu));
+	cpu->setPC(this->get_address(cpu));
 	return this->_tcount;
 }
 
@@ -22,7 +22,7 @@ template <class T> std::string JMP<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "JMP " << this->address_mode;
+	ret << "JMP " << this->address_mode << std::hex << " " << this->addr;
 	return ret.str();
 }
 

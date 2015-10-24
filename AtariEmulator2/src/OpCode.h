@@ -28,6 +28,7 @@ class Indirect {
 protected:
 	Indirect() : _tcount(5), address_mode("Indirect"), addr(0), value(0) { }
 	unsigned char read(CPU *cpu);
+	unsigned short get_address(CPU *cpu);
 	int _tcount;
 	std::string address_mode;
 	unsigned short addr;
@@ -89,6 +90,7 @@ class Absolute {
 protected:
 	Absolute() : _tcount(3), address_mode("Absolute"), addr(0), value(0) { }
 	unsigned char read(CPU *cpu);
+	unsigned short get_address(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
 	int _tcount;
 	std::string address_mode;

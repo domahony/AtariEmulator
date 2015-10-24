@@ -64,6 +64,7 @@ mnemonic() {
 	std::stringstream ret;
 
 	ret << "CPX " << this->address_mode;
+	return ret.str();
 }
 
 template <class T> int CPY<T>::
@@ -91,6 +92,7 @@ mnemonic() {
 	std::stringstream ret;
 
 	ret << "CPY " << this->address_mode;
+	return ret.str();
 }
 
 template class CMP<Immediate>;

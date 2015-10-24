@@ -62,25 +62,36 @@ write(CPU* cpu, unsigned char val) {
 
 unsigned char Absolute::
 read(CPU* cpu) {
+	addr = get_address(cpu);
+	value = cpu->read(addr);
+	return value;
+}
+
+unsigned short Absolute::
+get_address(CPU *cpu) {
 	addr = cpu->absoluteAddress();
-	return cpu->read(addr);
+	return addr;
 }
 
 void Absolute::
 write(CPU* cpu, unsigned char val) {
-	cpu->write(addr, val);
+	addr = cpu->absoluteAddress();
+	value = val;
+	cpu->write(addr, value);
 }
 
 unsigned char AbsoluteWithX::
 read(CPU* cpu) {
 	addr = cpu->absoluteAddressX(_tcount);
-	return addr;
+	value = cpu->read(addr);
+	return value;
 }
 
 void AbsoluteWithX::
 write(CPU* cpu, unsigned char val) {
 	addr = cpu->absoluteAddressX(_tcount);
-	cpu->write(addr, val);
+	value = val;
+	cpu->write(addr, value);
 }
 
 unsigned char AbsoluteWithY::
@@ -123,6 +134,13 @@ write(CPU* cpu, unsigned char val)
 unsigned char Indirect::
 read(CPU* cpu)
 {
+	addr = get_address(cpu);
+	value = cpu->read(addr);
+	return value;
+}
+
+unsigned short Indirect::
+get_address(CPU* cpu) {
 	addr = cpu->getIndirect();
 	return addr;
 }

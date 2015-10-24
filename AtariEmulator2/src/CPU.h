@@ -21,6 +21,8 @@ public:
 	CPU(int hz, int refresh_rate);
 	virtual ~CPU();
 
+	void breakpoint();
+
 	double ticks_per_second();
 	bool execute();
 
@@ -144,31 +146,13 @@ public:
 		unsigned char high = read(zp + 1);
 
 		unsigned short addr1 = make_short(low, high);
-		unsigned short addr2 = addr1 + static_cast<char>(Y);
+		unsigned short addr2 = addr1 + Y; // change from signed to unsigned here...
 
 		if ((addr1 >> 8) != (addr2 >> 8)) {
 			_tcount += 1;
 		}
 
 		return addr2;
-	}
-
-	void
-	setZpIndirectIdxWithYx(int& _tcount, unsigned char val)
-	{
-		unsigned char zp = readPCandInc();
-
-		unsigned char low = read(zp);
-		unsigned char high = read(zp + 1);
-
-		unsigned short addr1 = make_short(low, high);
-		unsigned short addr2 = addr1 + static_cast<char>(Y);
-
-		if ((addr1 >> 8) != (addr2 >> 8)) {
-			_tcount += 1;
-		}
-
-		return write(addr2, val);
 	}
 
 	unsigned char

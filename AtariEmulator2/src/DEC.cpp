@@ -24,7 +24,8 @@ operator()(CPU* cpu) {
 	M = (M - 1) & 0xFF;
 	cpu->N = (M >> 7);
 	cpu->Z = (M == 0);
-	this->write(cpu, M);
+	this->value = M;
+	cpu->write(this->addr, this->value);
 
 	return 3 + this->_tcount;
 }
@@ -33,7 +34,7 @@ template <class T> std::string DEC<T>::
 mnemonic() {
 	std::stringstream ret;
 
-	ret << "DEC " << this->address_mode << " " << std::hex << this->addr;
+	ret << "DEC " << this->address_mode << " " << std::hex << this->addr << " " << this->value;
 	return ret.str();
 }
 
