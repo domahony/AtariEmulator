@@ -233,9 +233,9 @@ _execute()
 	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
 
-	//bug add f27a CLRCHP
+	// seems good up to IOC1A 0xe4d8
 
-	if (pc == 0xf2ad) { //JSR EDITRV+$C... jumps to 0xf3e4, need to find this PWRONA I think
+	if (pc == 0xe4d8) {
 		int x = 1;
 	}
 

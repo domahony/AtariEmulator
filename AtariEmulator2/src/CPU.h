@@ -30,11 +30,17 @@ public:
 		return read(PC++);
 	}
 
-	unsigned char getIndirect() {
-		unsigned char zp = readPCandInc();
-		unsigned char low = read(make_short(zp, 0));
-		unsigned char high = read(make_short(zp + 1, 0));
-		return read(make_short(low, high));
+	unsigned short getIndirect() {
+		unsigned char l1 = readPCandInc();
+		unsigned char h1 = readPCandInc();
+
+		unsigned short addr_low = make_short(l1, h1);
+		unsigned short addr_high = addr_low + 1;
+
+		unsigned short low = read(addr_low);
+		unsigned short high = read(addr_high);
+
+		return make_short(low, high);
 	}
 
 	unsigned short zeroPageWithXIdx() {
@@ -91,21 +97,6 @@ public:
 		}
 
 		return addr2;
-	}
-
-	void absoluteAddressY(int& _tcount, unsigned char val)
-	{
-		unsigned char low = readPCandInc();
-		unsigned char high = readPCandInc();
-
-		unsigned short addr1 = make_short(low, high);
-		unsigned short addr2 = addr1 + Y;
-
-		if ((addr1 >> 8) != (addr2 >> 8)) {
-			_tcount += 1;
-		}
-
-		write(addr2, val);
 	}
 
 	char getRelative()

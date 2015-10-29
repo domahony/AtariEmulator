@@ -102,7 +102,9 @@ read(CPU* cpu) {
 
 void AbsoluteWithY::
 write(CPU* cpu, unsigned char val) {
-	return cpu->absoluteAddressY(_tcount, val);
+	addr = cpu->absoluteAddressY(_tcount);
+	value = val;
+	cpu->write(addr, value);
 }
 
 unsigned char ZpIdxIndirect::
