@@ -29,8 +29,10 @@ public:
 
 	bool tick() {
 
+		/*
 		++ticks;
 		return true;
+		*/
 
 		struct timespec cur_tick;
 		clock_gettime(CLOCK_MONOTONIC, &cur_tick);
@@ -53,7 +55,9 @@ public:
 
 		if (!(++ticks % 500000)) {
 
-			auto total = cur_tick.tv_sec + static_cast<double>(cur_tick.tv_nsec) / (1000 * 1000 * 1000) - t0.tv_sec + static_cast<double>(t0.tv_nsec) / (1000 * 1000 * 1000);
+			auto total = cur_tick.tv_sec
+					+ (static_cast<double>(cur_tick.tv_nsec) / (BILLION))
+					- t0.tv_sec + (static_cast<double>(t0.tv_nsec) / (BILLION));
 			std::cout << "HZ: " << std::fixed << static_cast<double>(ticks) / total << std::endl;
 		}
 

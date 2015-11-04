@@ -234,15 +234,17 @@ _execute()
 	unsigned char opcode = read(PC++);
 
 	// seems good up to IOC1A 0xe4d8
+	// seems good up to DOPENA STA HOLD1 0xf457
 
-	if (pc == 0xe4d8) {
+	//if (pc == 0xf3fc) {
+	if (pc == 0xf496) {
 		int x = 1;
 	}
 
 	OpCode *o = op[opcode];
 
 	int ret = (*o)(this);
-	std::cout << pc << " " << o->to_string(this) << std::endl;
+	//std::cout << pc << " " << o->to_string(this) << std::endl;
 
 	return ret;
 
@@ -259,16 +261,18 @@ bool CPU::
 execute()
 {
 	while (acc < hz) {
-		acc += refresh_rate;
-		clock.tick();
 
-		if (--wait <= 0) {
-			wait = _execute();
+		acc += refresh_rate;
+
+		if (clock.tick()) {
+			if (--wait <= 0) {
+				wait = _execute();
+			}
+			address_space.tick();
 		}
 	}
 
 	acc %= hz;
-
 	return true;
 
 	/*

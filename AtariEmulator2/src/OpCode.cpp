@@ -97,7 +97,7 @@ write(CPU* cpu, unsigned char val) {
 unsigned char AbsoluteWithY::
 read(CPU* cpu) {
 	addr= cpu->absoluteAddressY(_tcount);
-	return addr;
+	return cpu->read(addr);
 }
 
 void AbsoluteWithY::

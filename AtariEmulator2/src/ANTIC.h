@@ -23,6 +23,26 @@ public:
 
 	}
 
+	void tick() const {
+
+		// 29.97 fps * 262.5 lines
+		// 7867.125 lps
+		// 2,000,000 tps
+		// cpu / lps
+
+		int acc = 0;
+		int lps = 29.97 * 262.5;
+		int vcount = 0;
+
+		acc += lps;
+
+		if (acc >= 2000000) {
+			vcount++;
+		}
+
+		acc %= 2000000;
+	}
+
 };
 
 } /* namespace address */

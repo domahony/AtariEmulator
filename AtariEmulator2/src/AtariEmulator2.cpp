@@ -15,7 +15,7 @@
 int main(int argc, char **argv)
 {
 	video::Video video;
-	cpu::CPU cpu(2000000, video.get_refresh_rate());
+	cpu::CPU cpu(2 * 1000 * 1000, video.get_refresh_rate());
 	bool quit = false;
 
 	while( !quit ) {
@@ -30,6 +30,7 @@ int main(int argc, char **argv)
 			}
 		}
 
+		std::cout << std::fixed << "Ticks Per Second: " << cpu.ticks_per_second() << std::endl;
 		video.swapWindow();
 	}
 
