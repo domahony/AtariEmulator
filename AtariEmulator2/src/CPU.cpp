@@ -233,18 +233,16 @@ _execute()
 	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
 
-	// seems good up to IOC1A 0xe4d8
-	// seems good up to DOPENA STA HOLD1 0xf457
-
-	//if (pc == 0xf3fc) {
-	if (pc == 0xf496) {
+	// good up to 0xf4bb //around the NOMOD symbol in the source code
+	if (pc == 0xf4bb) { //STORE gives seg fault...
+	//if (pc == 0xf961) { //STORE gives seg fault...
 		int x = 1;
 	}
 
 	OpCode *o = op[opcode];
 
 	int ret = (*o)(this);
-	//std::cout << pc << " " << o->to_string(this) << std::endl;
+	std::cout << pc << " " << o->to_string(this) << std::endl;
 
 	return ret;
 
@@ -264,11 +262,11 @@ execute()
 
 		acc += refresh_rate;
 
-		if (clock.tick()) {
+		if (clock.tick()) { //clock.tick(wait); ???
 			if (--wait <= 0) {
 				wait = _execute();
 			}
-			address_space.tick();
+			address_space.tick(); //address_space.tick(wait); ???
 		}
 	}
 

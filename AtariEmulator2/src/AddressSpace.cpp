@@ -16,7 +16,8 @@ AddressSpace::AddressSpace() :
 		os(new ROM("/home/domahony/Projects/atariROMs/new/REVBNTSC.ROM")),
 		cartridgeA(new ROM("/home/domahony/Projects/atariROMs/REVA.ROM")),
 		ram(new RAM(0xA000)),
-		ramB(new RAM(0x8000))
+		ramB(new RAM(0x8000)),
+		antic(new ANTIC())
 {
 
 
