@@ -233,6 +233,7 @@ _execute()
 	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
 
+	//f7bf is CLRSC2
 	// good up to 0xf4bb //around the NOMOD symbol in the source code
 	if (pc == 0xf4bb) { //STORE gives seg fault...
 	//if (pc == 0xf961) { //STORE gives seg fault...

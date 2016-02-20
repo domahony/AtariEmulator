@@ -13,11 +13,23 @@ $addr{"COMTAB"} = {
 	ADDR => 0xeee,
 };
 
+my $skipping = 0;
 while(<>) {
 	chomp;
 	my $line = $_;
 
 	$line =~ s/\s*;.*$//;
+
+	if ($line =~ /\s+\.IF\s+PALFLG(-1)?\s*$/) {
+		next if ($1 eq "-1");
+		$skipping = 1;
+	} 
+	if ($line =~ /\s+\.ENDIF\s*$/) {
+		$skipping = 0;
+		next;
+	}
+
+	next if $skipping;
 
 	if ($line =~ /^\s+\*=\$(\S+)/) {
 		$count = hex($1);
@@ -74,13 +86,18 @@ while(<>) {
 	} elsif ($line =~ /^((\S+):)?\s*(\S+)\s*(\S+)?$/) {
 		#print "Label: $2\nCommand: $3\nArgs: $4\n";
 		if ($3 eq ".RES") {
-			if (!exists($addr{$2})) {
-				$addr{$2} = {
-					label => $2, 
+			my $thelabel = $2;
+			if (!exists($addr{$thelabel})) {
+				$addr{$thelabel} = {
+					label => $thelabel, 
 					bsize => $4,
 					ADDR => $ram_addr, 
 				};
 				$ram_addr += $4;
+			}
+
+			if (!exists($symbols{$thelabel})) {
+				$symbols{$2} = 0x0;
 			}
 
 			next;
@@ -89,6 +106,8 @@ while(<>) {
 		my $l = sprintf("%04x %04x $line\n", $count, $count + $offset);
 		$count += get_op_length($3, $4);
 		print $l;
+	} elsif ($line =~ /^((\S+):)?\s*(\S+)\s*(\S+,\s+\S+)$/) {
+		$count += get_op_length($3, $4);
 	}
 
 	#print "$line\n";
@@ -124,28 +143,19 @@ get_op_length
 		$ret = scalar split(/,/, $arg);
 	} elsif ($op eq ".WORD") {
 		$ret = (scalar split(/,/, $arg)) * 2;
-	}
-
-	if ($arg =~ /^#/) { #immediate value
+	} elsif ($arg =~ /^#/) { #immediate value
 		$ret = 2;
-	}
-
-	if ($arg =~ /^\$((\S\S)(\S\S)?)$/) { #immediate value
+	} elsif ($arg =~ /^\$((\S\S)(\S\S)?)$/) { #immediate value
 		if (hex($1) > 0xFF) {
 			$ret = 2;
 		} else {
 			$ret = 3;
 		}
-	}
-
-	if ($arg =~ /^A$/) { #accumulator
+	} elsif ($arg =~ /^A$/) { #accumulator
 		$ret = 1;
-	}
-
-	if ($arg =~ /\((\S+((\+|-)[^,]+)?)\),(y|Y)$/) {
+	} elsif ($arg =~ /\((\S+((\+|-)[^,]+)?)\),(y|Y)$/) {
 		$ret = 2;
-
-	} elsif ($arg =~ /^(([A-Z0-9]+)((\+|-)\d+)?),(x|X|y|Y)$/) {
+	} elsif ($arg =~ /^(([A-Z0-9?]+)((\+|-)\d+)?),\s*(x|X|y|Y)$/) {
 		if (exists($addr{$2})) {
 			my $h = $addr{$2};
 			#for my $z (keys(%{$h})) {
@@ -158,10 +168,11 @@ get_op_length
 				$ret = 3;
 			}
 		}
-	}
+	} elsif ($arg =~ /^([A-Z0-9?]+)((\+|-)\d+)?$/) { 
 
-	if ($arg =~ /^([A-Z0-9]+)((\+|-)\d+)?$/) { 
-		if (exists($addr{$1})) {
+		$arg = $1;	
+
+		if (defined($addr{$arg})) {
 			my $h = $addr{$arg};
 			#for my $z (keys(%{$h})) {
 			#	print "'$z' '$h->{$z}'\n";
@@ -172,7 +183,7 @@ get_op_length
 			} else {
 				$ret = 3;
 			}	
-		}
+		} 
 	}
 
 	if (!$ret) {
