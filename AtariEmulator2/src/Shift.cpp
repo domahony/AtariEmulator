@@ -23,7 +23,7 @@ operator()(CPU* cpu)
 
 	cpu->Z = (B == 0);
 
-	this->write(cpu, B);
+	this->write_back(cpu, B);
 
 	return 2 + this->_tcount;
 }
@@ -53,7 +53,7 @@ operator()(CPU* cpu)
 	cpu->Z = (B == 0);
 	cpu->N = B >> 7;
 
-	this->write(cpu, B);
+	this->write_back(cpu, B);
 
 	return this->_tcount + 3;
 }
@@ -83,7 +83,7 @@ operator()(CPU* cpu)
 	cpu->Z = (B == 0);
 	cpu->N = B >> 7;
 
-	this->write(cpu, B);
+	this->write_back(cpu, B);
 
 	return this->_tcount + 3;
 }

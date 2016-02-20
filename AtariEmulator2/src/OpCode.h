@@ -19,6 +19,7 @@ protected:
 	Accumulator() : _tcount(0), address_mode("Accumulator") { }
 	unsigned char read(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
+	void write_back(CPU* cpu, unsigned char val);
 
 	int _tcount;
 	std::string address_mode;
@@ -53,6 +54,7 @@ protected:
 	ZeroPage() : _tcount(2), address_mode("ZeroPage"), addr(0), value(0) { }
 	unsigned char read(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
+	void write_back(CPU *cpu, unsigned char val);
 	int _tcount;
 	std::string address_mode;
 	unsigned short addr;
@@ -65,6 +67,7 @@ protected:
 	ZeroPageWithXIdx() : _tcount(3), address_mode("ZeroPageWithXIdx"), addr(0), value(0) { }
 	unsigned char read(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
+	void write_back(CPU* cpu, unsigned char val);
 	int _tcount;
 	std::string address_mode;
 	unsigned short addr;
@@ -92,6 +95,7 @@ protected:
 	unsigned char read(CPU *cpu);
 	unsigned short get_address(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
+	void write_back(CPU* cpu, unsigned char val);
 	int _tcount;
 	std::string address_mode;
 	unsigned short addr;
@@ -105,6 +109,7 @@ protected:
 	AbsoluteWithX() : _tcount(3), address_mode("AbsoluteWithX"), addr(0), value(0) { }
 	unsigned char read(CPU *cpu);
 	void write(CPU* cpu, unsigned char val);
+	void write_back(CPU* cpu, unsigned char val);
 	int _tcount;
 	std::string address_mode;
 	unsigned short addr;

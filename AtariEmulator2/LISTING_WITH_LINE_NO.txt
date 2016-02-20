@@ -1,0 +1,6522 @@
+0c56 e456 		  JMP	  CIO
+0c6e e46e 		  JMP	  CIOINT
+0ca6 e4a6 CIOINT: LDX	  #0
+0ca8 e4a8 CIOI1:  LDA	  #IOCFRE
+0caa e4aa 		  STA	  ICHID,X
+0cad e4ad 		  LDA	  #ERRTNL
+0caf e4af 		  STA	  ICPTL,X
+0cb2 e4b2 		  LDA	  #ERRTNH
+0cb4 e4b4 		  STA	  ICPTH,X
+0cb7 e4b7 		  TXA
+0cb8 e4b8 		  CLC
+0cb9 e4b9 		  ADC	  #IOCBSZ
+0cbb e4bb 		  TAX
+0cbc e4bc 		  CMP	  #MAXIOC
+0cbe e4be 		  BCC	  CIOI1
+0cc0 e4c0 		  RTS
+0cc1 e4c1 		  LDY	  #NOTOPN
+0cc3 e4c3 		  RTS
+0cc4 e4c4 CIO:	 STA	  CIOCHR
+0cc6 e4c6 		  STX	  ICIDNO
+0cc8 e4c8 		  TXA
+0cc9 e4c9 		  AND	  #$F
+0ccb e4cb 		  BNE	  CIERR1
+0ccd e4cd 		  CPX	  #MAXIOC
+0ccf e4cf 		  BCC	  IOC1
+0cd1 e4d1 CIERR1: LDY	  #BADIOC
+0cd3 e4d3 		  JMP	  CIRTN1
+0cd6 e4d6 IOC1:	LDY	  #0
+0cd8 e4d8 IOC1A:  LDA	  IOCB,X
+0cdb e4db 		  STA	  IOCBAS,Y
+0cdd e4dd 		  INX
+0cde e4de 		  INY
+0cdf e4df 		  CPY	  #12
+0ce1 e4e1 		  BCC	  IOC1A
+0ce3 e4e3 		  LDY	  #NVALID
+0ce5 e4e5 		  LDA	  ICCOMZ
+0ce7 e4e7 		  CMP	  #OPEN
+0ce9 e4e9 		  BCC	  CIERR4
+0ceb e4eb 		  TAY
+0cec e4ec 		  CPY	  #SPECIL
+0cee e4ee 		  BCC	  IOC2
+0cf0 e4f0 		  LDY	  #SPECIL
+0cf2 e4f2 IOC2:	STY	  ICCOMT
+0cf4 e4f4 		  LDA	  COMTAB-3,Y
+0cf7 e4f7 		  BEQ	  CIOPEN
+0cf9 e4f9 		  CMP	  #2
+0cfb e4fb 		  BEQ	  CICLOS
+0cfd e4fd 		  CMP	  #8
+0cff e4ff 		  BCS	  CISTSP
+0d01 e501 		  CMP	  #4
+0d03 e503 		  BEQ	  CIREAD
+0d05 e505 		  JMP	  CIWRIT
+0d08 e508 CIOPEN: LDA	  ICHIDZ
+0d0a e50a 		  CMP	  #IOCFRE
+0d0c e50c 		  BEQ	  IOC6
+0d0e e50e CIERR3: LDY	  #PRVOPN
+0d10 e510 CIERR4: JMP	  CIRTN1
+0d13 e513 IOC6:	JSR	  DEVSRC
+0d16 e516 		  BCS	  CIERR4
+0d18 e518 IOC7:	JSR	  COMENT
+0d1b e51b 		  BCS	  CIERR4
+0d1d e51d 		  JSR	  GOHAND
+0d20 e520 		  LDA	  #PUTCHR
+0d22 e522 		  STA	  ICCOMT
+0d24 e524 		  JSR	  COMENT
+0d27 e527 		  LDA	  ICSPRZ
+0d29 e529 		  STA	  ICPTLZ
+0d2b e52b 		  LDA	  ICSPRZ+1
+0d2d e52d 		  STA	  ICPTHZ
+0d2f e52f 		  JMP	  CIRTN2
+0d32 e532 CICLOS: LDY	  #SUCCES
+0d34 e534 		  STY	  ICSTAZ
+0d36 e536 		  JSR	  COMENT
+0d39 e539 		  BCS	  CICLO2
+0d3b e53b 		  JSR	  GOHAND
+0d3e e53e CICLO2: LDA	  #IOCFRE
+0d40 e540 		  STA	  ICHIDZ
+0d42 e542 		  LDA	  #ERRTNH
+0d44 e544 		  STA	  ICPTHZ
+0d46 e546 		  LDA	  #ERRTNL
+0d48 e548 		  STA	  ICPTLZ
+0d4a e54a 		  JMP	  CIRTN2
+0d4d e54d CISTSP: LDA	  ICHIDZ
+0d4f e54f 		  CMP	  #IOCFRE
+0d51 e551 		  BNE	  CIST1
+0d53 e553 		  JSR	  DEVSRC
+0d56 e556 		  BCS	  CIERR4
+0d58 e558 CIST1:  JSR	  COMENT
+0d5b e55b 		  JSR	  GOHAND
+0d5e e55e 		  LDX	  ICIDNO
+0d60 e560 		  LDA	  ICHID,X
+0d63 e563 		  STA	  ICHIDZ
+0d65 e565 		  JMP	  CIRTN2
+0d68 e568 CIREAD: LDA	  ICCOMZ
+0d6a e56a 		  AND	  ICAX1Z
+0d6c e56c 		  BNE	  RCI1A
+0d6e e56e 		  LDY	  #WRONLY
+0d70 e570 RCI1B:  JMP	  CIRTN1
+0d73 e573 RCI1A:  JSR	  COMENT
+0d76 e576 		  BCS	  RCI1B
+0d78 e578 		  LDA	  ICBLLZ
+0d7a e57a 		  ORA	  ICBLLZ+1
+0d7c e57c 		  BNE	  RCI3
+0d7e e57e 		  JSR	  GOHAND
+0d81 e581 		  STA	  CIOCHR
+0d83 e583 		  JMP	  CIRTN2
+0d86 e586 RCI3:	JSR	  GOHAND
+0d89 e589 		  STA	  CIOCHR
+0d8b e58b 		  BMI	  RCI4
+0d8d e58d 		  LDY	  #0
+0d8f e58f 		  STA	  (ICBALZ),Y
+0d91 e591 		  JSR	  INCBFP
+0d94 e594 		  LDA	  ICCOMZ
+0d96 e596 		  AND	  #2
+0d98 e598 		  BNE	  RCI1
+0d9a e59a 		  LDA	  CIOCHR
+0d9c e59c 		  CMP	  #EOL
+0d9e e59e 		  BNE	  RCI1
+0da0 e5a0 		  JSR	  DECBFL
+0da3 e5a3 		  JMP	  RCI4
+0da6 e5a6 RCI1:	JSR	  DECBFL
+0da9 e5a9 		  BNE	  RCI3
+0dab e5ab RCI2:	LDA	  ICCOMZ
+0dad e5ad 		  AND	  #2
+0daf e5af 		  BNE	  RCI4
+0db1 e5b1 RCI6:	JSR	  GOHAND
+0db4 e5b4 		  STA	  CIOCHR
+0db6 e5b6 		  BMI	  RCI4
+0db8 e5b8 		  LDA	  CIOCHR
+0dba e5ba 		  CMP	  #EOL
+0dbc e5bc 		  BNE	  RCI6
+0dbe e5be RCI1I:  LDA	  #TRNRCD
+0dc0 e5c0 		  STA	  ICSTAZ
+0dc2 e5c2 RCI4:	JSR	  SUBBFL
+0dc5 e5c5 		  JMP	  CIRTN2
+0dc8 e5c8 CIWRIT: LDA	  ICCOMZ
+0dca e5ca 		  AND	  ICAX1Z
+0dcc e5cc 		  BNE	  WCIIA
+0dce e5ce 		  LDY	  #RDONLY
+0dd0 e5d0 WCI1B:  JMP	  CIRTN1
+0dd3 e5d3 WCIIA:  JSR	  COMENT
+0dd6 e5d6 		  BCS	  WCI1B
+0dd8 e5d8 		  LDA	  ICBLLZ
+0dda e5da 		  ORA	  ICBLLZ+1
+0ddc e5dc 		  BNE	  WCI3
+0dde e5de 		  LDA	  CIOCHR
+0de0 e5e0 		  INC	  ICBLLZ
+0de2 e5e2 		  BNE	  WCI4
+0de4 e5e4 WCI3:	LDY	  #0
+0de6 e5e6 		  LDA	  (ICBALZ),Y
+0de8 e5e8 		  STA	  CIOCHR
+0dea e5ea WCI4:	JSR	  GOHAND
+0ded e5ed 		  BMI	  WCI5
+0def e5ef 		  JSR	  INCBFP
+0df2 e5f2 		  LDA	  ICCOMZ
+0df4 e5f4 		  AND	  #2
+0df6 e5f6 		  BNE	  WCI1
+0df8 e5f8 		  LDA	  CIOCHR
+0dfa e5fa 		  CMP	  #EOL
+0dfc e5fc 		  BNE	  WCI1
+0dfe e5fe 		  JSR	  DECBFL
+0e01 e601 		  JMP	  WCI5
+0e04 e604 WCI1:	JSR	  DECBFL
+0e07 e607 		  BNE	  WCI3
+0e09 e609 WCI2:	LDA	  ICCOMZ
+0e0b e60b 		  AND	  #2
+0e0d e60d 		  BNE	  WCI5
+0e0f e60f 		  LDA	  #EOL
+0e11 e611 		  JSR	  GOHAND
+0e14 e614 WCI5:	JSR	  SUBBFL
+0e17 e617 		  JMP	  CIRTN2
+0e1a e61a CIRTN1: STY	  ICSTAZ
+0e1c e61c CIRTN2: LDY	  ICIDNO
+0e1e e61e 		  LDA	  ICBAL,Y
+0e21 e621 		  STA	  ICBALZ
+0e23 e623 		  LDA	  ICBAH,Y
+0e26 e626 		  STA	  ICBAHZ
+0e28 e628 		  LDX	  #0
+0e2a e62a CIRT3:  LDA	  IOCBAS,X
+0e2c e62c 		  STA	  IOCB,Y
+0e2f e62f 		  INX
+0e30 e630 		  INY
+0e31 e631 		  CPX	  #12
+0e33 e633 		  BCC	  CIRT3
+0e35 e635 		  LDA	  CIOCHR
+0e37 e637 		  LDX	  ICIDNO
+0e39 e639 		  LDY	  ICSTAZ
+0e3b e63b 		  RTS
+0e3c e63c COMENT: LDY	  ICHIDZ
+0e3e e63e 		  CPY	  #MAXDEV+1
+0e40 e640 		  BCC	  COM1
+0e42 e642 		  LDY	  #NOTOPN
+0e44 e644 		  BCS	  COM2
+0e46 e646 COM1:	LDA	  HATABS+1,Y
+0e49 e649 		  STA	  ICSPRZ
+0e4b e64b 		  LDA	  HATABS+2,Y
+0e4e e64e 		  STA	  ICSPRZ+1
+0e50 e650 		  LDY	  ICCOMT
+0e52 e652 		  LDA	  COMTAB-3,Y
+0e55 e655 		  TAY
+0e56 e656 		  LDA	  (ICSPRZ),Y
+0e58 e658 		  TAX
+0e59 e659 		  INY
+0e5a e65a 		  LDA	  (ICSPRZ),Y
+0e5c e65c 		  STA	  ICSPRZ+1
+0e5e e65e 		  STX	  ICSPRZ
+0e60 e660 		  CLC
+0e61 e661 COM2:	RTS
+0e62 e662 DECBFL: DEC	  ICBLLZ
+0e64 e664 		  LDA	  ICBLLZ
+0e66 e666 		  CMP	  #$FF
+0e68 e668 		  BNE	  DECBF1
+0e6a e66a 		  DEC	  ICBLLZ+1
+0e6c e66c DECBF1: ORA	  ICBLLZ+1
+0e6e e66e 		  RTS
+0e6f e66f INCBFP: INC	  ICBALZ
+0e71 e671 		  BNE	  INCBF1
+0e73 e673 		  INC	  ICBALZ+1
+0e75 e675 INCBF1: RTS
+0e76 e676 SUBBFL: LDX	  ICIDNO
+0e78 e678 		  SEC
+0e79 e679 		  LDA	  ICBLL,X
+0e7c e67c 		  SBC	  ICBLLZ
+0e7e e67e 		  STA	  ICBLLZ
+0e80 e680 		  LDA	  ICBLH,X
+0e83 e683 		  SBC	  ICBLLZ+1
+0e85 e685 		  STA	  ICBLHZ
+0e87 e687 		  RTS
+0e88 e688 GOHAND: LDY	  #FNCNOT
+0e8a e68a 		  JSR	  CIJUMP
+0e8d e68d 		  STY	  ICSTAZ
+0e8f e68f 		  CPY	  #0
+0e91 e691 		  RTS
+0e92 e692 CIJUMP: TAX
+0e93 e693 		  LDA	  ICSPRZ+1
+0e95 e695 		  PHA
+0e96 e696 		  LDA	  ICSPRZ
+0e98 e698 		  PHA
+0e99 e699 		  TXA
+0e9a e69a 		  LDX	  ICIDNO
+0e9c e69c 		  RTS
+0e9d e69d DEVSRC: LDY	  #0
+0e9f e69f 		  LDA	  (ICBALZ),Y
+0ea1 e6a1 		  BEQ	  CIERR2
+0ea3 e6a3 		  LDY	  #MAXDEV
+0ea5 e6a5 DEVS1:  CMP	  HATABS,Y
+0ea8 e6a8 		  BEQ	  DEVS2
+0eaa e6aa 		  DEY
+0eab e6ab 		  DEY
+0eac e6ac 		  DEY
+0ead e6ad 		  BPL	  DEVS1
+0eaf e6af CIERR2: LDY	  #NONDEV
+0eb1 e6b1 		  SEC
+0eb2 e6b2 		  BCS	  DEVS4
+0eb4 e6b4 DEVS2:  TYA
+0eb5 e6b5 		  STA	  ICHIDZ
+0eb7 e6b7 		  SEC
+0eb8 e6b8 		  LDY	  #1
+0eba e6ba 		  LDA	  (ICBALZ),Y
+0ebc e6bc 		  SBC	  #ASCZER
+0ebe e6be 		  CMP	  #$A
+0ec0 e6c0 		  BCC	  DEVS3
+0ec2 e6c2 		  LDA	  #1
+0ec4 e6c4 DEVS3:  STA	  ICDNOZ
+0ec6 e6c6 		  CLC
+0ec7 e6c7 DEVS4:  RTS
+0ec8 e6c8 COMTAB: BYTE	 0,4,4,4,4,6,6,6,6,2,8,10
+0014 d814 CIOSPR: BYTE	 INTORG-CRNTP1
+e912 1c112 		  JMP	  SETVBL
+0c5c e45c 		  JMP	  SETVBL
+0c5f e45f 		  JMP	  SYSVBL
+0c62 e462 		  JMP	  XITVBL
+0c6b e46b 		  JMP	  IHINIT
+NO SYMBOL: VCTABL+INTABS-VDSLST
+0c6e e46e 		  .WORD	SYRTI
+0c70 e470 		  .WORD	SYIRQB
+0c72 e472 		  .WORD	SYIRQB
+0c74 e474 		  .WORD	SYIRQB
+0c76 e476 		  .WORD	SYIRQB
+0c78 e478 		  .WORD	SYIRQB
+0c7a e47a 		  .WORD	SYIRQB
+0c7c e47c 		  .WORD	SYIRQ
+0c7e e47e 		  .WORD	0,0,0,0,0
+0c88 e488 		  .WORD	SYSVBL
+0c8a e48a 		  .WORD	XITVBL
+900c 1680c 		  LDA	  #PIRQH
+900e 1680e 		  STA	  $FFF9
+9010 16810 		  LDA	  #PIRQL
+9012 16812 		  STA	  $FFF8
+9014 16814 		  LDA	  #PNMIH
+9016 16816 		  STA	  $FFFB
+9018 16818 		  LDA	  #PNMIL
+901a 1681a 		  STA	  $FFFA
+901c 1681c 		  RTS
+0ed5 e6d5 IHINIT: LDA	  #$40
+0ed7 e6d7 		  STA	  NMIEN
+0eda e6da 		  LDA	  #$38
+0edc e6dc 		  STA	  PACTL
+0edf e6df 		  STA	  PBCTL
+0ee2 e6e2 		  LDA	  #0
+0ee4 e6e4 		  STA	  PORTA
+0ee7 e6e7 		  STA	  PORTB
+0eea e6ea 		  LDA	  #$3C
+0eec e6ec 		  STA	  PACTL
+0eef e6ef 		  STA	  PBCTL
+0ef2 e6f2 		  RTS
+0ef3 e6f3 PIRQ:	JMP	  (VIMIRU)
+0ef6 e6f6 CMPTAB: .BYTE	$80
+0ef7 e6f7 		  .BYTE	$40
+0ef8 e6f8 		  .BYTE	$04
+0ef9 e6f9 		  .BYTE	$02
+0efa e6fa 		  .BYTE	$01
+0efb e6fb 		  .BYTE	$08
+0efc e6fc 		  .BYTE	$10
+0efd e6fd 		  .BYTE	$20
+0efe e6fe ADRTAB: .BYTE	BRKKY-INTABS
+0eff e6ff 		  .BYTE	VKEYBD-INTABS
+0f00 e700 		  .BYTE	VTIMR4-INTABS
+0f01 e701 		  .BYTE	VTIMR2-INTABS
+0f02 e702 		  .BYTE	VTIMR1-INTABS
+0f03 e703 		  .BYTE	VSEROC-INTABS
+0f04 e704 		  .BYTE	VSEROR-INTABS
+0f05 e705 		  .BYTE	VSERIN-INTABS
+0f06 e706 SYIRQ:  PHA
+0f07 e707 		  LDA	  IRQST
+0f0a e70a 		  AND	  #$20
+0f0c e70c 		  BNE	  SYIRQ2
+0f0e e70e 		  LDA	  #$DF
+0f10 e710 		  STA	  IRQEN
+0f13 e713 		  LDA	  POKMSK
+0f15 e715 		  STA	  IRQEN
+0f18 e718 		  JMP	  (VSERIN)
+0f1b e71b SYIRQ2: TXA
+0f1c e71c 		  PHA
+0f1d e71d 		  LDX	  #$6
+Unresolved: LDA CMPTAB,X
+0f1f e71f LOOPM:  LDA	  CMPTAB,X
+0f22 e722 		  CPX	  #5
+0f24 e724 		  BNE	  LOOPM2
+0f26 e726 		  AND	  POKMSK
+0f28 e728 		  BEQ	  LL
+0f2a e72a LOOPM2: BIT	  IRQST
+0f2d e72d 		  BEQ	  JMPP
+0f2f e72f LL:	  DEX
+0f30 e730 		  BPL	  LOOPM
+0f32 e732 		  JMP	  SYIRQ8
+0f35 e735 JMPP:	EOR	  #$FF
+0f37 e737 		  STA	  IRQEN
+0f3a e73a 		  LDA	  POKMSK
+0f3c e73c 		  STA	  IRQEN
+Unresolved: LDA ADRTAB,X
+0f3f e73f 		  LDA	  ADRTAB,X
+0f42 e742 		  TAX
+0f43 e743 		  LDA	  INTABS,X
+0f46 e746 		  STA	  JVECK
+0f49 e749 		  LDA	  INTABS+1,X
+0f4c e74c 		  STA	  JVECK+1
+0f4f e74f 		  PLA
+0f50 e750 		  TAX
+0f51 e751 		  JMP	  (JVECK)
+0f54 e754 BRKKY2: LDA	  #0
+0f56 e756 		  STA	  BRKKEY
+0f58 e758 		  STA	  SSFLAG
+0f5b e75b 		  STA	  CRSINH
+0f5e e75e 		  STA	  ATRACT
+0f60 e760 		  PLA
+0f61 e761 		  RTI
+0f62 e762 SYIRQ8: PLA
+0f63 e763 		  TAX
+0f64 e764 		  BIT	  PACTL
+0f67 e767 		  BPL	  SYIRQ9
+0f69 e769 		  LDA	  PORTA
+0f6c e76c 		  JMP	  (VPRCED)
+0f6f e76f SYIRQ9: BIT	  PBCTL
+0f72 e772 		  BPL	  SYIRQA
+0f74 e774 		  LDA	  PORTB
+0f77 e777 		  JMP	  (VINTER)
+0f7a e77a SYIRQA: PLA
+0f7b e77b 		  STA	  JVECK
+0f7e e77e 		  PLA
+0f7f e77f 		  PHA
+0f80 e780 		  AND	  #$10
+0f82 e782 		  BEQ	  SYRTI2
+0f84 e784 		  LDA	  JVECK
+0f87 e787 		  PHA
+0f88 e788 		  JMP	  (VBREAK)
+0f8b e78b SYRTI2: LDA	  JVECK
+0f8e e78e 		  PHA
+0f8f e78f SYIRQB: PLA
+0f90 e790 SYRTI:  RTI
+0f91 e791 PNMI:	BIT	  NMIST
+0f94 e794 		  BPL	  PNMI1
+0f96 e796 		  JMP	  (VDSLST)
+0f99 e799 PNMI1:  PHA
+0f9a e79a 		  LDA	  NMIST
+0f9d e79d 		  AND	  #$20
+0f9f e79f 		  BEQ	  *+5
+0fa1 e7a1 		  JMP	  WARMSV
+0fa4 e7a4 		  TXA
+0fa5 e7a5 		  PHA
+0fa6 e7a6 		  TYA
+0fa7 e7a7 		  PHA
+0fa8 e7a8 		  STA	  NMIRES
+0fab e7ab 		  JMP	  (VVBLKI)
+0fae e7ae SYSVBL: INC	  RTCLOK+2
+0fb0 e7b0 		  BNE	  SYSVB1
+0fb2 e7b2 		  INC	  ATRACT
+0fb4 e7b4 		  INC	  RTCLOK+1
+0fb6 e7b6 		  BNE	  SYSVB1
+0fb8 e7b8 		  INC	  RTCLOK
+0fba e7ba SYSVB1: LDA	  #$FE
+0fbc e7bc 		  LDX	  #0
+0fbe e7be 		  LDY	  ATRACT
+0fc0 e7c0 		  BPL	  VBATRA
+0fc2 e7c2 		  STA	  ATRACT
+0fc4 e7c4 		  LDX	  RTCLOK+1
+0fc6 e7c6 		  LDA	  #$F6
+0fc8 e7c8 VBATRA: STA	  DRKMSK
+0fca e7ca 		  STX	  COLRSH
+0fcc e7cc 		  LDX	  #0
+0fce e7ce 		  JSR	  DCTIMR
+0fd1 e7d1 		  BNE	  SYSVB2
+0fd3 e7d3 		  JSR	  JTIMR1
+0fd6 e7d6 SYSVB2: LDA	  CRITIC
+0fd8 e7d8 		  BNE	  XXIT
+0fda e7da 		  TSX
+Unresolved: LDA $104,X
+0fdb e7db 		  LDA	  $104,X
+0fde e7de 		  AND	  #$04
+0fe0 e7e0 		  BEQ	  SYSVB3
+0fe2 e7e2 XXIT:	JMP	  XITVBL
+0fe5 e7e5 SYSVB3: LDA	  PENV
+0fe8 e7e8 		  STA	  LPENV
+0feb e7eb 		  LDA	  PENH
+0fee e7ee 		  STA	  LPENH
+0ff1 e7f1 		  LDA	  SDLSTH
+0ff4 e7f4 		  STA	  DLISTH
+0ff7 e7f7 		  LDA	  SDLSTL
+0ffa e7fa 		  STA	  DLISTL
+0ffd e7fd 		  LDA	  SDMCTL
+1000 e800 		  STA	  DMACTL
+1003 e803 		  LDA	  GPRIOR
+1006 e806 		  STA	  PRIOR
+1009 e809 		  LDX	  #$08
+100b e80b 		  STX	  CONSOL
+100e e80e SCOLLP: CLI
+1012 e812 		  EOR	  COLRSH
+1014 e814 		  AND	  DRKMSK
+1016 e816 		  STA	  COLPM0,X
+1019 e819 		  DEX
+101a e81a 		  BPL	  SCOLLP
+101c e81c 		  LDA	  CHBAS
+101f e81f 		  STA	  CHBASE
+1022 e822 		  LDA	  CHACT
+1025 e825 		  STA	  CHACTL
+1028 e828 		  LDX	  #2
+102a e82a 		  JSR	  DCTIMR
+102d e82d 		  BNE	  SYSVB4
+102f e82f 		  JSR	  JTIMR2
+1032 e832 SYSVB4: LDX	  #2
+1034 e834 SYSVBB: INX
+1035 e835 		  INX
+1036 e836 		  LDA	  CDTMV1,X
+1039 e839 		  ORA	  CDTMV1+1,X
+103c e83c 		  BEQ	  SYSVBA
+103e e83e 		  JSR	  DCTIMR
+1041 e841 		  STA	  CDTMF3-4,X
+1044 e844 SYSVBA: CPX	  #8
+1046 e846 		  BNE	  SYSVBB
+1048 e848 		  LDA	  SKSTAT
+104b e84b 		  AND	  #$04
+104d e84d 		  BEQ	  SYVB6A
+104f e84f 		  LDA	  KEYDEL
+1052 e852 		  BEQ	  SYVB6A
+1054 e854 		  DEC	  KEYDEL
+1057 e857 SYVB6A: LDA	  SRTIMR
+105a e85a 		  BEQ	  SYSVB7
+105c e85c 		  LDA	  SKSTAT
+105f e85f 		  AND	  #$04
+1061 e861 		  BNE	  SYSVB6
+1063 e863 		  DEC	  SRTIMR
+1066 e866 		  BNE	  SYSVB7
+1068 e868 		  LDA	  #SRTIM2
+106a e86a 		  STA	  SRTIMR
+106d e86d 		  LDA	  KBCODE
+1070 e870 		  STA	  CH
+1073 e873 SYSVB7: LDY	  #1
+1075 e875 		  LDX	  #3
+1077 e877 STLOOP: LDA	  PORTA,Y
+107a e87a 		  LSR	  A
+107b e87b 		  LSR	  A
+107c e87c 		  LSR	  A
+107d e87d 		  LSR	  A
+107e e87e 		  STA	  STICK0,X
+1081 e881 		  DEX
+1082 e882 		  LDA	  PORTA,Y
+1085 e885 		  AND	  #$F
+1087 e887 		  STA	  STICK0,X
+108a e88a 		  DEX
+108b e88b 		  DEY
+108c e88c 		  BPL	  STLOOP
+108e e88e 		  LDX	  #3
+1090 e890 STRL:	LDA	  TRIG0,X
+1093 e893 		  STA	  STRIG0,X
+1096 e896 		  LDA	  POT0,X
+1099 e899 		  STA	  PADDL0,X
+109c e89c 		  LDA	  POT4,X
+109f e89f 		  STA	  PADDL4,X
+10a2 e8a2 		  DEX
+10a3 e8a3 		  BPL	  STRL
+10a5 e8a5 		  STA	  POTGO
+10a8 e8a8 		  LDX	  #6
+10aa e8aa 		  LDY	  #3
+10ac e8ac PTRLP:  LDA	  STICK0,Y
+10af e8af 		  LSR	  A
+10b0 e8b0 		  LSR	  A
+10b1 e8b1 		  LSR	  A
+10b2 e8b2 		  STA	  PTRIG1,X
+10b5 e8b5 		  LDA	  #0
+10b7 e8b7 		  ROL	  A
+10b8 e8b8 		  STA	  PTRIG0,X
+10bb e8bb 		  DEX
+10bc e8bc 		  DEX
+10bd e8bd 		  DEY
+10be e8be 		  BPL	  PTRLP
+10c0 e8c0 		  JMP	  (VVBLKD)
+10c3 e8c3 SYSVB6: LDA	  #0
+10c5 e8c5 		  STA	  SRTIMR
+10c8 e8c8 		  BEQ	  SYSVB7
+10ca e8ca JTIMR1: JMP	  (CDTMA1)
+10cd e8cd JTIMR2: JMP	  (CDTMA2)
+10d0 e8d0 DCTIMR: LDY	  CDTMV1,X
+10d3 e8d3 		  BNE	  DCTIM1
+10d5 e8d5 		  LDY	  CDTMV1+1,X
+10d8 e8d8 		  BEQ	  DCTXF
+10da e8da 		  DEC	  CDTMV1+1,X
+10dd e8dd DCTIM1: DEC	  CDTMV1,X
+10e0 e8e0 		  BNE	  DCTXF
+10e2 e8e2 		  LDY	  CDTMV1+1,X
+10e5 e8e5 		  BNE	  DCTXF
+10e7 e8e7 		  LDA	  #0
+10e9 e8e9 		  RTS
+10ea e8ea DCTXF:  LDA	  #$FF
+10ec e8ec 		  RTS
+10ed e8ed SETVBL: ASL	  A
+10ee e8ee 		  STA	  INTEMP
+10f1 e8f1 		  TXA
+10f2 e8f2 		  LDX	  #5
+10f4 e8f4 		  STA	  WSYNC
+10f7 e8f7 SETLOP: DEX
+10f8 e8f8 		  BNE	  SETLOP
+10fa e8fa 		  LDX	  INTEMP
+10fd e8fd 		  STA	  CDTMV1-1,X
+1100 e900 		  TYA
+1101 e901 		  STA	  CDTMV1-2,X
+1104 e904 		  RTS
+1105 e905 XITVBL: PLA
+1106 e906 		  TAY
+1107 e907 		  PLA
+1108 e908 		  TAX
+1109 e909 		  PLA
+110a e90a 		  RTI
+0014 d814 INTSPR: .BYTE	SIOORG-CRNTP2
+0c59 e459 		  JMP	  SIO
+0c65 e465 		  JMP	  SIOINT
+0c68 e468 		  JMP	  SENDEN
+NO SYMBOL: VCTABL-INTABS+VSERIN
+0c6b e46b 		  .WORD	  ISRSIR
+0c6d e46d 		  .WORD	  ISRODN
+0c6f e46f 		  .WORD	  ISRTD
+1144 e944 SIOINT: LDA	  #MOTRST
+1146 e946 		  STA	  PACTL
+1149 e949 		  LDA	  #NCOMHI
+114b e94b 		  STA	  PBCTL
+114e e94e 		  LDA	  #3
+1150 e950 		  STA	  SSKCTL
+1153 e953 		  STA	  SOUNDR
+1155 e955 		  STA	  SKCTL
+1158 e958 		  RTS
+1159 e959 SIO:	 TSX
+115a e95a 		  STX	  STACKP
+115d e95d 		  LDA	  #1
+115f e95f 		  STA	  CRITIC
+1161 e961 		  LDA	  DDEVIC
+1164 e964 		  CMP	  #CASET
+1166 e966 		  BNE	  NOTCST
+1168 e968 		  JMP	  CASENT
+116b e96b NOTCST: LDA	  #0
+116d e96d 		  STA	  CASFLG
+1170 e970 		  LDA	  #DRETRI
+1172 e972 		  STA	  DRETRY
+1174 e974 COMMND: LDA	  #CRETRI
+1176 e976 		  STA	  CRETRY
+1178 e978 COMFRM: LDA	  #B192LO
+117a e97a 		  STA	  AUDF3
+117d e97d 		  LDA	  #B192HI
+117f e97f 		  STA	  AUDF4
+1182 e982 		  CLC
+1183 e983 		  LDA	  DDEVIC
+1186 e986 		  ADC	  DUNIT
+1189 e989 		  ADC	  #$FF
+118b e98b 		  STA	  CDEVIC
+118e e98e 		  LDA	  DCOMND
+1191 e991 		  STA	  CCOMND
+1194 e994 		  LDA	  DAUX1
+1197 e997 		  STA	  CAUX1
+119a e99a 		  LDA	  DAUX2
+119d e99d 		  STA	  CAUX2
+11a0 e9a0 		  CLC
+11a1 e9a1 		  LDA	  #CBUFLO
+11a3 e9a3 		  STA	  BUFRLO
+11a5 e9a5 		  ADC	  #4
+11a7 e9a7 		  STA	  BFENLO
+11a9 e9a9 		  LDA	  #CBUFHI
+11ab e9ab 		  STA	  BUFRHI
+11ad e9ad 		  STA	  BFENHI
+11af e9af 		  LDA	  #NCOMLO
+11b1 e9b1 		  STA	  PBCTL
+11b4 e9b4 		  JSR	  SENDIN
+11b7 e9b7 		  LDA	  ERRFLG
+11ba e9ba 		  BNE	  BADCOM
+11bc e9bc 		  TYA
+11bd e9bd 		  BNE	  ACKREC
+11bf e9bf BADCOM: DEC	  CRETRY
+11c1 e9c1 		  BPL	  COMFRM
+11c3 e9c3 		  JMP	  DERR1
+11c6 e9c6 ACKREC: LDA	  DSTATS
+11c9 e9c9 		  BPL	  WATCOM
+11cb e9cb 		  LDA	  #CRETRI
+11cd e9cd 		  STA	  CRETRY
+11cf e9cf 		  JSR	  LDPNTR
+11d2 e9d2 		  JSR	  SENDIN
+11d5 e9d5 		  BEQ	  BADCOM
+11d7 e9d7 WATCOM: JSR	  STTMOT
+11da e9da 		  LDA	  #$00
+11dc e9dc 		  STA	  ERRFLG
+11df e9df 		  JSR	  WAITER
+11e2 e9e2 		  BEQ	  DERR
+11e4 e9e4 		  BIT	  DSTATS
+11e7 e9e7 		  BVS	  MODATA
+11e9 e9e9 		  LDA	  ERRFLG
+11ec e9ec 		  BNE	  DERR1
+11ee e9ee 		  BEQ	  RETURN
+11f0 e9f0 MODATA: JSR	  LDPNTR
+11f3 e9f3 		  JSR	  RECEIV
+11f6 e9f6 DERR:	LDA	  ERRFLG
+11f9 e9f9 		  BEQ	  NOTERR
+11fb e9fb 		  LDA	  TSTAT
+11fe e9fe 		  STA	  STATUS
+1200 ea00 NOTERR: LDA	  STATUS
+1202 ea02 		  CMP	  #SUCCES
+1204 ea04 		  BEQ	  RETURN
+1206 ea06 DERR1:  DEC	  DRETRY
+1208 ea08 		  BMI	  RETURN
+120a ea0a 		  JMP	  COMMND
+120d ea0d RETURN: JSR	  SENDDS
+1210 ea10 		  LDA	  #0
+1212 ea12 		  STA	  CRITIC
+1214 ea14 		  LDY	  STATUS
+1216 ea16 		  STY	  DSTATS
+1219 ea19 		  RTS	  RETURN
+121a ea1a WAIT:	LDA	  #$00
+121c ea1c 		  STA	  ERRFLG
+121f ea1f 		  CLC
+1220 ea20 		  LDA	  #TEMPLO
+1222 ea22 		  STA	  BUFRLO
+1224 ea24 		  ADC	  #1
+1226 ea26 		  STA	  BFENLO
+1228 ea28 		  LDA	  #TEMPHI
+122a ea2a 		  STA	  BUFRHI
+122c ea2c 		  STA	  BFENHI
+122e ea2e 		  LDA	  #$FF
+1230 ea30 		  STA	  NOCKSM
+1232 ea32 		  JSR	  RECEIV
+1235 ea35 		  LDY	  #$FF
+1237 ea37 		  LDA	  STATUS
+1239 ea39 		  CMP	  #SUCCES
+123b ea3b 		  BNE	  NWOK
+123d ea3d WOK:	 LDA	  TEMP
+1240 ea40 		  CMP	  #ACK
+1242 ea42 		  BEQ	  GOOD
+1244 ea44 		  CMP	  #COMPLT
+1246 ea46 		  BEQ	  GOOD
+1248 ea48 		  CMP	  #ERROR
+124a ea4a 		  BNE	  NOTDER
+124c ea4c 		  LDA	  #DERROR
+124e ea4e 		  STA	  STATUS
+1250 ea50 		  BNE	  NWOK
+1252 ea52 NOTDER: LDA	  #DNACK
+1254 ea54 		  STA	  STATUS
+1256 ea56 NWOK:	LDA	  STATUS
+1258 ea58 		  CMP	  #TIMOUT
+125a ea5a 		  BEQ	  BAD
+125c ea5c 		  LDA	  #$FF
+125e ea5e 		  STA	  ERRFLG
+1261 ea61 		  BNE	  GOOD
+1263 ea63 BAD:	 LDY	  #0
+1265 ea65 GOOD:	LDA	  STATUS
+1267 ea67 		  STA	  TSTAT
+126a ea6a 		  RTS
+126b ea6b SEND:	LDA	  #SUCCES
+126d ea6d 		  STA	  STATUS
+126f ea6f 		  JSR	  SENDEN
+1272 ea72 		  LDY	  #0
+1274 ea74 		  STY	  CHKSUM
+1276 ea76 		  STY	  CHKSNT
+1278 ea78 		  STY	  XMTDON
+127a ea7a 		  LDA	  (BUFRLO),Y
+127c ea7c 		  STA	  SEROUT
+127f ea7f 		  STA	  CHKSUM
+1281 ea81 NOTDON: LDA	  BRKKEY
+1283 ea83 		  BNE	  NTBRKO
+1285 ea85 		  JMP	  BROKE
+1288 ea88 NTBRKO: LDA	  XMTDON
+128a ea8a 		  BEQ	  NOTDON
+128c ea8c 		  JSR	  SENDDS
+128f ea8f 		  RTS	  RETURN
+1290 ea90 ISRODN: TYA
+1291 ea91 		  PHA
+1292 ea92 		  INC	  BUFRLO
+1294 ea94 		  BNE	  NOWRPO
+1296 ea96 		  INC	  BUFRHI
+1298 ea98 NOWRPO: LDA	  BUFRLO
+129a ea9a 		  CMP	  BFENLO
+129c ea9c 		  LDA	  BUFRHI
+129e ea9e 		  SBC	  BFENHI
+12a0 eaa0 		  BCC	  NOTEND
+12a2 eaa2 		  LDA	  CHKSNT
+12a4 eaa4 		  BNE	  RELONE
+12a6 eaa6 		  LDA	  CHKSUM
+12a8 eaa8 		  STA	  SEROUT
+12ab eaab 		  LDA	  #$FF
+12ad eaad 		  STA	  CHKSNT
+12af eaaf 		  BNE	  CHKDON
+12b1 eab1 RELONE: LDA	  POKMSK
+12b3 eab3 		  ORA	  #$08
+12b5 eab5 		  STA	  POKMSK
+12b7 eab7 		  STA	  IRQEN
+12ba eaba CHKDON: PLA
+12bb eabb 		  TAY
+12bc eabc 		  PLA
+12bd eabd 		  RTI
+12be eabe NOTEND: LDY	  #0
+12c0 eac0 		  LDA	  (BUFRLO),Y
+12c2 eac2 		  STA	  SEROUT
+12c5 eac5 		  CLC
+12c6 eac6 		  ADC	  CHKSUM
+12c8 eac8 		  ADC	  #0
+12ca eaca 		  STA	  CHKSUM
+12cc eacc 		  JMP	  CHKDON
+12cf eacf ISRTD:  LDA	  CHKSNT
+12d1 ead1 		  BEQ	  FOOEY
+12d3 ead3 		  STA	  XMTDON
+12d5 ead5 		  LDA	  POKMSK
+12d7 ead7 		  AND	  #$F7
+12d9 ead9 		  STA	  POKMSK
+12db eadb 		  STA	  IRQEN
+12de eade FOOEY:  PLA
+12df eadf 		  RTI
+12e0 eae0 RECEIV: LDA	  #0
+12e2 eae2 		  LDY	  CASFLG
+12e5 eae5 		  BNE	  NOCLR
+12e7 eae7 		  STA	  CHKSUM
+12e9 eae9 NOCLR:  STA	  BUFRFL
+12eb eaeb 		  STA	  RECVDN
+12ed eaed 		  LDA	  #SUCCES
+12ef eaef 		  STA	  STATUS
+12f1 eaf1 		  JSR	  RECVEN
+12f4 eaf4 		  LDA	  #NCOMHI
+12f6 eaf6 		  STA	  PBCTL
+12f9 eaf9 CHKTIM: LDA	  BRKKEY
+12fb eafb 		  BNE	  NTBRK1
+12fd eafd 		  JMP	  BROKE
+1300 eb00 NTBRK1: LDA	  TIMFLG
+1303 eb03 		  BEQ	  TOUT
+1305 eb05 		  LDA	  RECVDN
+1307 eb07 		  BEQ	  CHKTIM
+1309 eb09 GOBACK: RTS
+130a eb0a TOUT:	LDA	  #TIMOUT
+130c eb0c 		  STA	  STATUS
+130e eb0e RRETRN: RTS
+130f eb0f ISRSIR: TYA
+1310 eb10 		  PHA
+1311 eb11 		  LDA	  SKSTAT
+1314 eb14 		  STA	  SKRES
+1317 eb17 		  BMI	  NTFRAM
+1319 eb19 		  LDY	  #FRMERR
+131b eb1b 		  STY	  STATUS
+131d eb1d NTFRAM: AND	  #$20
+131f eb1f 		  BNE	  NTOVRN
+1321 eb21 		  LDY	  #OVRRUN
+1323 eb23 		  STY	  STATUS
+1325 eb25 NTOVRN: LDA	  BUFRFL
+1327 eb27 		  BEQ	  NOTYET
+1329 eb29 		  LDA	  SERIN
+132c eb2c 		  CMP	  CHKSUM
+132e eb2e 		  BEQ	  SRETRN
+1330 eb30 		  LDY	  #CHKERR
+1332 eb32 		  STY	  STATUS
+1334 eb34 SRETRN: LDA	  #$FF
+1336 eb36 		  STA	  RECVDN
+1338 eb38 SUSUAL: PLA
+1339 eb39 		  TAY
+133a eb3a 		  PLA
+133b eb3b 		  RTI
+133c eb3c NOTYET: LDA	  SERIN
+133f eb3f 		  LDY	  #0
+1341 eb41 		  STA	  (BUFRLO),Y
+1343 eb43 		  CLC
+1344 eb44 		  ADC	  CHKSUM
+1346 eb46 		  ADC	  #0
+1348 eb48 		  STA	  CHKSUM
+134a eb4a 		  INC	  BUFRLO
+134c eb4c 		  BNE	  NTWRP1
+134e eb4e 		  INC	  BUFRHI
+1350 eb50 NTWRP1: LDA	  BUFRLO
+1352 eb52 		  CMP	  BFENLO
+1354 eb54 		  LDA	  BUFRHI
+1356 eb56 		  SBC	  BFENHI
+Unresolved: DCC SUSUAL
+1358 eb58 		  DCC	  SUSUAL
+135b eb5b 		  LDA	  NOCKSM
+135d eb5d 		  BEQ	  GOON
+135f eb5f 		  LDA	  #0
+1361 eb61 		  STA	  NOCKSM
+1363 eb63 		  BEQ	  SRETRN
+1365 eb65 GOON:	LDA	  #$FF
+1367 eb67 		  STA	  BUFRFL
+1369 eb69 		  BNE	  SUSUAL
+136b eb6b LDPNTR: CLC
+136c eb6c 		  LDA	  DBUFLO
+136f eb6f 		  STA	  BUFRLO
+1371 eb71 		  ADC	  DBYTLO
+1374 eb74 		  STA	  BFENLO
+1376 eb76 		  LDA	  DBUFHI
+1379 eb79 		  STA	  BUFRHI
+137b eb7b 		  ADC	  DBYTHI
+137e eb7e 		  STA	  BFENHI
+1380 eb80 		  RTS
+1381 eb81 CASENT: LDA	  DSTATS
+1384 eb84 		  BPL	  CASRED
+1386 eb86 		  LDA	  #B600LO
+1388 eb88 		  STA	  AUDF3
+138b eb8b 		  LDA	  #B600HI
+138d eb8d 		  STA	  AUDF4
+1390 eb90 		  JSR	  SENDEN
+1393 eb93 		  LDY	  #WSIRG
+1395 eb95 		  LDA	  DAUX2
+1398 eb98 		  BMI	  SRTIR0
+139a eb9a 		  LDY	  #WIRGLO
+139c eb9c SRTIR0: LDX	  #WIRGHI
+139e eb9e 		  JSR	  SETVBX
+13a1 eba1 		  LDA	  #MOTRGO
+13a3 eba3 		  STA	  PACTL
+13a6 eba6 TIMIT:  LDA	  TIMFLG
+13a9 eba9 		  BNE	  TIMIT
+13ab ebab 		  JSR	  LDPNTR
+13ae ebae 		  JSR	  SEND
+13b1 ebb1 		  JMP	  CRETRN
+13b4 ebb4 CASRED: LDA	  #$FF
+13b6 ebb6 		  STA	  CASFLG
+13b9 ebb9 		  LDY	  #RSIRG
+13bb ebbb 		  LDA	  DAUX2
+13be ebbe 		  BMI	  SRTIR1
+13c0 ebc0 		  LDY	  #RIRGLO
+13c2 ebc2 SRTIR1: LDX	  #RIRGHI
+13c4 ebc4 		  JSR	  SETVBX
+13c7 ebc7 		  LDA	  #MOTRGO
+13c9 ebc9 		  STA	  PACTL
+13cc ebcc TIMIT1: LDA	  TIMFLG
+13cf ebcf 		  BNE	  TIMIT1
+13d1 ebd1 		  JSR	  LDPNTR
+13d4 ebd4 		  JSR	  STTMOT
+13d7 ebd7 		  JSR	  SETVBX
+13da ebda 		  JSR	  BEGIN
+13dd ebdd 		  JSR	  RECEIV
+13e0 ebe0 CRETRN: LDA	  DAUX2
+13e3 ebe3 		  BMI	  SRTIR2
+13e5 ebe5 		  LDA	  #MOTRST
+13e7 ebe7 		  STA	  PACTL
+13ea ebea SRTIR2: JMP	  RETURN
+13ed ebed JTIMER: LDA	  #$00
+13ef ebef 		  STA	  TIMFLG
+13f2 ebf2 		  RTS
+13f3 ebf3 SENDEN: LDA	  #$07
+13f5 ebf5 		  AND	  SSKCTL
+13f8 ebf8 		  ORA	  #$20
+13fa ebfa 		  LDY	  DDEVIC
+13fd ebfd 		  CPY	  #CASET
+13ff ebff 		  BNE	  NOTCAS
+1401 ec01 		  ORA	  #$08
+1403 ec03 		  LDY	  #LOTONE
+1405 ec05 		  STY	  AUDF2
+1408 ec08 		  LDY	  #HITONE
+140a ec0a 		  STY	  AUDF1
+140d ec0d NOTCAS: STA	  SSKCTL
+1410 ec10 		  STA	  SKCTL
+1413 ec13 		  LDA	  #$C7
+1415 ec15 		  AND	  POKMSK
+1417 ec17 		  ORA	  #$10
+1419 ec19 		  JMP	  CONTIN
+141c ec1c RECVEN: LDA	  #$07
+141e ec1e 		  AND	  SSKCTL
+1421 ec21 		  ORA	  #$10
+1423 ec23 		  STA	  SSKCTL
+1426 ec26 		  STA	  SKCTL
+1429 ec29 		  STA	  SKRES
+142c ec2c 		  LDA	  #$C7
+142e ec2e 		  AND	  POKMSK
+1430 ec30 		  ORA	  #$20
+1432 ec32 CONTIN: STA	  POKMSK
+1434 ec34 		  STA	  IRQEN
+1437 ec37 		  LDA	  #$28
+1439 ec39 		  STA	  AUDCTL
+143c ec3c 		  LDX	  #6
+143e ec3e 		  LDA	  #$A8
+1440 ec40 		  LDY	  SOUNDR
+1442 ec42 		  BNE	  NOISE1
+1444 ec44 		  LDA	  #$A0
+1446 ec46 NOISE1: STA	  AUDC1,X
+1449 ec49 		  DEX
+144a ec4a 		  DEX
+144b ec4b 		  BPL	  NOISE1
+144d ec4d 		  LDA	  #$A0
+144f ec4f 		  STA	  AUDC3
+1452 ec52 		  LDY	  DDEVIC
+1455 ec55 		  CPY	  #CASET
+1457 ec57 		  BEQ	  CAS31
+1459 ec59 		  STA	  AUDC1
+145c ec5c 		  STA	  AUDC2
+145f ec5f CAS31:	RTS
+1460 ec60 SENDDS: NOP
+1461 ec61 RECVDS: LDA	  #$C7
+1463 ec63 		  AND	  POKMSK
+1465 ec65 		  STA	  POKMSK
+1467 ec67 		  STA	  IRQEN
+146a ec6a 		  LDX	  #6
+146c ec6c 		  LDA	  #0
+Unresolved: STA AUDC11X
+146e ec6e ZERIT:  STA	  AUDC11X
+1471 ec71 		  DEX
+1472 ec72 		  DEX
+1473 ec73 		  BPL	  ZERIT
+1475 ec75 		  RTS
+1476 ec76 STTMOT: LDA	  DTIMLO
+1479 ec79 		  ROR	  A
+147a ec7a 		  ROR	  A
+147b ec7b 		  TAY
+147c ec7c 		  AND	  #$3F
+147e ec7e 		  TAX
+147f ec7f 		  TYA
+1480 ec80 		  ROR	  A
+1481 ec81 		  AND	  #$C0
+1483 ec83 		  TAY
+1484 ec84 		  RTS
+1485 ec85 INTTBL: .WORD	ISRSIR
+1487 ec87 		  .WORD	ISRODN
+1489 ec89 		  .WORD	ISRTD
+148b ec8b SENDIN: LDX	  #$01
+148d ec8d DELAY0: LDY	  #$FF
+148f ec8f DELAY1: DEY
+1490 ec90 		  BNE	  DELAY1
+1492 ec92 		  DEX
+1493 ec93 		  BNE	  DELAY0
+1495 ec95 		  JSR	  SEND
+1498 ec98 		  LDY	  #CTIMLO
+149a ec9a 		  LDX	  #CTIMHI
+149c ec9c WAITER: JSR	  SETVBX
+149f ec9f 		  JSR	  WAIT
+14a2 eca2 		  TYA
+14a3 eca3 		  RTS
+14a4 eca4 COMPUT: STA	  TIMER2
+14a7 eca7 		  STY	  TIMER2+1
+14aa ecaa 		  JSR	  ADJUST
+14ad ecad 		  STA	  TIMER2
+14b0 ecb0 		  LDA	  TIMER1
+14b3 ecb3 		  JSR	  ADJUST
+14b6 ecb6 		  STA	  TIMER1
+14b9 ecb9 		  LDA	  TIMER2
+14bc ecbc 		  SEC
+14bd ecbd 		  SBC	  TIMER1
+14c0 ecc0 		  STA	  TEMP1
+14c3 ecc3 		  LDA	  TIMER2+1
+14c6 ecc6 		  SEC
+14c7 ecc7 		  SBC	  TIMER1+1
+14ca ecca 		  TAY
+14cb eccb 		  LDA	  #-$83
+14cd eccd HITIMR: CLC
+14ce ecce 		  ADC	  #$83
+14d0 ecd0 		  DEY
+14d1 ecd1 		  BPL	  HITIMR
+14d3 ecd3 		  CLC
+14d4 ecd4 		  ADC	  TEMP1
+14d7 ecd7 FINDX:  TAY
+14d8 ecd8 		  LSR	  A
+14d9 ecd9 		  LSR	  A
+14da ecda 		  LSR	  A
+14db ecdb 		  ASL	  A
+14dc ecdc 		  SEC
+14dd ecdd 		  SBC	  #22
+14df ecdf 		  TAX
+14e0 ece0 		  TYA
+14e1 ece1 		  AND	  #7
+14e3 ece3 		  TAY
+14e4 ece4 		  LDA	  #-11
+14e6 ece6 DOINTP: CLC
+14e7 ece7 		  ADC	  #11
+14e9 ece9 		  DEY
+14ea ecea 		  BPL	  DOINTP
+14ec ecec ENINTP: LDY	  #0
+14ee ecee 		  STY	  ADDCOR
+14f1 ecf1 		  SEC
+14f2 ecf2 		  SBC	  #7
+14f4 ecf4 		  BPL	  PLUS
+14f6 ecf6 		  DEC	  ADDCOR
+14f9 ecf9 PLUS:	CLC
+Unresolved: ADC POKTAB,X
+14fa ecfa 		  ADC	  POKTAB,X
+14fd ecfd 		  TAY
+14fe ecfe 		  LDA	  ADDCOR
+Unresolved: ADC POKTAB+1,X
+1501 ed01 		  ADC	  POKTAB+1,X
+1504 ed04 		  RTS
+1505 ed05 ADJUST: CMP	  #$7C
+1507 ed07 		  BMI	  ADJ1
+1509 ed09 		  SEC
+150a ed0a 		  SBC	  #$7C
+150c ed0c 		  RTS
+150d ed0d ADJ1:	CLC
+150e ed0e 		  ADC	  #$7
+1510 ed10 		  RTS
+1511 ed11 BEGIN:  LDA	  BRKKEY
+1513 ed13 		  BNE	  NTBRK2
+1515 ed15 		  JMP	  BROKE
+1518 ed18 NTBRK2: SEI
+1519 ed19 		  LDA	  TIMFLG
+151c ed1c 		  BNE	  OKTIM1
+151e ed1e 		  BEQ	  TOUT1
+1520 ed20 OKTIM1: LDA	  SKSTAT
+1523 ed23 		  AND	  #$10
+1525 ed25 		  BNE	  BEGIN
+1527 ed27 		  STA	  SAVIO
+152a ed2a 		  LDX	  VCOUNT
+152d ed2d 		  LDY	  RTCLOK+2
+152f ed2f 		  STX	  TIMER1
+1532 ed32 		  STY	  TIMER1+1
+1535 ed35 		  LDX	  #1
+1537 ed37 		  STX	  TEMP3
+153a ed3a 		  LDY	  #10
+153c ed3c COUNT:  LDA	  BRKKEY
+153e ed3e 		  BEQ	  BROKE
+1540 ed40 		  LDA	  TIMFLG
+1543 ed43 		  BNE	  OKTIMR
+1545 ed45 TOUT1:  CLI
+1546 ed46 		  JMP	  TOUT
+1549 ed49 OKTIMR: LDA	  SKSTAT
+154c ed4c 		  AND	  #$10
+154e ed4e 		  CMP	  SAVIO
+1551 ed51 		  BEQ	  COUNT
+1553 ed53 		  STA	  SAVIO
+1556 ed56 		  DEY
+1557 ed57 		  BNE	  COUNT
+1559 ed59 		  DEC	  TEMP3
+155c ed5c 		  BMI	  GOREAD
+155e ed5e 		  LDA	  VCOUNT
+1561 ed61 		  LDY	  RTCLOK+2
+1563 ed63 		  JSR	  COMPUT
+1566 ed66 		  STY	  CBAUDL
+1569 ed69 		  STA	  CBAUDH
+156c ed6c 		  LDY	  #9
+156e ed6e 		  BNE	  COUNT
+1570 ed70 GOREAD: LDA	  CBAUDL
+1573 ed73 		  STA	  AUDF3
+1576 ed76 		  LDA	  CBAUDH
+1579 ed79 		  STA	  AUDF4
+157c ed7c 		  LDA	  #0
+157e ed7e 		  STA	  SKSTAT
+1581 ed81 		  LDA	  SSKCTL
+1584 ed84 		  STA	  SKSTAT
+1587 ed87 		  LDA	  #$55
+1589 ed89 		  STA	  (BUFRLO),Y
+158b ed8b 		  INY
+158c ed8c 		  STA	  (BUFRLO),Y
+158e ed8e 		  LDA	  #$AA
+1590 ed90 		  STA	  CHKSUM
+1592 ed92 		  CLC
+1593 ed93 		  LDA	  BUFRLO
+1595 ed95 		  ADC	  #2
+1597 ed97 		  STA	  BUFRLO
+1599 ed99 		  LDA	  BUFRHI
+159b ed9b 		  ADC	  #0
+159d ed9d 		  STA	  BUFRHI
+159f ed9f 		  CLI
+15a0 eda0 		  RTS
+15a1 eda1 BROKE:  JSR	  SENDDS
+15a4 eda4 		  LDA	  #MOTRST
+15a6 eda6 		  STA	  PACTL
+15a9 eda9 		  STA	  PBCTL
+15ac edac 		  LDA	  #BRKABT
+15ae edae 		  STA	  STATUS
+15b0 edb0 		  LDX	  STACKP
+15b3 edb3 		  TXS
+15b4 edb4 		  DEC	  BRKKEY
+15b6 edb6 		  CLI
+15b7 edb7 		  JMP	  RETURN
+15ba edba SETVBX: LDA	  #JTADRL
+15bc edbc 		  STA	  CDTMA1
+15bf edbf 		  LDA	  #JTADRH
+15c1 edc1 		  STA	  CDTMA1+1
+15c4 edc4 		  LDA	  #1
+15c6 edc6 		  SEI
+15c7 edc7 		  JSR	  SETVBV
+15ca edca 		  LDA	  #1
+15cc edcc 		  STA	  TIMFLG
+15cf edcf 		  CLI
+15d0 edd0 		  RTS
+15d1 edd1 POKTAB: .WORD	$3E8
+15d3 edd3 		  .WORD	$443
+15d5 edd5 		  .WORD	$49E
+15d7 edd7 		  .WORD	$4F9
+15d9 edd9 		  .WORD	$554
+15db eddb 		  .WORD	$5AF
+15dd eddd 		  .WORD	$60A
+15df eddf 		  .WORD	$665
+15e1 ede1 		  .WORD	$6C0
+15e3 ede3 		  .WORD	$71A
+15e5 ede5 		  .WORD	$775
+15e7 ede7 		  .WORD	$7D0
+0014 d814 SIOSPR: .BYTE	DSKORG-CRNTP3
+e450 1bc50 		  JMP	  DINIT
+e453 1bc53 		  JMP	  DSKIF
+15ea edea DINIT:  LDA	  #160
+15ec edec 		  STA	  DSKTIM
+15ef edef 		  RTS
+15f0 edf0 DSKIF:  LDA	  #DISKID
+15f2 edf2 		  STA	  DDEVIC
+15f5 edf5 		  LDA	  DSKTIM
+15f8 edf8 		  LDX	  DCOMND
+15fb edfb 		  CPX	  #FOMAT
+15fd edfd 		  BEQ	  PUTDTO
+15ff edff 		  LDA	  #7
+1601 ee01 PUTDTO: STA	  DTIMLO
+1604 ee04 		  LDX	  #GETDAT
+1606 ee06 		  LDY	  #$80
+1608 ee08 		  LDA	  DCOMND
+160b ee0b 		  CMP	  #WRITE
+160d ee0d 		  BNE	  CKSTC
+160f ee0f 		  LDX	  #PUTDAT
+1611 ee11 CKSTC:  CMP	  #STATC
+1613 ee13 		  BNE	  PUTCNT
+1615 ee15 		  LDA	  #STATVL
+1617 ee17 		  STA	  DBUFLO
+161a ee1a 		  LDA	  #STATVH
+161c ee1c 		  STA	  DBUFHI
+161f ee1f 		  LDY	  #4
+1621 ee21 PUTCNT: STX	  DSTATS
+1624 ee24 		  STY	  DBYTLO
+1627 ee27 		  LDA	  #0
+1629 ee29 		  STA	  DBYTHI
+162c ee2c 		  JSR	  SIOV
+162f ee2f 		  BPL	  GOODST
+1631 ee31 		  RTS
+1632 ee32 GOODST: LDA	  DCOMND
+1635 ee35 		  CMP	  #STATC
+1637 ee37 		  BNE	  PUTBC
+1639 ee39 		  JSR	  PUTADR
+163c ee3c 		  LDY	  #2
+163e ee3e 		  LDA	  (BUFADR),Y
+1640 ee40 		  STA	  DSKTIM
+1643 ee43 PUTBC:  LDA	  DCOMND
+1646 ee46 		  CMP	  #FOMAT
+1648 ee48 		  BNE	  ENDDIF
+164a ee4a FMTD:	JSR	  PUTADR
+164d ee4d 		  LDY	  #$FE
+164f ee4f TWICE:  INY
+1650 ee50 		  INY
+1651 ee51 RDBAD:  LDA	  (BUFADR),Y
+1653 ee53 		  CMP	  #$FF
+1655 ee55 		  BNE	  TWICE
+1657 ee57 		  INY
+1658 ee58 		  LDA	  (BUFADR),Y
+165a ee5a 		  INY
+165b ee5b 		  CMP	  #$FF
+165d ee5d 		  BNE	  RDBAD
+165f ee5f 		  DEY
+1660 ee60 		  DEY
+1661 ee61 		  STY	  DBYTLO
+1664 ee64 		  LDA	  #0
+1666 ee66 		  STA	  DBYTHI
+1669 ee69 ENDDIF: LDY	  DSTATS
+166c ee6c 		  RTS
+166d ee6d PUTADR: LDA	  DBUFLO
+1670 ee70 		  STA	  BUFADR
+1672 ee72 		  LDA	  DBUFHI
+1675 ee75 		  STA	  BUFADR+1
+1677 ee77 		  RTS
+1678 ee78 DSKSPR: .BYTE	PRNORG-CRNTP4
+e430 1bc30 		  .WORD	PHOPEN-1
+e432 1bc32 		  .WORD	PHCLOS-1
+e434 1bc34 		  .WORD	BADST-1
+e436 1bc36 		  .WORD	PHWRIT-1
+e438 1bc38 		  .WORD	PHSTAT-1
+e43a 1bc3a 		  .WORD	BADST-1
+e43c 1bc3c 		  JMP	  PHINIT
+e43f 1bc3f 		  .BYTE	0
+1678 ee78 PHINIT: LDA	  #30
+167a ee7a 		  STA	  PTIMOT
+167c ee7c 		  RTS
+167d ee7d PHSTLO: .WORD	DVSTAT
+167f ee7f PHCHLO: .WORD	PRNBUF
+1681 ee81 PHSTAT: LDA	  #4
+1683 ee83 		  STA	  PBUFSZ
+1685 ee85 		  LDX	  PHSTLO
+1687 ee87 		  LDY	  PHSTLO+1
+1689 ee89 		  LDA	  #STATC
+168b ee8b 		  STA	  DCOMND
+168e ee8e 		  STA	  DAUX1
+1691 ee91 		  JSR	  SETDCB
+1694 ee94 		  JSR	  SIOV
+1697 ee97 		  BMI	  BADST
+1699 ee99 		  JSR	  PHPUT
+169c ee9c BADST:  RTS
+169d ee9d PHOPEN: JSR	  PHSTAT
+16a0 eea0 		  LDA	  #0
+16a2 eea2 		  STA	  PBPNT
+16a4 eea4 		  RTS
+16a5 eea5 PHWRIT: STA	  PTEMP
+16a7 eea7 		  JSR	  PRMODE
+16aa eeaa 		  LDX	  PBPNT
+16ac eeac 		  LDA	  PTEMP
+16ae eeae 		  STA	  PRNBUF,X
+16b1 eeb1 		  INX
+16b2 eeb2 		  CPX	  PBUFSZ
+16b4 eeb4 		  BEQ	  BUFFUL
+16b6 eeb6 		  STX	  PBPNT
+16b8 eeb8 		  CMP	  #CR
+16ba eeba 		  BEQ	  BLFILL
+16bc eebc 		  LDY	  #SUCCES
+16be eebe 		  RTS
+16bf eebf BLFILL: LDA	  #SPACE
+16c1 eec1 FILLBF: STA	  PRNBUF,X
+16c4 eec4 		  INX
+16c5 eec5 		  CPX	  PBUFSZ
+16c7 eec7 		  BNE	  FILLBF
+16c9 eec9 BUFFUL: LDA	  #0
+16cb eecb 		  STA	  PBPNT
+16cd eecd 		  LDX	  PHCHLO
+16cf eecf 		  LDY	  PHCHLO+1
+16d1 eed1 		  JSR	  SETDCB
+16d4 eed4 		  JSR	  SIOV
+16d7 eed7 		  RTS
+16d8 eed8 PHCLOS: JSR	  PRMODE
+16db eedb 		  LDX	  PBPNT
+16dd eedd 		  BNE	  BLFILL
+16df eedf 		  LDY	  #SUCCES
+16e1 eee1 		  RTS
+16e2 eee2 SETDCB: STX	  DBUFLO
+16e5 eee5 		  STY	  DBUFHI
+16e8 eee8 		  LDA	  #PDEVN
+16ea eeea 		  STA	  DDEVIC
+16ed eeed 		  LDA	  #1
+16ef eeef 		  STA	  DUNIT
+16f2 eef2 		  LDA	  #$80
+16f4 eef4 		  LDX	  DCOMND
+16f7 eef7 		  CPX	  #STATC
+16f9 eef9 		  BNE	  PSIOC
+16fb eefb 		  LDA	  #$40
+16fd eefd PSIOC:  STA	  DSTATS
+1700 ef00 		  LDA	  PBUFSZ
+1702 ef02 		  STA	  DBYTLO
+1705 ef05 		  LDA	  #0
+1707 ef07 		  STA	  DBYTHI
+170a ef0a 		  LDA	  PTIMOT
+170c ef0c 		  STA	  DTIMLO
+170f ef0f 		  RTS
+1710 ef10 PHPUT:  LDA	  DVSTAT+2
+1713 ef13 		  STA	  PTIMOT
+1715 ef15 		  RTS
+1716 ef16 PRMODE: LDY	  #WRITEC
+1718 ef18 		  LDA	  ICAX2Z
+171a ef1a CMODE:  CMP	  #N
+171c ef1c 		  BNE	  CDUBL
+171e ef1e 		  LDX	  #NBUFSZ
+1720 ef20 		  BNE	  SETBSZ
+1722 ef22 CDUBL:  CMP	  #D
+1724 ef24 		  BNE	  CSIDE
+1726 ef26 		  LDX	  #DBUFSZ
+1728 ef28 		  BNE	  SETBSZ
+172a ef2a CSIDE:  CMP	  #S
+172c ef2c 		  BNE	  GOERR
+172e ef2e 		  LDX	  #SBUFSZ
+1730 ef30 SETBSZ: STX	  PBUFSZ
+1732 ef32 		  STY	  DCOMND
+1735 ef35 		  STA	  DAUX1
+1738 ef38 		  RTS
+1739 ef39 GOERR:  LDA	  #N
+173b ef3b 		  BNE	  CMODE
+173d ef3d PRNSPR: .BYTE	CASORG-CRNTP5
+0c40 e440 		  .WORD	OPENC-1,CLOSEC-1,GBYTE-1,PBYTE-1,STATU-1,SPECIAL-1
+0c4c e44c 		  JMP	  INIT
+0c4f e44f 		  .BYTE	0
+0c7a e47a 		  JMP	  RBLOK
+0c7d e47d 		  JMP	  OPINP
+1741 ef41 INIT:	LDA	  #$CC
+1743 ef43 		  STA	  CBAUDL
+1746 ef46 		  LDA	  #$05
+1748 ef48 		  STA	  CBAUDH
+Unresolved: SPECIAL: 
+174b ef4b SPECIAL:
+174e ef4e 		  RTS
+174f ef4f OPENC:  LDA	  ICAX2Z
+1751 ef51 		  STA	  FTYPE
+1753 ef53 		  LDA	  ICAX1Z
+1755 ef55 		  AND	  #$0C
+1757 ef57 		  CMP	  #$04
+1759 ef59 		  BEQ	  OPINP
+175b ef5b 		  CMP	  #$08
+175d ef5d 		  BEQ	  OPOUT
+175f ef5f 		  RTS
+1760 ef60 OPINP:  LDA	  #0
+1762 ef62 		  STA	  WMODE
+1765 ef65 		  STA	  FEOF
+1767 ef67 SFH:	 LDA	  #TONE2
+1769 ef69 		  JSR	  BEEP
+176c ef6c 		  BMI	  OPNRTN
+176e ef6e 		  LDA	  #MOTRGO
+1770 ef70 		  STA	  PACTL
+1773 ef73 		  LDY	  #$40
+1775 ef75 		  LDX	  #2
+1777 ef77 		  LDA	  #3
+1779 ef79 		  STA	  CDTMF3
+177c ef7c 		  JSR	  SETVBV
+177f ef7f WAITTM: LDA	  CDTMF3
+1782 ef82 		  BNE	  WAITTM
+1784 ef84 		  LDA	  #$80
+1786 ef86 		  STA	  BPTR
+1788 ef88 		  STA	  BLIM
+178b ef8b 		  JMP	  OPOK
+178e ef8e PBRK:	LDY	  #BRKABT
+1790 ef90 		  DEC	  BRKKEY
+1792 ef92 OPNRTN: LDA	  #0
+1794 ef94 		  STA	  WMODE
+1797 ef97 		  RTS
+1798 ef98 OPOUT:  LDA	  #$80
+179a ef9a 		  STA	  WMODE
+179d ef9d 		  LDA	  #TONE1
+179f ef9f 		  JSR	  BEEP
+17a2 efa2 		  BMI	  OPNRTN
+17a4 efa4 		  LDA	  #$CC
+17a6 efa6 		  STA	  AUDF3
+17a9 efa9 		  LDA	  #$05
+17ab efab 		  STA	  AUDF4
+17ae efae 		  LDA	  #$60
+17b0 efb0 		  STA	  DDEVIC
+17b3 efb3 		  JSR	  SENDEV
+17b6 efb6 		  LDA	  #MOTRGO
+17b8 efb8 		  STA	  PACTL
+17bb efbb 		  LDA	  #3
+17bd efbd 		  LDX	  #4
+17bf efbf 		  LDY	  #$80
+17c1 efc1 		  JSR	  SETVBV
+17c4 efc4 		  LDA	  #$FF
+17c6 efc6 		  STA	  CDTMF3
+17c9 efc9 WDLR:	LDA	  BRKKEY
+17cb efcb 		  BEQ	  PBRK
+17cd efcd 		  LDA	  CDTMF3
+17d0 efd0 		  BNE	  WDLR
+17d2 efd2 		  LDA	  #0
+17d4 efd4 		  STA	  BPTR
+17d6 efd6 OPOK:	LDY	  #SUCCES
+17d8 efd8 		  RTS
+17d9 efd9 GBYTE:  LDA	  FEOF
+17db efdb 		  BMI	  ISEOF
+17dd efdd 		  LDX	  BPTR
+17df efdf 		  CPX	  BLIM
+17e2 efe2 		  BEQ	  RBLOK
+17e4 efe4 		  LDA	  CASBUF+3,X
+17e7 efe7 		  INC	  BPTR
+17e9 efe9 		  LDY	  #SUCCES
+17eb efeb GBX:	 RTS
+17ec efec RBLOK:  LDA	  #'R
+17ee efee 		  JSR	  SIOSB
+17f1 eff1 		  TYA
+17f2 eff2 		  BMI	  GBX
+17f4 eff4 		  LDA	  #0
+17f6 eff6 		  STA	  BPTR
+17f8 eff8 		  LDX	  #$80
+17fa effa 		  LDA	  CASBUF+2
+17fd effd 		  CMP	  #EOT
+17ff efff 		  BEQ	  ATEOF
+1801 f001 		  CMP	  #DT1
+1803 f003 		  BNE	  NLR
+1805 f005 		  LDX	  CASBUF+130
+1808 f008 NLR:	 STX	  BLIM
+180b f00b 		  JMP	  GBYTE
+180e f00e ATEOF:  DEC	  FEOF
+1810 f010 ISEOF:  LDY	  #EOFERR
+1812 f012 		  RTS
+1813 f013 PBYTE:  LDX	  BPTR
+1815 f015 		  STA	  CASBUF+3,X
+1818 f018 		  INC	  BPTR
+181a f01a 		  LDY	  #SUCCES
+181c f01c 		  CPX	  #127
+181e f01e 		  BEQ	  *+3
+1820 f020 		  RTS
+1821 f021 		  LDA	  #DTA
+1823 f023 		  JSR	  WSIOSB
+1826 f026 		  LDA	  #0
+1828 f028 		  STA	  BPTR
+182a f02a 		  RTS
+182b f02b STATU:  LDY	  #SUCCES
+182d f02d 		  RTS
+182e f02e CLOSEC: LDA	  WMODE
+1831 f031 		  BMI	  CLWRT
+1833 f033 		  LDY	  #SUCCES
+1835 f035 FCAX:	LDA	  #MOTRST
+1837 f037 		  STA	  PACTL
+183a f03a 		  RTS
+183b f03b CLWRT:  LDX	  BPTR
+183d f03d 		  BEQ	  WTLR
+183f f03f 		  STX	  CASBUF+130
+1842 f042 		  LDA	  #DT1
+1844 f044 		  JSR	  WSIOSB
+1847 f047 		  BMI	  FCAX
+1849 f049 WTLR:	LDX	  #127
+184b f04b 		  LDA	  #0
+184d f04d ZTBUF:  STA	  CASBUF+3,X
+1850 f050 		  DEX
+1851 f051 		  BPL	  ZTBUF
+1853 f053 		  LDA	  #EOT
+1855 f055 		  JSR	  WSIOSB
+1858 f058 		  JMP	  FCAX
+185b f05b BEEP:	STA	  FREQ
+185d f05d BEEP1:  LDA	  RTCLOK+2
+185f f05f 		  CLC
+1860 f060 		  ADC	  #30
+1862 f062 		  TAX
+1863 f063 WFL:	 LDA	  #$FF
+1865 f065 		  STA	  CONSOL
+1868 f068 		  LDA	  #0
+186a f06a 		  LDY	  #$F0
+186c f06c 		  DEY
+186d f06d 		  BNE	  *-1
+186f f06f 		  STA	  CONSOL
+1872 f072 		  LDY	  #$F0
+1874 f074 		  DEY
+1875 f075 		  BNE	  *-1
+1877 f077 		  CPX	  RTCLOK+2
+1879 f079 		  BNE	  WFL
+187b f07b 		  DEC	  FREQ
+187d f07d 		  BEQ	  WFAK
+187f f07f 		  TXA
+1880 f080 		  CLC
+1881 f081 		  ADC	  #10
+1883 f083 		  TAX
+1884 f084 		  CPX	  RTCLOK+2
+1886 f086 		  BNE	  *-2
+1888 f088 		  BEQ	  BEEP1
+188a f08a WEAK:	JSR	  WFAK1
+188d f08d 		  TYA
+188e f08e 		  RTS
+Unresolved: LDA KEYBDV
+188f f08f WFAK1:  LDA	  KEYBDV+5
+1892 f092 		  PHA
+Unresolved: LDA KEYBDV
+1893 f093 		  LDA	  KEYBDV+4
+1896 f096 		  PHA
+1897 f097 		  RTS
+1898 f098 SIOSB:  STA	  DCOMND
+189b f09b 		  LDA	  #0
+189d f09d 		  STA	  DBYTHI
+18a0 f0a0 		  LDA	  #131
+18a2 f0a2 		  STA	  DBYTLO
+18a5 f0a5 		  LDA	  #CBUFH
+18a7 f0a7 		  STA	  DBUFHI
+18aa f0aa 		  LDA	  #CBUFL
+18ac f0ac 		  STA	  DBUFLO
+18af f0af CSIO:	LDA	  #$60
+18b1 f0b1 		  STA	  DDEVIC
+18b4 f0b4 		  LDA	  #0
+18b6 f0b6 		  STA	  DUNIT
+18b9 f0b9 		  LDA	  #35
+18bb f0bb 		  STA	  DTIMLO
+18be f0be 		  LDA	  DCOMND
+18c1 f0c1 		  LDY	  #SRSTA
+18c3 f0c3 		  CMP	  #'R
+18c5 f0c5 		  BEQ	  *+4
+18c7 f0c7 		  LDY	  #SWSTA
+18c9 f0c9 		  STY	  DSTATS
+18cc f0cc 		  LDA	  FTYPE
+18ce f0ce 		  STA	  DAUX2
+18d1 f0d1 		  JSR	  SIOV
+18d4 f0d4 		  RTS
+18d5 f0d5 WSIOSB: STA	  CASBUF+2
+18d8 f0d8 		  LDA	  #$55
+18da f0da 		  STA	  CASBUF+0
+18dd f0dd 		  STA	  CASBUF+1
+18e0 f0e0 		  LDA	  #'W
+18e2 f0e2 		  JSR	  SIOSB
+18e5 f0e5 		  RTS	  AND
+0014 d814 CASSPR: .BYTE	MONORG-CRNTP6
+0c71 e471 		  JMP	  SIGNON
+0c74 e474 		  JMP	  RESET
+0c77 e477 		  JMP	  PWRUP
+9000 16800 		  JSR	  $900C
+9002 16802 		  JMP	  PWRUP
+9005 16805 		  JSR	  $900C
+9007 16807 		  JMP	  RESET
+18e3 f0e3 TBLENT: .BYTE	'P'
+18e4 f0e4 		  .WORD	PRINTV
+18e6 f0e6 		  .BYTE	'C'
+18e7 f0e7 		  .WORD	CASETV
+18e9 f0e9 		  .BYTE	'E'
+18ea f0ea 		  .WORD	EDITRV
+18ec f0ec 		  .BYTE	'S'
+18ed f0ed 		  .WORD	SCRENV
+18ef f0ef 		  .BYTE	'K'
+18f0 f0f0 		  .WORD	KEYBDV
+18f2 f0f2 OPNEDT: .BYTE	'E:',CR
+18f4 f0f4 RESET:  SEI
+18f5 f0f5 		  LDA	  COLDST
+18f8 f0f8 		  BNE	  PWRUP
+18fa f0fa 		  LDA	  #$FF
+18fc f0fc 		  BNE	  PWRUP1
+18fe f0fe PWRUP:  SEI
+18ff f0ff 		  LDA	  #0
+1901 f101 PWRUP1: STA	  WARMST
+1903 f103 		  CLD
+1904 f104 		  LDX	  #$FF
+1906 f106 		  TXS
+1907 f107 		  JSR	  SPECL
+190a f10a 		  JSR	  HARDI
+190d f10d 		  LDA	  WARMST
+190f f10f 		  BNE	  ZOSRAM
+1911 f111 ZERORM: LDA	  #0
+1913 f113 		  LDY	  #WARMST
+1915 f115 		  STA	  RAMLO
+1917 f117 		  STA	  RAMLO+1
+1919 f119 CLRRAM: STA	  (RAMLO),Y
+191b f11b 		  INY
+191c f11c 		  CPY	  #0
+191e f11e 		  BNE	  CLRRAM
+1920 f120 		  INC	  RAMLO+1
+1922 f122 		  LDX	  RAMLO+1
+1924 f124 		  CPX	  TRAMSZ
+1926 f126 		  BNE	  CLRRAM
+Unresolved: LDA BLKBDV
+1928 f128 		  LDA	  BLKBDV+1
+192b f12b 		  STA	  DOSVEC
+Unresolved: LDA BLKBDV
+192d f12d 		  LDA	  BLKBDV+2
+1930 f130 		  STA	  DOSVEC+1
+1932 f132 		  LDA	  #$FF
+1934 f134 		  STA	  COLDST
+1937 f137 		  BNE	  ESTSCM
+1939 f139 ZOSRAM: LDX	  #0
+193b f13b 		  TXA
+Unresolved: STA $200,X
+193c f13c ZOSRM2: STA	  $200,X
+Unresolved: STA $300,X
+193f f13f 		  STA	  $300,X
+1942 f142 		  DEX
+1943 f143 		  BNE	  ZOSRM2
+1945 f145 		  LDX	  #INTZBS
+Unresolved: STA 0,X
+1947 f147 ZOSRM3: STA	  0,X
+194a f14a 		  INX
+194b f14b 		  BPL	  ZOSRM3
+194d f14d ESTSCM: LDA	  #LEDGE
+194f f14f 		  STA	  LMARGN
+1951 f151 		  LDA	  #REDGE
+1953 f153 		  STA	  RMARGN
+1955 f155 OPSYS:  LDX	  #$25
+Unresolved: LDA VCTABL,X
+1957 f157 MOVVEC: LDA	  VCTABL,X
+195a f15a 		  STA	  INTABS,X
+195d f15d 		  DEX
+195e f15e 		  BPL	  MOVVEC
+1960 f160 		  JSR	  OSRAM
+1963 f163 		  CLI
+1964 f164 		  LDX	  #TBLLEN
+Unresolved: LDA TBLENT,X
+1966 f166 NXTENT: LDA	  TBLENT,X
+1969 f169 		  STA	  HATABS,X
+196c f16c 		  DEX
+196d f16d 		  BPL	  NXTENT
+196f f16f 		  LDX	  #0
+1971 f171 		  STX	  TSTDAT
+1973 f173 		  STX	  TRAMSZ
+1975 f175 		  LDX	  RAMSIZ
+1978 f178 		  CPX	  #$90
+197a f17a 		  BCS	  ENDBCK
+Unresolved: LDA CART-$2000
+197c f17c 		  LDA	  CART-$2000
+197f f17f 		  BNE	  ENDBCK
+1981 f181 		  INC	  TSTDAT
+1983 f183 		  JSR	  CBINI
+1986 f186 ENDBCK: LDX	  RAMSIZ
+1989 f189 		  CPX	  #$B0
+198b f18b 		  BCS	  ENDACK
+198d f18d 		  LDX	  CART
+1990 f190 		  BNE	  ENDACK
+1992 f192 		  INC	  TRAMSZ
+1994 f194 		  JSR	  CAINI
+1997 f197 ENDACK: LDA	  #3
+1999 f199 		  LDX	  #SEX
+199b f19b 		  STA	  ICCOM,X
+199e f19e 		  LDA	  #OPNL
+19a0 f1a0 		  STA	  ICBAL,X
+19a3 f1a3 		  LDA	  #OPNH
+19a5 f1a5 		  STA	  ICBAH,X
+19a8 f1a8 		  LDA	  #$C
+19aa f1aa 		  STA	  ICAX1,X
+19ad f1ad 		  JSR	  CIOV
+19b0 f1b0 		  BPL	  SCRNOK
+19b2 f1b2 		  JMP	  PWRUP
+19b5 f1b5 SCRNOK: INX
+19b6 f1b6 		  BNE	  SCRNOK
+19b8 f1b8 		  INY
+19b9 f1b9 		  BPL	  SCRNOK
+19bb f1bb 		  JSR	  CSBOOT
+19be f1be 		  LDA	  TRAMSZ
+19c0 f1c0 		  ORA	  TSTDAT
+19c2 f1c2 		  BEQ	  NOCART
+19c4 f1c4 		  LDA	  TRAMSZ
+19c6 f1c6 		  BEQ	  NOA1
+19c8 f1c8 		  LDA	  CARTFG
+19cb f1cb NOA1:	LDX	  TSTDAT
+19cd f1cd 		  BEQ	  NOB1
+Unresolved: ORA CARTFG-$2000
+19cf f1cf 		  ORA	  CARTFG-$2000
+19d2 f1d2 NOB1:	AND	  #1
+19d4 f1d4 		  BEQ	  NOBOOT
+19d6 f1d6 NOCART: JSR	  BOOT
+19d9 f1d9 NOBOOT: LDA	  #0
+19db f1db 		  STA	  COLDST
+19de f1de 		  LDA	  TRAMSZ
+19e0 f1e0 		  BEQ	  NOA2
+19e2 f1e2 		  LDA	  CARTFG
+19e5 f1e5 		  AND	  #4
+19e7 f1e7 		  BEQ	  NOA2
+19e9 f1e9 		  JMP	  (CARTCS)
+19ec f1ec NOA2:	LDA	  TSTDAT
+19ee f1ee 		  BEQ	  NOCAR2
+Unresolved: LDA CARTFG-$2000
+19f0 f1f0 		  LDA	  CARTFG-$2000
+19f3 f1f3 		  AND	  #4
+19f5 f1f5 		  BEQ	  NOCART
+19f7 f1f7 		  JMP	  (CARTCS-$2000)
+19fa f1fa NOCAR2: JMP	  (DOSVEC)
+19fd f1fd SIGNON: LDX	  #IDENTL
+19ff f1ff 		  LDY	  #IDENTH
+1a01 f201 		  JSR	  PUTLIN
+1a04 f204 BLACKB: JSR	  BLKB2
+1a07 f207 		  JMP	  BLACKB
+Unresolved: LDA EDITRV
+1a0a f20a BLKB2:  LDA	  EDITRV+5
+1a0d f20d 		  PHA
+Unresolved: LDA EDITRV
+1a0e f20e 		  LDA	  EDITRV+4
+1a11 f211 		  PHA
+1a12 f212 		  RTS
+1a13 f213 CAINI:  JMP	  (CARTAD)
+1a16 f216 CBINI:  JMP	  (CARTAD-$2000)
+1a19 f219 SPECL:  LDA	  CART
+1a1c f21c 		  BNE	  ENSPE2
+1a1e f21e 		  INC	  CART
+1a21 f221 		  LDA	  CART
+1a24 f224 		  BNE	  ENSPEC
+1a26 f226 		  LDA	  CARTFG
+1a29 f229 		  BPL	  ENSPEC
+1a2b f22b 		  JMP	  (CARTAD)
+1a2e f22e ENSPEC: DEC	  CART
+1a31 f231 ENSPE2: LDY	  #0
+1a33 f233 		  STY	  RAMLO+1
+1a35 f235 		  LDA	  #$10
+1a37 f237 		  STA	  TRAMSZ
+1a39 f239 HOWMCH: LDA	  (RAMLO+1),Y
+1a3b f23b 		  EOR	  #$FF
+1a3d f23d 		  STA	  (RAMLO+1),Y
+1a3f f23f 		  CMP	  (RAMLO+1),Y
+1a41 f241 		  BNE	  ENDRAM
+1a43 f243 		  EOR	  #$FF
+1a45 f245 		  STA	  (RAMLO+1),Y
+1a47 f247 		  LDA	  TRAMSZ
+1a49 f249 		  CLC
+1a4a f24a 		  ADC	  #$10
+1a4c f24c 		  STA	  TRAMSZ
+1a4e f24e 		  BNE	  HOWMCH
+1a50 f250 ENDRAM: RTS
+1a51 f251 HARDI:  LDA	  #0
+1a53 f253 		  TAX
+Unresolved: STA $D000,X
+1a54 f254 CLRCHP: STA	  $D000,X
+Unresolved: STA $D400,X
+1a57 f257 		  STA	  $D400,X
+Unresolved: STA $D200,X
+1a5a f25a 		  STA	  $D200,X
+Unresolved: STA $D300,X
+1a5d f25d 		  STA	  $D300,X
+1a60 f260 		  INX
+1a61 f261 		  BNE	  CLRCHP
+1a63 f263 		  RTS
+1a64 f264 OSRAM:  DEC	  BRKKEY
+1a66 f266 		  LDA	  #.LOW.BRKKY2
+1a68 f268 		  STA	  BRKKY
+1a6b f26b 		  LDA	  #.HIGH.BRKKY2
+1a6d f26d 		  STA	  BRKKY+1
+1a70 f270 		  LDA	  TRAMSZ
+1a72 f272 		  STA	  RAMSIZ
+1a75 f275 		  STA	  MEMTOP+1
+1a78 f278 		  LDA	  #0
+1a7a f27a 		  STA	  MEMTOP
+1a7d f27d 		  LDA	  #INIMLL
+1a7f f27f 		  STA	  MEMLO
+1a82 f282 		  LDA	  #INIMLH
+1a84 f284 		  STA	  MEMLO+1
+1a87 f287 		  JSR	  EDITRV+$C
+1a8a f28a 		  JSR	  SCRENV+$C
+1a8d f28d 		  JSR	  KEYBDV+$C
+1a90 f290 		  JSR	  PRINTV+$C
+1a93 f293 		  JSR	  CASETV+$C
+1a96 f296 		  JSR	  CIOINV
+1a99 f299 		  JSR	  SIOINV
+1a9c f29c 		  JSR	  INTINV
+1a9f f29f 		  LDA	  CONSOL
+1aa2 f2a2 		  AND	  #$1
+1aa4 f2a4 		  BNE	  NOKEY
+1aa6 f2a6 		  INC	  CKEY
+1aa8 f2a8 NOKEY:  RTS
+1aa9 f2a9 BOOT:	LDA	  WARMST
+1aab f2ab 		  BEQ	  NOWARM
+1aad f2ad 		  LDA	  BOOT?
+1aaf f2af 		  AND	  #1
+1ab1 f2b1 		  BEQ	  NOINIT
+1ab3 f2b3 		  JSR	  DINI
+1ab6 f2b6 NOINIT: RTS
+1ab7 f2b7 NOWARM: LDA	  #1
+1ab9 f2b9 		  STA	  DUNIT
+1abc f2bc 		  LDA	  #STATC
+1abe f2be 		  STA	  DCOMND
+1ac1 f2c1 		  JSR	  DSKINV
+1ac4 f2c4 		  BPL	  DOBOOT
+1ac6 f2c6 		  RTS
+1ac7 f2c7 DOBOOT: LDA	  #0
+1ac9 f2c9 		  STA	  DAUX2
+1acc f2cc 		  LDA	  #1
+1ace f2ce 		  STA	  DAUX1
+1ad1 f2d1 		  LDA	  #BUFFL
+1ad3 f2d3 		  STA	  DBUFLO
+1ad6 f2d6 		  LDA	  #BUFFH
+1ad8 f2d8 		  STA	  DBUFHI
+1adb f2db SECT1:  JSR	  GETSEC
+1ade f2de 		  BPL	  ALLSEC
+1ae0 f2e0 BADDSK: JSR	  DSKRDE
+1ae3 f2e3 		  LDA	  CASSBT
+1ae5 f2e5 		  BEQ	  DOBOOT
+1ae7 f2e7 		  RTS
+1ae8 f2e8 ALLSEC: LDX	  #3
+1aea f2ea RDBYTE: LDA	  CASBUF+3,X
+1aed f2ed 		  STA	  DFLAGS,X
+1af0 f2f0 		  DEX
+1af1 f2f1 		  BPL	  RDBYTE
+1af3 f2f3 		  LDA	  BOOTAD
+1af6 f2f6 		  STA	  RAMLO
+1af8 f2f8 		  LDA	  BOOTAD+1
+1afb f2fb 		  STA	  RAMLO+1
+1afd f2fd 		  LDA	  CASBUF+7
+1b00 f300 		  STA	  DOSINI
+1b02 f302 		  LDA	  CASBUF+8
+1b05 f305 		  STA	  DOSINI+1
+1b07 f307 MVBUFF: LDY	  #$7F
+1b09 f309 MVNXB:  LDA	  CASBUF+3,Y
+1b0c f30c 		  STA	  (RAMLO),Y
+1b0e f30e 		  DEY
+1b0f f30f 		  BPL	  MVNXB
+1b11 f311 		  CLC
+1b12 f312 		  LDA	  RAMLO
+1b14 f314 		  ADC	  #$80
+1b16 f316 		  STA	  RAMLO
+1b18 f318 		  LDA	  RAMLO+1
+1b1a f31a 		  ADC	  #0
+1b1c f31c 		  STA	  RAMLO+1
+1b1e f31e 		  DEC	  DBSECT
+1b21 f321 		  BEQ	  ENBOOT
+1b23 f323 		  INC	  DAUX1
+1b26 f326 SECTX:  JSR	  GETSEC
+1b29 f329 		  BPL	  MVBUFF
+1b2b f32b 		  JSR	  DSKRDE
+1b2e f32e 		  LDA	  CASSBT
+1b30 f330 		  BNE	  BADDSK
+1b32 f332 		  BEQ	  SECTX
+1b34 f334 ENBOOT: LDA	  CASSBT
+1b36 f336 		  BEQ	  XBOOT
+1b38 f338 		  JSR	  GETSEC
+1b3b f33b XBOOT:  JSR	  BLOAD
+1b3e f33e 		  BCS	  BADDSK
+1b40 f340 		  JSR	  DINI
+1b43 f343 		  INC	  BOOT?
+1b45 f345 		  RTS
+1b46 f346 BLOAD:  CLC
+1b47 f347 		  LDA	  BOOTAD
+1b4a f34a 		  ADC	  #6
+1b4c f34c 		  STA	  RAMLO
+1b4e f34e 		  LDA	  BOOTAD+1
+1b51 f351 		  ADC	  #0
+1b53 f353 		  STA	  RAMLO+1
+1b55 f355 		  JMP	  (RAMLO)
+1b58 f358 DINI:	JMP	  (DOSINI)
+1b5b f35b DSKRDE: LDX	  #DERRL
+1b5d f35d 		  LDY	  #DERRH
+1b5f f35f PUTLIN: TXA
+1b60 f360 		  LDX	  #SEX
+1b62 f362 		  STA	  ICBAL,X
+1b65 f365 		  TYA
+1b66 f366 		  STA	  ICBAH,X
+1b69 f369 		  LDA	  #PUTTXT
+1b6b f36b 		  STA	  ICCOM,X
+1b6e f36e 		  LDA	  #$FF
+1b70 f370 		  STA	  ICBLL,X
+1b73 f373 		  JSR	  CIOV
+1b76 f376 		  RTS
+1b77 f377 GETSEC: LDA	  CASSBT
+1b79 f379 		  BEQ	  DISKM
+1b7b f37b 		  JMP	  RBLOKV
+1b7e f37e DISKM:  LDA	  #READ
+1b80 f380 		  STA	  DCOMND
+1b83 f383 		  LDA	  #1
+1b85 f385 		  STA	  DUNIT
+1b88 f388 		  JSR	  DSKINV
+1b8b f38b 		  RTS
+1b8c f38c CSBOOT: LDA	  WARMST
+1b8e f38e 		  BEQ	  CSBOT2
+1b90 f390 		  LDA	  BOOT?
+1b92 f392 		  AND	  #2
+1b94 f394 		  BEQ	  NOCSB2
+1b96 f396 		  JSR	  CINI
+1b99 f399 NOCSB2: RTS
+1b9a f39a CSBOT2: LDA	  CKEY
+1b9c f39c 		  BEQ	  NOCSBT
+1b9e f39e 		  LDA	  #$80
+1ba0 f3a0 		  STA	  FTYPE
+1ba2 f3a2 		  INC	  CASSBT
+1ba4 f3a4 		  JSR	  CSOPIV
+1ba7 f3a7 		  JSR	  SECT1
+1baa f3aa 		  LDA	  #0
+1bac f3ac 		  STA	  CASSBT
+1bae f3ae 		  STA	  CKEY
+1bb0 f3b0 		  ASL	  BOOT?
+1bb2 f3b2 		  LDA	  DOSINI
+1bb4 f3b4 		  STA	  CASINI
+1bb6 f3b6 		  LDA	  DOSINI+1
+1bb8 f3b8 		  STA	  CASINI+1
+1bba f3ba NOCSBT: RTS
+1bbb f3bb CINI:	JMP	  (CASINI)
+0014 d814 MONSPR: .BYTE	KBDORG-CRNTP7
+0c00 e400 EDITOR: .WORD	EOPEN-1
+0c02 e402 		  .WORD	RETUR1-1
+0c04 e404 		  .WORD	EGETCH-1
+0c06 e406 		  .WORD	EOUTCH-1
+0c08 e408 		  .WORD	RETUR1-1
+0c0a e40a 		  .WORD	NOFUNC-1
+0c0c e40c 		  JMP	  PWRONA
+0c0f e40f 		  .BYTE	0
+0c10 e410 DISPLA: .WORD	DOPEN-1
+0c12 e412 		  .WORD	RETUR1-1
+0c14 e414 		  .WORD	GETCH-1
+0c16 e416 		  .WORD	OUTCH-1
+0c18 e418 		  .WORD	RETUR1-1
+0c1a e41a 		  .WORD	DRAW-1
+0c1c e41c 		  JMP	  PWRONA
+0c1f e41f 		  .BYTE	0
+0c20 e420 KBDHND: .WORD	RETUR1-1
+0c22 e422 		  .WORD	RETUR1-1
+0c24 e424 		  .WORD	KGETCH-1
+0c26 e426 		  .WORD	NOFUNC-1
+0c28 e428 		  .WORD	RETUR1-1
+0c2a e42a 		  .WORD	NOFUNC-1
+0c2c e42c 		  JMP	  PWRONA
+0c2f e42f 		  .BYTE	0
+NO SYMBOL: VCTABL-INTABS+VKEYBD
+0c30 e430 		  .WORD	PIRQ5
+1be4 f3e4 PWRONA: LDA	  #$FF
+1be6 f3e6 		  STA	  CH
+1be9 f3e9 		  LDA	  MEMTOP+1
+1bec f3ec 		  AND	  #$F0
+1bee f3ee 		  STA	  RAMTOP
+1bf0 f3f0 		  LDA	  #$40
+1bf2 f3f2 		  STA	  SHFLOK
+1bf5 f3f5 		  RTS
+1bf6 f3f6 DOPEN:  LDA	  ICAX2Z
+1bf8 f3f8 		  AND	  #$F
+1bfa f3fa 		  BNE	  OPNCOM
+1bfc f3fc EOPEN:  LDA	  ICAX1Z
+1bfe f3fe 		  AND	  #$F
+1c00 f400 		  STA	  ICAX1Z
+1c02 f402 		  LDA	  #0
+1c04 f404 OPNCOM: STA	  DINDEX
+1c06 f406 		  LDA	  #$E0
+1c08 f408 		  STA	  CHBAS
+1c0b f40b 		  LDA	  #2
+1c0d f40d 		  STA	  CHACT
+1c10 f410 		  STA	  SDMCTL
+1c13 f413 		  LDA	  #SUCCES
+1c15 f415 		  STA	  DSTAT
+1c17 f417 		  LDA	  #$C0
+1c19 f419 		  ORA	  POKMSK
+1c1b f41b 		  STA	  POKMSK
+1c1d f41d 		  STA	  IRQEN
+1c20 f420 		  LDA	  #0
+1c22 f422 		  STA	  TINDEX
+1c25 f425 		  STA	  ADRESS
+1c27 f427 		  STA	  SWPFLG
+1c29 f429 		  STA	  CRSINH
+1c2c f42c 		  LDY	  #14
+1c2e f42e 		  LDA	  #1
+1c30 f430 CLRTBS: STA	  TABMAP,Y
+1c33 f433 		  DEY
+1c34 f434 		  BPL	  CLRTBS
+1c36 f436 		  LDX	  #4
+Unresolved: LDA COLRTB,X
+1c38 f438 DOPEN8: LDA	  COLRTB,X
+1c3b f43b 		  STA	  COLOR0,X
+1c3e f43e 		  DEX
+1c3f f43f 		  BPL	  DOPEN8
+1c41 f441 		  LDY	  RAMTOP
+1c43 f443 		  DEY
+1c44 f444 		  STY	  TXTMSC+1
+1c47 f447 		  LDA	  #$60
+1c49 f449 		  STA	  TXTMSC
+1c4c f44c 		  LDX	  DINDEX
+Unresolved: LDA ANCONV,X
+1c4e f44e 		  LDA	  ANCONV,X
+1c51 f451 		  BNE	  DOPENA
+1c53 f453 OPNERR: LDA	  #BADMOD
+1c55 f455 		  STA	  DSTAT
+1c57 f457 DOPENA: STA	  HOLD1
+1c59 f459 		  LDA	  RAMTOP
+1c5b f45b 		  STA	  ADRESS+1
+1c5d f45d 		  LDY	  ALOCAT,X
+1c5f f45f DOPEN1: LDA	  #40
+1c61 f461 		  JSR	  DBSUB
+1c64 f464 		  DEY
+1c65 f465 		  BNE	  DOPEN1
+1c67 f467 		  LDA	  GPRIOR
+1c6a f46a 		  AND	  #$3F
+1c6c f46c 		  STA	  OPNTMP+1
+1c6e f46e 		  TAY
+1c6f f46f 		  CPX	  #8
+1c71 f471 		  BCC	  NOT8
+1c73 f473 		  TXA
+1c74 f474 		  ROR	  A
+1c75 f475 		  ROR	  A
+1c76 f476 		  ROR	  A
+1c77 f477 		  AND	  #$C0
+1c79 f479 		  ORA	  OPNTMP+1
+1c7b f47b 		  TAY
+1c7c f47c 		  LDA	  #16
+1c7e f47e 		  JSR	  DBSUB
+1c81 f481 		  CPX	  #11
+1c83 f483 		  BNE	  NOT8
+1c85 f485 		  LDA	  #6
+1c87 f487 		  STA	  COLOR4
+1c8a f48a NOT8:	STY	  GPRIOR
+1c8d f48d 		  LDA	  ADRESS
+1c8f f48f 		  STA	  SAVMSC
+1c91 f491 		  LDA	  ADRESS+1
+1c93 f493 		  STA	  SAVMSC+1
+1c95 f495 VBWAIT: LDA	  VCOUNT
+1c98 f498 		  CMP	  #$7A
+1c9a f49a 		  BNE	  VBWAIT
+1c9c f49c 		  JSR	  DBDEC
+Unresolved: LDA PAGETB,X
+1c9f f49f 		  LDA	  PAGETB,X
+1ca2 f4a2 		  BEQ	  NOMOD
+1ca4 f4a4 		  LDA	  #$FF
+1ca6 f4a6 		  STA	  ADRESS
+1ca8 f4a8 		  DEC	  ADRESS+1
+1caa f4aa NOMOD:  LDA	  ADRESS
+1cac f4ac 		  STA	  SAVADR
+1cae f4ae 		  LDA	  ADRESS+1
+1cb0 f4b0 		  STA	  SAVADR+1
+1cb2 f4b2 		  JSR	  DBDDEC
+1cb5 f4b5 		  LDA	  #$41
+1cb7 f4b7 		  JSR	  STORE
+1cba f4ba 		  STX	  OPNTMP
+1cbc f4bc 		  LDA	  #24
+1cbe f4be 		  STA	  BOTSCR
+1cc1 f4c1 		  LDA	  DINDEX
+1cc3 f4c3 		  CMP	  #9
+1cc5 f4c5 		  BCS	  NOTMXD
+1cc7 f4c7 		  LDA	  ICAX1Z
+1cc9 f4c9 		  AND	  #$10
+1ccb f4cb 		  BEQ	  NOTMXD
+1ccd f4cd 		  LDA	  #4
+1ccf f4cf 		  STA	  BOTSCR
+1cd2 f4d2 		  LDX	  #2
+1cd4 f4d4 DOPEN2: LDA	  #2
+1cd6 f4d6 		  JSR	  STORE
+1cd9 f4d9 		  DEX
+1cda f4da 		  BPL	  DOPEN2
+1cdc f4dc 		  LDY	  RAMTOP
+1cde f4de 		  DEY
+1cdf f4df 		  TYA
+1ce0 f4e0 		  JSR	  STORE
+1ce3 f4e3 		  LDA	  #$60
+1ce5 f4e5 		  JSR	  STORE
+1ce8 f4e8 		  LDA	  #$42
+1cea f4ea 		  JSR	  STORE
+1ced f4ed 		  CLC
+1cee f4ee 		  LDA	  #MXDMDE-NUMDLE
+1cf0 f4f0 		  ADC	  OPNTMP
+1cf2 f4f2 		  STA	  OPNTMP
+1cf4 f4f4 NOTMXD: LDY	  OPNTMP
+1cf6 f4f6 		  LDX	  NUMDLE,Y
+1cf8 f4f8 DOPEN3: LDA	  HOLD1
+1cfa f4fa 		  JSR	  STORE
+1cfd f4fd 		  DEX
+1cfe f4fe 		  BNE	  DOPEN3
+1d00 f500 		  LDA	  DINDEX
+1d02 f502 		  CMP	  #8
+1d04 f504 		  BCC	  DOPEN5
+1d06 f506 		  LDX	  #93
+1d08 f508 		  LDA	  RAMTOP
+1d0a f50a 		  SEC
+1d0b f50b 		  SBC	  #$10
+1d0d f50d 		  JSR	  STORE
+1d10 f510 		  LDA	  #0
+1d12 f512 		  JSR	  STORE
+1d15 f515 		  LDA	  #$4F
+1d17 f517 		  JSR	  STORE
+1d1a f51a DOPEN4: LDA	  HOLD1
+1d1c f51c 		  JSR	  STORE
+1d1f f51f 		  DEX
+1d20 f520 		  BNE	  DOPEN4
+1d22 f522 DOPEN5: LDA	  SAVMSC+1
+1d24 f524 		  JSR	  STORE
+1d27 f527 		  LDA	  SAVMSC
+1d29 f529 		  JSR	  STORE
+1d2c f52c 		  LDA	  HOLD1
+1d2e f52e 		  ORA	  #$40
+1d30 f530 		  JSR	  STORE
+1d33 f533 		  LDA	  #$70
+1d35 f535 		  JSR	  STORE
+1d38 f538 		  LDA	  #$70
+1d3a f53a 		  JSR	  STORE
+1d3d f53d 		  LDA	  ADRESS
+1d3f f53f 		  STA	  SDLSTL
+1d42 f542 		  LDA	  ADRESS+1
+1d44 f544 		  STA	  SDLSTL+1
+1d47 f547 		  LDA	  #$70
+1d49 f549 		  JSR	  STORE
+1d4c f54c 		  LDA	  ADRESS
+1d4e f54e 		  STA	  MEMTOP
+1d51 f551 		  LDA	  ADRESS+1
+1d53 f553 		  STA	  MEMTOP+1
+1d56 f556 		  LDA	  SAVADR
+1d58 f558 		  STA	  ADRESS
+1d5a f55a 		  LDA	  SAVADR+1
+1d5c f55c 		  STA	  ADRESS+1
+1d5e f55e 		  LDA	  SDLSTL+1
+1d61 f561 		  JSR	  STORE
+1d64 f564 		  LDA	  SDLSTL
+1d67 f567 		  JSR	  STORE
+1d6a f56a 		  LDA	  DSTAT
+1d6c f56c 		  BPL	  DOPEN9
+1d6e f56e 		  PHA
+1d6f f56f 		  JSR	  EOPEN
+1d72 f572 		  PLA
+1d73 f573 		  TAY
+1d74 f574 		  RTS
+1d75 f575 DOPEN9: LDA	  ICAX1Z
+1d77 f577 		  AND	  #$20
+1d79 f579 		  BNE	  DOPEN7
+1d7b f57b 		  JSR	  CLRSCR
+1d7e f57e 		  STA	  TXTROW
+1d81 f581 		  LDA	  LMARGN
+1d83 f583 		  STA	  TXTCOL
+1d86 f586 DOPEN7: LDA	  #$22
+1d88 f588 		  ORA	  SDMCTL
+1d8b f58b 		  STA	  SDMCTL
+1d8e f58e 		  JMP	  RETUR2
+1d91 f591 GETCH:  JSR	  RANGE
+1d94 f594 		  JSR	  GETPLT
+1d97 f597 		  JSR	  INATAC
+1d9a f59a 		  JSR	  INCRSB
+1d9d f59d 		  JMP	  RETUR1
+1da0 f5a0 GETPLT: JSR	  CONVRT
+1da3 f5a3 		  LDA	  (ADRESS),Y
+1da5 f5a5 		  AND	  DMASK
+1da8 f5a8 SHIFTD: LSR	  SHFAMT
+1daa f5aa 		  BCS	  SHIFT1
+1dac f5ac 		  LSR	  A
+1dad f5ad 		  BPL	  SHIFTD
+1daf f5af SHIFT1: STA	  CHAR
+1db2 f5b2 		  CMP	  #0
+1db4 f5b4 		  RTS
+1db5 f5b5 OUTCH:  STA	  ATACHR
+1db8 f5b8 		  JSR	  RANGE
+1dbb f5bb OUTCHA: LDA	  ATACHR
+1dbe f5be 		  CMP	  #CLRCOD
+1dc0 f5c0 		  BNE	  OUTCHE
+1dc2 f5c2 		  JSR	  CLRSCR
+1dc5 f5c5 		  JMP	  RETUR2
+1dc8 f5c8 OUTCHE: LDA	  ATACHR
+1dcb f5cb 		  CMP	  #CR
+1dcd f5cd 		  BNE	  OUTCHB
+1dcf f5cf 		  JSR	  DOCRWS
+1dd2 f5d2 		  JMP	  RETUR2
+1dd5 f5d5 OUTCHB: JSR	  OUTPLT
+1dd8 f5d8 		  JSR	  INCRSR
+1ddb f5db 		  JMP	  RETUR2
+1dde f5de OUTPLT: LDA	  SSFLAG
+1de1 f5e1 		  BNE	  OUTPLT
+1de3 f5e3 		  LDX	  #2
+1de5 f5e5 CRLOOP: LDA	  ROWCRS,X
+1de7 f5e7 		  STA	  OLDROW,X
+1de9 f5e9 		  DEX
+1dea f5ea 		  BPL	  CRLOOP
+1dec f5ec 		  LDA	  ATACHR
+1def f5ef 		  TAY
+1df0 f5f0 		  ROL	  A
+1df1 f5f1 		  ROL	  A
+1df2 f5f2 		  ROL	  A
+1df3 f5f3 		  ROL	  A
+1df4 f5f4 		  AND	  #3
+1df6 f5f6 		  TAX
+1df7 f5f7 		  TYA
+1df8 f5f8 		  AND	  #$9F
+Unresolved: ORA ATAINT,X
+1dfa f5fa 		  ORA	  ATAINT,X
+1dfd f5fd OUTCH2: STA	  CHAR
+1e00 f600 		  JSR	  CONVRT
+1e03 f603 		  LDA	  CHAR
+1e06 f606 SHIFTU: LSR	  SHFAMT
+1e08 f608 		  BCS	  SHIFT2
+1e0a f60a 		  ASL	  A
+1e0b f60b 		  JMP	  SHIFTU
+1e0e f60e SHIFT2: AND	  DMASK
+1e11 f611 		  STA	  TMPCHR
+1e13 f613 		  LDA	  DMASK
+1e16 f616 		  EOR	  #$FF
+1e18 f618 		  AND	  (ADRESS),Y
+1e1a f61a 		  ORA	  TMPCHR
+1e1c f61c 		  STA	  (ADRESS),Y
+1e1e f61e 		  RTS
+1e1f f61f RETUR2: JSR	  GETPLT
+1e22 f622 		  STA	  OLDCHR
+1e24 f624 		  LDX	  DINDEX
+1e26 f626 		  BNE	  RETUR1
+1e28 f628 		  LDX	  CRSINH
+1e2b f62b 		  BNE	  RETUR1
+1e2d f62d 		  EOR	  #$80
+1e2f f62f 		  JSR	  OUTCH2
+1e32 f632 RETUR1: LDY	  DSTAT
+1e34 f634 		  LDA	  #SUCCES
+1e36 f636 		  STA	  DSTAT
+1e38 f638 		  LDA	  ATACHR
+1e3b f63b NOFUNC: RTS
+1e3c f63c EGETCH: JSR	  SWAP
+1e3f f63f 		  JSR	  ERANGE
+1e42 f642 		  LDA	  BUFCNT
+1e44 f644 		  BNE	  EGETC3
+1e46 f646 		  LDA	  ROWCRS
+1e48 f648 		  STA	  BUFSTR
+1e4a f64a 		  LDA	  COLCRS
+1e4c f64c 		  STA	  BUFSTR+1
+1e4e f64e EGETC1: JSR	  KGETCH
+1e51 f651 		  STY	  DSTAT
+1e53 f653 		  LDA	  ATACHR
+1e56 f656 		  CMP	  #CR
+1e58 f658 		  BEQ	  EGETC2
+1e5a f65a 		  JSR	  DOSS
+1e5d f65d 		  JSR	  SWAP
+1e60 f660 		  LDA	  LOGCOL
+1e62 f662 		  CMP	  #113
+1e64 f664 		  BNE	  EGETC6
+1e66 f666 		  JSR	  BELL
+1e69 f669 EGETC6: JMP	  EGETC1
+1e6c f66c EGETC2: JSR	  OFFCRS
+1e6f f66f 		  JSR	  DOBUFC
+1e72 f672 		  LDA	  BUFSTR
+1e74 f674 		  STA	  ROWCRS
+1e76 f676 		  LDA	  BUFSTR+1
+1e78 f678 		  STA	  COLCRS
+1e7a f67a EGETC3: LDA	  BUFCNT
+1e7c f67c 		  BEQ	  EGETC5
+1e7e f67e EGETC7: DEC	  BUFCNT
+1e80 f680 		  BEQ	  EGETC5
+1e82 f682 		  LDA	  DSTAT
+1e84 f684 		  BMI	  EGETC7
+1e86 f686 		  JSR	  GETCH
+1e89 f689 		  STA	  ATACHR
+1e8c f68c 		  JMP	  SWAP
+1e8f f68f EGETC5: JSR	  DOCRWS
+1e92 f692 		  LDA	  #CR
+1e94 f694 		  STA	  ATACHR
+1e97 f697 		  JSR	  RETUR2
+1e9a f69a 		  STY	  DSTAT
+1e9c f69c 		  JMP	  SWAP
+1e9f f69f JSRIND: JMP	  (ADRESS)
+1ea2 f6a2 EOUTCH: STA	  ATACHR
+1ea5 f6a5 		  JSR	  SWAP
+1ea8 f6a8 		  JSR	  ERANGE
+1eab f6ab DOSS:	JSR	  OFFCRS
+1eae f6ae 		  JSR	  TSTCTL
+1eb1 f6b1 		  BEQ	  EOUTC5
+1eb3 f6b3 EOUTC6: ASL	  ESCFLG
+1eb6 f6b6 		  JSR	  OUTCHE
+1eb9 f6b9 ERETN:  JMP	  SWAP
+1ebc f6bc EOUTC5: LDA	  DSPFLG
+1ebf f6bf 		  ORA	  ESCFLG
+1ec2 f6c2 		  BNE	  EOUTC6
+1ec4 f6c4 		  ASL	  ESCFLG
+1ec7 f6c7 		  INX
+Unresolved: LDA CNTRLS,X
+1ec8 f6c8 		  LDA	  CNTRLS,X
+1ecb f6cb 		  STA	  ADRESS
+Unresolved: LDA CNTRLS+1,X
+1ecd f6cd 		  LDA	  CNTRLS+1,X
+1ed0 f6d0 		  STA	  ADRESS+1
+1ed2 f6d2 		  JSR	  JSRIND
+1ed5 f6d5 		  JSR	  RETUR2
+1ed8 f6d8 		  JMP	  SWAP
+1edb f6db KGETC2: LDA	  #$FF
+1edd f6dd 		  STA	  CH
+1ee0 f6e0 KGETCH: LDA	  ICAX1Z
+1ee2 f6e2 		  LSR	  A
+1ee3 f6e3 		  BCS	  GETOUT
+1ee5 f6e5 		  LDA	  #BRKABT
+1ee7 f6e7 		  LDX	  BRKKEY
+1ee9 f6e9 		  BEQ	  K7
+1eeb f6eb 		  LDA	  CH
+1eee f6ee 		  CMP	  #$FF
+1ef0 f6f0 		  BEQ	  KGETCH
+1ef2 f6f2 		  STA	  HOLDCH
+1ef4 f6f4 		  LDX	  #$FF
+1ef6 f6f6 		  STX	  CH
+1ef9 f6f9 		  JSR	  CLICK
+1efc f6fc KGETC3: TAX
+1efd f6fd 		  CPX	  #$C0
+1eff f6ff 		  BCC	  ASCCO1
+1f01 f701 		  LDX	  #3
+Unresolved: LDA ATASCI,X
+1f03 f703 ASCCO1: LDA	  ATASCI,X
+1f06 f706 		  STA	  ATACHR
+1f09 f709 		  CMP	  #$80
+1f0b f70b 		  BEQ	  KGETC2
+1f0d f70d 		  CMP	  #$81
+1f0f f70f 		  BNE	  KGETC1
+1f11 f711 		  LDA	  INVFLG
+1f14 f714 		  EOR	  #$80
+1f16 f716 		  STA	  INVFLG
+1f19 f719 		  JMP	  KGETC2
+1f1c f71c KGETC1: CMP	  #$82
+1f1e f71e 		  BNE	  K1
+1f20 f720 		  LDA	  #0
+1f22 f722 		  STA	  SHFLOK
+1f25 f725 		  BEQ	  KGETC2
+1f27 f727 K1:	  CMP	  #$83
+1f29 f729 		  BNE	  K2
+1f2b f72b 		  LDA	  #$40
+1f2d f72d 		  STA	  SHFLOK
+1f30 f730 		  BNE	  KGETC2
+1f32 f732 K2:	  CMP	  #$84
+1f34 f734 		  BNE	  K3
+1f36 f736 		  LDA	  #$80
+1f38 f738 		  STA	  SHFLOK
+1f3b f73b 		  BNE	  KGETC2
+1f3d f73d K3:	  CMP	  #$85
+1f3f f73f 		  BNE	  K6
+1f41 f741 		  LDA	  #EOFERR
+1f43 f743 K7:	  STA	  DSTAT
+1f45 f745 		  STA	  BRKKEY
+1f47 f747 GETOUT: LDA	  #CR
+1f49 f749 		  BNE	  K8
+1f4b f74b K6:	  LDA	  HOLDCH
+1f4d f74d 		  CMP	  #$40
+1f4f f74f 		  BCS	  K5
+1f51 f751 		  LDA	  ATACHR
+1f54 f754 		  CMP	  #$61
+1f56 f756 		  BCC	  K5
+1f58 f758 		  CMP	  #$7B
+1f5a f75a 		  BCS	  K5
+1f5c f75c 		  LDA	  SHFLOK
+1f5f f75f 		  BEQ	  K5
+1f61 f761 		  ORA	  HOLDCH
+1f63 f763 		  JMP	  KGETC3
+1f66 f766 K5:	  JSR	  TSTCTL
+1f69 f769 		  BEQ	  K4
+1f6b f76b 		  LDA	  ATACHR
+1f6e f76e 		  EOR	  INVFLG
+1f71 f771 K8:	  STA	  ATACHR
+1f74 f774 K4:	  JMP	  RETUR1
+1f77 f777 ESCAPE: LDA	  #$80
+1f79 f779 		  STA	  ESCFLG
+1f7c f77c 		  RTS
+1f7d f77d CRSRUP: DEC	  ROWCRS
+1f7f f77f 		  BPL	  COMRET
+1f81 f781 		  LDX	  BOTSCR
+1f84 f784 		  DEX
+1f85 f785 UPDNCM: STX	  ROWCRS
+1f87 f787 COMRET: JMP	  STRBEG
+1f8a f78a CRSRDN: INC	  ROWCRS
+1f8c f78c 		  LDA	  ROWCRS
+1f8e f78e 		  CMP	  BOTSCR
+1f91 f791 		  BCC	  COMRET
+1f93 f793 		  LDX	  #0
+1f95 f795 		  BEQ	  UPDNCM
+1f97 f797 CRSRLF: DEC	  COLCRS
+1f99 f799 		  LDA	  COLCRS
+1f9b f79b 		  BMI	  CRSRL1
+1f9d f79d 		  CMP	  LMARGN
+1f9f f79f 		  BCS	  COMRE1
+1fa1 f7a1 CRSRL1: LDA	  RMARGN
+1fa3 f7a3 LFRTCM: STA	  COLCRS
+1fa5 f7a5 COMRE1: JMP	  DOLCOL
+1fa8 f7a8 CRSRRT: INC	  COLCRS
+1faa f7aa 		  LDA	  COLCRS
+1fac f7ac 		  CMP	  RMARGN
+1fae f7ae 		  BCC	  COMRE1
+1fb0 f7b0 		  BEQ	  COMRE1
+1fb2 f7b2 		  LDA	  LMARGN
+1fb4 f7b4 		  JMP	  LFRTCM
+1fb7 f7b7 CLRSCR: JSR	  PUTMSC
+1fba f7ba 		  LDY	  #0
+1fbc f7bc 		  TYA
+1fbd f7bd CLRSC2: STA	  (ADRESS),Y
+1fbf f7bf 		  INY
+1fc0 f7c0 		  BNE	  CLRSC2
+1fc2 f7c2 		  INC	  ADRESS+1
+1fc4 f7c4 		  LDX	  ADRESS+1
+1fc6 f7c6 		  CPX	  RAMTOP
+1fc8 f7c8 		  BCC	  CLRSC2
+1fca f7ca 		  LDA	  #$FF
+1fcc f7cc CLRSC3: STA	  LOGMAP,Y
+1fcf f7cf 		  INY
+1fd0 f7d0 		  CPY	  #4
+1fd2 f7d2 		  BCC	  CLRSC3
+1fd4 f7d4 HOME:	JSR	  COLCR
+1fd7 f7d7 		  STA	  LOGCOL
+1fd9 f7d9 		  STA	  BUFSTR+1
+1fdb f7db 		  LDA	  #0
+1fdd f7dd 		  STA	  ROWCRS
+1fdf f7df 		  STA	  COLCRS+1
+1fe1 f7e1 		  STA	  BUFSTR
+1fe3 f7e3 		  RTS
+1fe4 f7e4 BS:	  LDA	  LOGCOL
+1fe6 f7e6 		  CMP	  LMARGN
+1fe8 f7e8 		  BEQ	  BS1
+1fea f7ea BSA:	 LDA	  COLCRS
+1fec f7ec 		  CMP	  LMARGN
+1fee f7ee 		  BNE	  BS3
+1ff0 f7f0 		  JSR	  DELTIM
+1ff3 f7f3 BS3:	 JSR	  CRSRLF
+1ff6 f7f6 		  LDA	  COLCRS
+1ff8 f7f8 		  CMP	  RMARGN
+1ffa f7fa 		  BNE	  BS2
+1ffc f7fc 		  LDA	  ROWCRS
+1ffe f7fe 		  BEQ	  BS2
+2000 f800 		  JSR	  CRSRUP
+2003 f803 BS2:	 LDA	  #$20
+2005 f805 		  STA	  ATACHR
+2008 f808 		  JSR	  OUTPLT
+200b f80b BS1:	 JMP	  DOLCOL
+200e f80e TAB:	 JSR	  CRSRRT
+2011 f811 		  LDA	  COLCRS
+2013 f813 		  CMP	  LMARGN
+2015 f815 		  BNE	  TAB1
+2017 f817 		  JSR	  DOCR
+201a f81a 		  JSR	  LOGGET
+201d f81d 		  BCC	  TAB1
+201f f81f 		  BCS	  TAB2
+2021 f821 TAB1:	LDA	  LOGCOL
+2023 f823 		  JSR	  BITGET
+2026 f826 		  BCC	  TAB
+2028 f828 TAB2:	JMP	  DOLCOL
+202b f82b SETTAB: LDA	  LOGCOL
+202d f82d 		  JMP	  BITSET
+2030 f830 CLRTAB: LDA	  LOGCOL
+2032 f832 		  JMP	  BITCLR
+2035 f835 INSCHR: JSR	  PHACRS
+2038 f838 		  JSR	  GETPLT
+203b f83b 		  STA	  INSDAT
+203d f83d 		  LDA	  #0
+203f f83f 		  STA	  SCRFLG
+2042 f842 INSCH4: JSR	  OUTCH2
+2045 f845 		  LDA	  LOGCOL
+2047 f847 		  PHA
+2048 f848 		  JSR	  INCRSA
+204b f84b 		  PLA
+204c f84c 		  CMP	  LOGCOL
+204e f84e 		  BCS	  INSCH3
+2050 f850 INSCH1: LDA	  INSDAT
+2052 f852 		  PHA
+2053 f853 		  JSR	  GETPLT
+2056 f856 		  STA	  INSDAT
+2058 f858 		  PLA
+2059 f859 		  JMP	  INSCH4
+205c f85c INSCH3: JSR	  PLACRS
+205f f85f INSCH6: DEC	  SCRFLG
+2062 f862 		  BMI	  INSCH5
+2064 f864 		  DEC	  ROWCRS
+2066 f866 		  BNE	  INSCH6
+2068 f868 INSCH5: JMP	  DOLCOL
+206b f86b DELCHR: JSR	  PHACRS
+206e f86e DELCH1: JSR	  CONVRT
+2071 f871 		  LDA	  ADRESS
+2073 f873 		  STA	  SAVADR
+2075 f875 		  LDA	  ADRESS+1
+2077 f877 		  STA	  SAVADR+1
+2079 f879 		  LDA	  LOGCOL
+207b f87b 		  PHA
+207c f87c 		  JSR	  INCRSB
+207f f87f 		  PLA
+2080 f880 		  CMP	  LOGCOL
+2082 f882 		  BCS	  DELCH2
+2084 f884 		  LDA	  ROWCRS
+2086 f886 		  CMP	  BOTSCR
+2089 f889 		  BCS	  DELCH2
+208b f88b 		  JSR	  GETPLT
+208e f88e 		  LDY	  #0
+2090 f890 		  STA	  (SAVADR),Y
+2092 f892 		  BEQ	  DELCH1
+2094 f894 DELCH2: LDY	  #0
+2096 f896 		  TYA
+2097 f897 		  STA	  (SAVADR),Y
+2099 f899 		  JSR	  DELTIA
+209c f89c 		  JSR	  PLACRS
+209f f89f 		  JMP	  DOLCOL
+20a2 f8a2 INSLIN: SEC
+20a3 f8a3 INSLIA: JSR	  EXTEND
+20a6 f8a6 		  LDA	  LMARGN
+20a8 f8a8 		  STA	  COLCRS
+20aa f8aa 		  JSR	  CONVRT
+20ad f8ad 		  LDA	  ADRESS
+20af f8af 		  STA	  FRMADR
+20b1 f8b1 		  CLC
+20b2 f8b2 		  ADC	  #40
+20b4 f8b4 		  STA	  TOADR
+20b6 f8b6 		  LDA	  ADRESS+1
+20b8 f8b8 		  STA	  FRMADR+1
+20ba f8ba 		  ADC	  #0
+20bc f8bc 		  STA	  TOADR+1
+20be f8be 		  LDX	  ROWCRS
+20c0 f8c0 		  CPX	  #23
+20c2 f8c2 		  BEQ	  INSLI2
+20c4 f8c4 INSLI1: JSR	  MOVLIN
+20c7 f8c7 		  INX
+20c8 f8c8 		  CPX	  #23
+20ca f8ca 		  BNE	  INSLI1
+20cc f8cc INSLI2: JSR	  CLRLIN
+20cf f8cf 		  JMP	  DOLCOL
+20d2 f8d2 DELLIN: JSR	  DOLCOL
+20d5 f8d5 DELLIA: LDY	  HOLD1
+20d7 f8d7 		  STY	  ROWCRS
+20d9 f8d9 DELLIB: LDY	  ROWCRS
+20db f8db DELLI1: TYA
+20dc f8dc 		  SEC
+20dd f8dd 		  JSR	  LO2GET
+20e0 f8e0 		  PHP
+20e1 f8e1 		  TYA
+20e2 f8e2 		  CLC
+20e3 f8e3 		  ADC	  #120
+20e5 f8e5 		  PLP
+20e6 f8e6 		  JSR	  BITPUT
+20e9 f8e9 		  INY
+20ea f8ea 		  CPY	  #24
+20ec f8ec 		  BNE	  DELLI1
+20ee f8ee 		  LDA	  LOGMAP+2
+20f1 f8f1 		  ORA	  #1
+20f3 f8f3 		  STA	  LOGMAP+2
+20f6 f8f6 DELLI2: LDA	  LMARGN
+20f8 f8f8 		  STA	  COLCRS
+20fa f8fa 		  JSR	  CONVRT
+20fd f8fd 		  JSR	  SCROL1
+2100 f900 		  JSR	  LOGGET
+2103 f903 		  BCC	  DELLIB
+2105 f905 		  JMP	  DOLCOL
+2108 f908 BELL:	LDY	  #$20
+210a f90a BELL1:  JSR	  CLICK
+210d f90d 		  DEY
+210e f90e 		  BPL	  BELL1
+2110 f910 		  RTS
+2111 f911 DBDDEC: LDA	  #2
+2113 f913 		  BNE	  DBSUB
+2115 f915 STORE:  LDY	  DSTAT
+2117 f917 		  BMI	  STROK
+2119 f919 		  LDY	  #0
+211b f91b STOREI: STA	  (ADRESS),Y
+211d f91d DBDEC:  LDA	  #1
+211f f91f DBSUB:  STA	  SUBTMP
+2122 f922 		  LDA	  DSTAT
+2124 f924 		  BMI	  STROK
+2126 f926 		  LDA	  ADRESS
+2128 f928 		  SEC
+2129 f929 		  SBC	  SUBTMP
+212c f92c 		  STA	  ADRESS
+212e f92e 		  BCS	  DBSUB1
+2130 f930 		  DEC	  ADRESS+1
+2132 f932 DBSUB1: LDA	  APPMHI+1
+2134 f934 		  CMP	  ADRESS+1
+2136 f936 		  BCC	  STROK
+2138 f938 		  BNE	  STRERR
+213a f93a 		  LDA	  APPMHI
+213c f93c 		  CMP	  ADRESS
+213e f93e 		  BCC	  STROK
+2140 f940 STRERR: LDA	  #SCRMEM
+2142 f942 		  STA	  DSTAT
+2144 f944 STROK:  RTS
+2145 f945 CONVRT: LDA	  ROWCRS
+2147 f947 		  PHA
+2148 f948 		  LDA	  COLCRS
+214a f94a 		  PHA
+214b f94b 		  LDA	  COLCRS+1
+214d f94d 		  PHA
+214e f94e 		  JSR	  PUTMSC
+2151 f951 		  LDA	  ROWCRS
+2153 f953 		  STA	  MLTTMP
+2155 f955 		  LDA	  #0
+2157 f957 		  STA	  MLTTMP+1
+2159 f959 		  LDA	  MLTTMP
+215b f95b 		  ASL	  A
+215c f95c 		  ROL	  MLTTMP+1
+215e f95e 		  STA	  HOLD1
+2160 f960 		  LDY	  MLTTMP+1
+2162 f962 		  STY	  HOLD2
+2165 f965 		  ASL	  A
+2166 f966 		  ROL	  MLTTMP+1
+2168 f968 		  ASL	  A
+2169 f969 		  ROL	  MLTTMP+1
+216b f96b 		  CLC
+216c f96c 		  ADC	  HOLD1
+216e f96e 		  STA	  MLTTMP
+2170 f970 		  LDA	  MLTTMP+1
+2172 f972 		  ADC	  HOLD2
+2175 f975 		  STA	  MLTTMP+1
+2177 f977 		  LDX	  DINDEX
+2179 f979 		  LDY	  DHLINE,X
+217b f97b CONVR1: DEY
+217c f97c 		  BMI	  CONVR2
+217e f97e 		  ASL	  MLTTMP
+2180 f980 		  ROL	  MLTTMP+1
+2182 f982 		  JMP	  CONVR1
+2185 f985 CONVR2: LDY	  DIV2TB,X
+2187 f987 		  LDA	  COLCRS
+2189 f989 		  LDX	  #7
+218b f98b CONVR3: DEY
+218c f98c 		  BMI	  CONVR4
+218e f98e 		  DEX
+218f f98f 		  LSR	  COLCRS+1
+2191 f991 		  ROR	  A
+2192 f992 		  ROR	  TMPLBT
+2195 f995 		  JMP	  CONVR3
+2198 f998 CONVR4: INY
+2199 f999 		  CLC
+219a f99a 		  ADC	  MLTTMP
+219c f99c 		  STA	  MLTTMP
+219e f99e 		  BCC	  CONVR5
+21a0 f9a0 		  INC	  MLTTMP+1
+21a2 f9a2 CONVR5: SEC
+21a3 f9a3 CONVR6: ROR	  TMPLBT
+21a6 f9a6 		  CLC
+21a7 f9a7 		  DEX
+21a8 f9a8 		  BPL	  CONVR6
+21aa f9aa 		  LDX	  TMPLBT
+21ad f9ad 		  LDA	  MLTTMP
+21af f9af 		  CLC
+21b0 f9b0 		  ADC	  ADRESS
+21b2 f9b2 		  STA	  ADRESS
+21b4 f9b4 		  STA	  OLDADR
+21b6 f9b6 		  LDA	  MLTTMP+1
+21b8 f9b8 		  ADC	  ADRESS+1
+21ba f9ba 		  STA	  ADRESS+1
+21bc f9bc 		  STA	  OLDADR+1
+Unresolved: LDA DMASKT,X
+21be f9be 		  LDA	  DMASKT,X
+21c1 f9c1 		  STA	  DMASK
+21c4 f9c4 		  STA	  SHFAMT
+21c6 f9c6 		  PLA
+21c7 f9c7 		  STA	  COLCRS+1
+21c9 f9c9 		  PLA
+21ca f9ca 		  STA	  COLCRS
+21cc f9cc 		  PLA
+21cd f9cd 		  STA	  ROWCRS
+21cf f9cf 		  RTS
+21d0 f9d0 INCRSB: LDA	  #0
+21d2 f9d2 		  BEQ	  INCREC
+21d4 f9d4 INCRSR: LDA	  #$9B
+21d6 f9d6 INCREC: STA	  INSDAT
+21d8 f9d8 INCRSA: INC	  LOGCOL
+21da f9da 		  INC	  COLCRS
+21dc f9dc 		  BNE	  INCRS2
+21de f9de 		  INC	  COLCRS+1
+21e0 f9e0 INCRS2: LDA	  COLCRS
+21e2 f9e2 		  LDX	  DINDEX
+Unresolved: CMP COLUMN,X
+21e4 f9e4 		  CMP	  COLUMN,X
+21e7 f9e7 		  BEQ	  INC2A
+21e9 f9e9 		  CPX	  #0
+21eb f9eb 		  BNE	  INCRS3
+21ed f9ed 		  CMP	  RMARGN
+21ef f9ef 		  BEQ	  INCRS3
+21f1 f9f1 		  BCS	  INC2A
+21f3 f9f3 INCRS3: RTS
+21f4 f9f4 INC2A:  CPX	  #8
+21f6 f9f6 		  BCC	  DOCR1
+21f8 f9f8 		  LDA	  COLCRS+1
+21fa f9fa 		  BEQ	  INCRS3
+21fc f9fc DOCR1:  LDA	  DINDEX
+21fe f9fe 		  BNE	  DOCR
+2200 fa00 		  LDA	  LOGCOL
+2202 fa02 		  CMP	  #81
+2204 fa04 		  BCC	  DOCR1B
+2206 fa06 		  LDA	  INSDAT
+2208 fa08 		  BEQ	  DOCR
+220a fa0a 		  JSR	  DOCRWS
+220d fa0d 		  JMP	  INCRS1
+2210 fa10 DOCR1B: JSR	  DOCR
+2213 fa13 		  LDA	  ROWCRS
+2215 fa15 		  CLC
+2216 fa16 		  ADC	  #120
+2218 fa18 		  JSR	  BITGET
+221b fa1b 		  BCC	  DOCR1A
+221d fa1d 		  LDA	  INSDAT
+221f fa1f 		  BEQ	  DOCR1A
+2221 fa21 		  CLC
+2222 fa22 		  JSR	  INSLIA
+2225 fa25 DOCR1A: JMP	  DOLCOL
+2228 fa28 NOSCRL: LDA	  #0
+222a fa2a 		  BEQ	  NOSCR1
+222c fa2c DOCRWS: LDA	  #$9B
+222e fa2e NOSCR1: STA	  INSDAT
+2230 fa30 DOCR:	JSR	  COLCR
+2233 fa33 		  LDA	  #0
+2235 fa35 		  STA	  COLCRS+1
+2237 fa37 		  INC	  ROWCRS
+2239 fa39 DOCR2:  LDX	  DINDEX
+223b fa3b 		  LDY	  #24
+223d fa3d 		  BIT	  SWPFLG
+223f fa3f 		  BPL	  DOCR2A
+2241 fa41 		  LDY	  #4
+2243 fa43 		  TYA
+2244 fa44 		  BNE	  DOCR2B
+Unresolved: LDA NOROWS,X
+2246 fa46 DOCR2A: LDA	  NOROWS,X
+2249 fa49 DOCR2B: CMP	  ROWCRS
+224b fa4b 		  BNE	  INCRS1
+224d fa4d 		  STY	  HOLD3
+2250 fa50 		  TXA
+2251 fa51 		  BNE	  INCRS1
+2253 fa53 		  LDA	  INSDAT
+2255 fa55 		  BEQ	  INCRS1
+2257 fa57 		  CMP	  #$9B
+2259 fa59 		  SEC
+225a fa5a 		  BEQ	  DOCR4B
+225c fa5c 		  CLC
+225d fa5d DOCR4B: JSR	  SCROLL
+2260 fa60 		  INC	  SCRFLG
+2263 fa63 		  DEC	  BUFSTR
+2265 fa65 		  DEC	  HOLD3
+2268 fa68 		  LDA	  LOGMAP
+226b fa6b 		  SEC
+226c fa6c 		  BPL	  DOCR4B
+226e fa6e 		  LDA	  HOLD3
+2271 fa71 		  STA	  ROWCRS
+2273 fa73 INCRS1: JMP	  DOLCOL
+2276 fa76 SUBEND: SEC
+2277 fa77 		  LDA	  ROWAC,X
+2279 fa79 		  SBC	  ENDPT
+227b fa7b 		  STA	  ROWAC,X
+227d fa7d 		  LDA	  ROWAC+1,X
+227f fa7f 		  SBC	  ENDPT+1
+2281 fa81 		  STA	  ROWAC+1,X
+2283 fa83 		  RTS
+2284 fa84 ERANGE: LDA	  BOTSCR
+2287 fa87 		  CMP	  #4
+2289 fa89 		  BEQ	  RANGE
+228b fa8b 		  LDA	  DINDEX
+228d fa8d 		  BEQ	  RANGE
+228f fa8f 		  JSR	  EOPEN
+2292 fa92 RANGE:  LDA	  #39
+2294 fa94 		  CMP	  RMARGN
+2296 fa96 		  BCS	  RANGE3
+2298 fa98 		  STA	  RMARGN
+229a fa9a RANGE3: LDX	  DINDEX
+Unresolved: LDA NOROWS,X
+229c fa9c 		  LDA	  NOROWS,X
+229f fa9f 		  CMP	  ROWCRS
+22a1 faa1 		  BCC	  RNGERR
+22a3 faa3 		  BEQ	  RNGERR
+22a5 faa5 		  CPX	  #8
+22a7 faa7 		  BNE	  RANGE1
+22a9 faa9 		  LDA	  COLCRS+1
+22ab faab 		  BEQ	  RNGOK
+22ad faad 		  CMP	  #1
+22af faaf 		  BNE	  RNGERR
+22b1 fab1 		  BEQ	  RANGE2
+22b3 fab3 RANGE1: LDA	  COLCRS+1
+22b5 fab5 		  BNE	  RNGERR
+Unresolved: LDA COLUMN,X
+22b7 fab7 RANGE2: LDA	  COLUMN,X
+22ba faba 		  CMP	  COLCRS
+22bc fabc 		  BCC	  RNGERR
+22be fabe 		  BEQ	  RNGERR
+22c0 fac0 RNGOK:  LDA	  #SUCCES
+22c2 fac2 		  STA	  DSTAT
+22c4 fac4 		  LDA	  #BRKABT
+22c6 fac6 		  LDX	  BRKKEY
+22c8 fac8 		  STA	  BRKKEY
+22ca faca 		  BEQ	  RNGER2
+22cc facc 		  RTS
+22cd facd RNGERR: JSR	  HOME
+22d0 fad0 		  LDA	  #CRSROR
+22d2 fad2 RNGER2: STA	  DSTAT
+22d4 fad4 RNGER1: PLA
+22d5 fad5 		  PLA
+22d6 fad6 		  LDA	  SWPFLG
+22d8 fad8 		  BPL	  RETUR3
+22da fada 		  JSR	  SWAPA
+22dd fadd RETUR3: JMP	  RETUR1
+22e0 fae0 OFFCRS: LDY	  #0
+22e2 fae2 		  LDA	  OLDCHR
+22e4 fae4 		  STA	  (OLDADR),Y
+22e6 fae6 		  RTS
+22e7 fae7 BITCON: PHA
+22e8 fae8 		  AND	  #7
+22ea faea 		  TAX
+Unresolved: LDA MASKTB,X
+22eb faeb 		  LDA	  MASKTB,X
+22ee faee 		  STA	  BITMSK
+22f0 faf0 		  PLA
+22f1 faf1 		  LSR	  A
+22f2 faf2 		  LSR	  A
+22f3 faf3 		  LSR	  A
+22f4 faf4 		  TAX
+22f5 faf5 		  RTS
+22f6 faf6 BITROL: ROL	  LOGMAP+2
+22f9 faf9 		  ROL	  LOGMAP+1
+22fc fafc 		  ROL	  LOGMAP
+22ff faff 		  RTS
+2300 fb00 BITPUT: BCC	  BITCLR
+2302 fb02 BITSET: JSR	  BITCON
+2305 fb05 		  LDA	  TABMAP,X
+2308 fb08 		  ORA	  BITMSK
+230a fb0a 		  STA	  TABMAP,X
+230d fb0d 		  RTS
+230e fb0e BITCLR: JSR	  BITCON
+2311 fb11 		  LDA	  BITMSK
+2313 fb13 		  EOR	  #$FF
+2315 fb15 		  AND	  TABMAP,X
+2318 fb18 		  STA	  TABMAP,X
+231b fb1b 		  RTS
+231c fb1c LOGGET: LDA	  ROWCRS
+231e fb1e LO1GET: CLC
+231f fb1f LO2GET: ADC	  #120
+2321 fb21 BITGET: JSR	  BITCON
+2324 fb24 		  CLC
+2325 fb25 		  LDA	  TABMAP,X
+2328 fb28 		  AND	  BITMSK
+232a fb2a 		  BEQ	  BITGE1
+232c fb2c 		  SEC
+232d fb2d BITGE1: RTS
+232e fb2e INATAC: LDA	  CHAR
+2331 fb31 		  LDY	  DINDEX
+2333 fb33 		  CPY	  #3
+2335 fb35 		  BCS	  INATA1
+2337 fb37 		  ROL	  A
+2338 fb38 		  ROL	  A
+2339 fb39 		  ROL	  A
+233a fb3a 		  ROL	  A
+233b fb3b 		  AND	  #3
+233d fb3d 		  TAX
+233e fb3e 		  LDA	  CHAR
+2341 fb41 		  AND	  #$9F
+Unresolved: ORA INTATA,X
+2343 fb43 		  ORA	  INTATA,X
+2346 fb46 INATA1: STA	  ATACHR
+2349 fb49 		  RTS
+234a fb4a MOVLIN: LDA	  #LINBUF/256
+234c fb4c 		  STA	  ADRESS+1
+234e fb4e 		  LDA	  #LINBUF.AND.$FF
+2350 fb50 		  STA	  ADRESS
+2352 fb52 		  LDY	  #39
+2354 fb54 MOVLI1: LDA	  (TOADR),Y
+2356 fb56 		  STA	  TMPCHR
+2358 fb58 		  LDA	  (FRMADR),Y
+235a fb5a 		  STA	  (TOADR),Y
+235c fb5c 		  LDA	  TMPCHR
+235e fb5e 		  STA	  (ADRESS),Y
+2360 fb60 		  DEY
+2361 fb61 		  BPL	  MOVLI1
+2363 fb63 		  LDA	  ADRESS+1
+2365 fb65 		  STA	  FRMADR+1
+2367 fb67 		  LDA	  ADRESS
+2369 fb69 		  STA	  FRMADR
+236b fb6b 		  CLC
+236c fb6c 		  LDA	  TOADR
+236e fb6e 		  ADC	  #40
+2370 fb70 		  STA	  TOADR
+2372 fb72 		  BCC	  MOVLI2
+2374 fb74 		  INC	  TOADR+1
+2376 fb76 MOVLI2: RTS
+2377 fb77 EXTEND: PHP
+2378 fb78 		  LDY	  #23
+237a fb7a EXTEN1: TYA
+237b fb7b 		  JSR	  LO1GET
+237e fb7e 		  PHP
+237f fb7f 		  TYA
+2380 fb80 		  CLC
+2381 fb81 		  ADC	  #121
+2383 fb83 		  PLP
+2384 fb84 		  JSR	  BITPUT
+2387 fb87 EXTEN3: DEY
+2388 fb88 		  BMI	  EXTEN4
+238a fb8a 		  CPY	  ROWCRS
+238c fb8c 		  BCS	  EXTEN1
+238e fb8e EXTEN4: LDA	  ROWCRS
+2390 fb90 		  CLC
+2391 fb91 		  ADC	  #120
+2393 fb93 		  PLP
+2394 fb94 		  JMP	  BITPUT
+2397 fb97 CLRLIN: LDA	  LMARGN
+2399 fb99 		  STA	  COLCRS
+239b fb9b 		  JSR	  CONVRT
+239e fb9e 		  LDY	  #39
+23a0 fba0 		  LDA	  #0
+23a2 fba2 CLRLI1: STA	  (ADRESS),Y
+23a4 fba4 		  DEY
+23a5 fba5 		  BPL	  CLRLI1
+23a7 fba7 		  RTS
+23a8 fba8 SCROLL: JSR	  BITROL
+23ab fbab 		  LDA	  SAVMSC
+23ad fbad 		  STA	  ADRESS
+23af fbaf 		  LDA	  SAVMSC+1
+23b1 fbb1 		  STA	  ADRESS+1
+23b3 fbb3 SCROL1: LDY	  #40
+23b5 fbb5 		  LDA	  (ADRESS),Y
+23b7 fbb7 		  LDX	  RAMTOP
+23b9 fbb9 		  DEX
+23ba fbba 		  CPX	  ADRESS+1
+23bc fbbc 		  BNE	  SCROL2
+23be fbbe 		  LDX	  #$D7
+23c0 fbc0 		  CPX	  ADRESS
+23c2 fbc2 		  BCS	  SCROL2
+23c4 fbc4 		  LDA	  #0
+23c6 fbc6 SCROL2: LDY	  #0
+23c8 fbc8 		  STA	  (ADRESS),Y
+23ca fbca 		  INC	  ADRESS
+23cc fbcc 		  BNE	  SCROL1
+23ce fbce 		  INC	  ADRESS+1
+23d0 fbd0 		  LDA	  ADRESS+1
+23d2 fbd2 		  CMP	  RAMTOP
+23d4 fbd4 		  BNE	  SCROL1
+23d6 fbd6 		  JMP	  DOLCOL
+23d9 fbd9 DOLCOL: LDA	  #0
+23db fbdb 		  STA	  LOGCOL
+23dd fbdd 		  LDA	  ROWCRS
+23df fbdf 		  STA	  HOLD1
+23e1 fbe1 DOLCO1: LDA	  HOLD1
+23e3 fbe3 		  JSR	  LO1GET
+23e6 fbe6 		  BCS	  DOLCO2
+23e8 fbe8 		  LDA	  LOGCOL
+23ea fbea 		  CLC
+23eb fbeb 		  ADC	  #40
+23ed fbed 		  STA	  LOGCOL
+23ef fbef 		  DEC	  HOLD1
+23f1 fbf1 		  JMP	  DOLCO1
+23f4 fbf4 DOLCO2: CLC
+23f5 fbf5 		  LDA	  LOGCOL
+23f7 fbf7 		  ADC	  COLCRS
+23f9 fbf9 		  STA	  LOGCOL
+23fb fbfb 		  RTS
+23fc fbfc DOBUFC: JSR	  PHACRS
+23ff fbff 		  LDA	  LOGCOL
+2401 fc01 		  PHA
+2402 fc02 		  LDA	  BUFSTR
+2404 fc04 		  STA	  ROWCRS
+2406 fc06 		  LDA	  BUFSTR+1
+2408 fc08 		  STA	  COLCRS
+240a fc0a 		  LDA	  #1
+240c fc0c 		  STA	  BUFCNT
+240e fc0e DOBUF1: LDX	  #23
+2410 fc10 		  LDA	  SWPFLG
+2412 fc12 		  BPL	  DOB1
+2414 fc14 		  LDX	  #3
+2416 fc16 DOB1:	CPX	  ROWCRS
+2418 fc18 		  BNE	  DOBU1A
+241a fc1a 		  LDA	  COLCRS
+241c fc1c 		  CMP	  RMARGN
+241e fc1e 		  BNE	  DOBU1A
+2420 fc20 		  INC	  BUFCNT
+2422 fc22 		  JMP	  D0BUF2
+2425 fc25 DOBU1A: JSR	  INCRSB
+2428 fc28 		  INC	  BUFCNT
+242a fc2a 		  LDA	  LOGCOL
+242c fc2c 		  CMP	  LMARGN
+242e fc2e 		  BNE	  DOBUF1
+2430 fc30 		  DEC	  ROWCRS
+2432 fc32 		  JSR	  CRSRLF
+2435 fc35 DOBUF2: JSR	  GETPLT
+2438 fc38 		  BNE	  DOBUF4
+243a fc3a 		  DEC	  BUFCNT
+243c fc3c 		  LDA	  LOGCOL
+243e fc3e 		  CMP	  LMARGN
+2440 fc40 		  BEQ	  DOBUF4
+2442 fc42 		  JSR	  CRSRLF
+2445 fc45 		  LDA	  COLCRS
+2447 fc47 		  CMP	  RMARGN
+2449 fc49 		  BNE	  DOBUF3
+244b fc4b 		  DEC	  ROWCRS
+244d fc4d DOBUF3: LDA	  BUFCNT
+244f fc4f 		  BNE	  DOBUF2
+2451 fc51 DOBUF4: PLA
+2452 fc52 		  STA	  LOGCOL
+2454 fc54 		  JSR	  PLACRS
+2457 fc57 		  RTS
+2458 fc58 STRBEG: JSR	  DOLCOL
+245b fc5b 		  LDA	  HOLD1
+245d fc5d 		  STA	  BUFSTR
+245f fc5f 		  LDA	  LMARGN
+2461 fc61 		  STA	  BUFSTR+1
+2463 fc63 		  RTS
+2464 fc64 DELTIA: LDA	  LOGCOL
+2466 fc66 		  CMP	  LMARGN
+2468 fc68 		  BNE	  DELTIG
+246a fc6a 		  DEC	  ROWCRS
+246c fc6c DELTIG: JSR	  DOLCOL
+246f fc6f DELTIM: LDA	  LOGCOL
+2471 fc71 		  CMP	  LMARGN
+2473 fc73 		  BEQ	  DELTI3
+2475 fc75 		  JSR	  CONVRT
+2478 fc78 		  LDA	  RMARGN
+247a fc7a 		  SEC
+247b fc7b 		  SBC	  LMARGN
+247d fc7d 		  TAY
+247e fc7e DELTI1: LDA	  (ADRESS),Y
+2480 fc80 		  BNE	  DELTI3
+2482 fc82 		  DEY
+2483 fc83 		  BPL	  DELTI1
+2485 fc85 DELTI2: JMP	  DELLIB
+2488 fc88 DELTI3: RTS	  
+2489 fc89 TSTCTL: LDX	  #45
+Unresolved: LDA CNTRLS,X
+248b fc8b TSTCT1: LDA	  CNTRLS,X
+248e fc8e 		  CMP	  ATACHR
+2491 fc91 		  BEQ	  TSTCT2
+2493 fc93 		  DEX
+2494 fc94 		  DEX
+2495 fc95 		  DEX
+2496 fc96 		  BPL	  TSTCT1
+2498 fc98 TSTCT2: RTS
+2499 fc99 PHACRS: LDX	  #2
+249b fc9b PHACR1: LDA	  ROWCRS,X
+249d fc9d 		  STA	  TMPROW,X
+24a0 fca0 		  DEX
+24a1 fca1 		  BPL	  PHACR1
+24a3 fca3 		  RTS
+24a4 fca4 PLACRS: LDX	  #2
+24a6 fca6 PLACR1: LDA	  TMPROW,X
+24a9 fca9 		  STA	  ROWCRS,X
+24ab fcab 		  DEX
+24ac fcac 		  BPL	  PLACR1
+24ae fcae 		  RTS
+24af fcaf SWAP:	JSR	  SWAPA
+24b2 fcb2 		  JMP	  RETURI
+24b5 fcb5 SWAPA:  LDA	  BOTSCR
+24b8 fcb8 		  CMP	  #24
+24ba fcba 		  BEQ	  SWAP3
+24bc fcbc 		  LDX	  #11
+24be fcbe SWAP1:  LDA	  ROWCRS,X
+24c0 fcc0 		  PHA
+24c1 fcc1 		  LDA	  TXTROW,X
+24c4 fcc4 		  STA	  ROWCRS,X
+24c6 fcc6 		  PLA
+24c7 fcc7 		  STA	  TXTROW,X
+24ca fcca 		  DEX
+24cb fccb 		  BPL	  SWAP1
+24cd fccd 		  LDA	  SWPFLG
+24cf fccf 		  EOR	  #$FF
+24d1 fcd1 		  STA	  SWPFLG
+24d3 fcd3 SWAP3:  RTS
+24d4 fcd4 CLICK:  LDX	  #$7F
+24d6 fcd6 CLICK1: STX	  CONSOL
+24d9 fcd9 		  STX	  WSYNC
+24dc fcdc 		  DEX
+24dd fcdd 		  BPL	  CLICK1
+24df fcdf 		  RTS
+24e0 fce0 COLCR:  LDA	  #0
+24e2 fce2 		  LDX	  SWPFLG
+24e4 fce4 		  BNE	  COLCR1
+24e6 fce6 		  LDX	  DINDEX
+24e8 fce8 		  BNE	  COLCR2
+24ea fcea COLCR1: LDA	  LMARGN
+24ec fcec COLCR2: STA	  COLCRS
+24ee fcee 		  RTS
+24ef fcef PUTMSC: LDA	  SAVMSC
+24f1 fcf1 		  STA	  ADRESS
+24f3 fcf3 		  LDA	  SAVMSC+1
+24f5 fcf5 		  STA	  ADRESS+1
+24f7 fcf7 		  RTS
+24f8 fcf8 DRAW:	LDX	  #0
+24fa fcfa 		  LDA	  ICCOMZ
+24fc fcfc 		  CMP	  #$11
+24fe fcfe 		  BEQ	  DRAWA
+2500 fd00 		  CMP	  #$12
+2502 fd02 		  BEQ	  DRAWB
+2504 fd04 		  LDY	  #NVALID
+2506 fd06 		  RTS
+2507 fd07 DRAWB:  INX
+2508 fd08 DRAWA:  STX	  FILFLG
+250b fd0b 		  LDA	  ROWCRS
+250d fd0d 		  STA	  NEWROW
+250f fd0f 		  LDA	  COLCRS
+2511 fd11 		  STA	  NEWCOL
+2513 fd13 		  LDA	  COLCRS+1
+2515 fd15 		  STA	  NEWCOL+1
+2517 fd17 		  LDA	  #1
+2519 fd19 		  STA	  ROWINC
+251b fd1b 		  STA	  COLINC
+251d fd1d 		  SEC
+251e fd1e 		  LDA	  NEWROW
+2520 fd20 		  SBC	  OLDROW
+2522 fd22 		  STA	  DELTAR
+2524 fd24 		  BCS	  DRAW1
+2526 fd26 		  LDA	  #$FF
+2528 fd28 		  STA	  ROWINC
+252a fd2a 		  LDA	  DELTAR
+252c fd2c 		  EOR	  #$FF
+252e fd2e 		  CLC
+252f fd2f 		  ADC	  #1
+2531 fd31 		  STA	  DELTAR
+2533 fd33 DRAW1:  SEC
+2534 fd34 		  LDA	  NEWCOL
+2536 fd36 		  SBC	  OLDCOL
+2538 fd38 		  STA	  DELTAC
+253a fd3a 		  LDA	  NEWCOL+1
+253c fd3c 		  SBC	  OLDCOL+1
+253e fd3e 		  STA	  DELTAC+1
+2540 fd40 		  BCS	  DRAW2
+2542 fd42 		  LDA	  #$FF
+2544 fd44 		  STA	  COLINC
+2546 fd46 		  LDA	  DELTAC
+2548 fd48 		  EOR	  #$FF
+254a fd4a 		  STA	  DELTAC
+254c fd4c 		  LDA	  DELTAC+1
+254e fd4e 		  EOR	  #$FF
+2550 fd50 		  STA	  DELTAC+1
+2552 fd52 		  INC	  DELTAC
+2554 fd54 		  BNE	  DRAW2
+2556 fd56 		  INC	  DELTAC+1
+2558 fd58 DRAW2:  LDX	  #2
+255a fd5a 		  LDY	  #0
+255c fd5c 		  STY	  COLAC+1
+255e fd5e DRAW3A: TYA
+255f fd5f 		  STA	  ROWAC,X
+2561 fd61 		  LDA	  OLDROW,X
+2563 fd63 		  STA	  ROWCRS,X
+2565 fd65 		  DEX
+2566 fd66 		  BPL	  DRAW3A
+2568 fd68 		  LDA	  DELTAC
+256a fd6a 		  INX
+256b fd6b 		  TAY
+256c fd6c 		  LDA	  DELTAC+1
+256e fd6e 		  STA	  COUNTR+1
+2570 fd70 		  STA	  ENDPT+1
+2572 fd72 		  BNE	  DRAW3
+2574 fd74 		  LDA	  DELTAC
+2576 fd76 		  CMP	  DELTAR
+2578 fd78 		  BCS	  DRAW3
+257a fd7a 		  LDA	  DELTAR
+257c fd7c 		  LDX	  #2
+257e fd7e 		  TAY
+257f fd7f DRAW3:  TYA
+2580 fd80 		  STA	  COUNTR
+2582 fd82 		  STA	  ENDPT
+2584 fd84 		  PHA
+2585 fd85 		  LDA	  ENDPT+1
+2587 fd87 		  LSR	  A
+2588 fd88 		  PLA
+2589 fd89 		  ROR	  A
+258a fd8a 		  STA	  ROWAC,X
+258c fd8c DRAW4A: LDA	  COUNTR
+258e fd8e 		  ORA	  COUNTR+1
+2590 fd90 		  BNE	  DRAWI1
+2592 fd92 		  JMP	  DRAW10
+2595 fd95 DRAWI1: CLC
+2596 fd96 		  LDA	  ROWAC
+2598 fd98 		  ADC	  DELTAR
+259a fd9a 		  STA	  ROWAC
+259c fd9c 		  BCC	  DRAW5
+259e fd9e 		  INC	  ROWAC+1
+25a0 fda0 DRAW5:  LDA	  ROWAC+1
+25a2 fda2 		  CMP	  ENDPT+1
+25a4 fda4 		  BCC	  DRAW6
+25a6 fda6 		  BNE	  DRAW5A
+25a8 fda8 		  LDA	  ROWAC
+25aa fdaa 		  CMP	  ENDPT
+25ac fdac 		  BCC	  DRAW6
+25ae fdae DRAW5A: CLC
+25af fdaf 		  LDA	  ROWCRS
+25b1 fdb1 		  ADC	  ROWINC
+25b3 fdb3 		  STA	  ROWCRS
+25b5 fdb5 		  LDX	  #0
+25b7 fdb7 		  JSR	  SUBEND
+25ba fdba DRAW6:  CLC
+25bb fdbb 		  LDA	  COLAC
+25bd fdbd 		  ADC	  DELTAC
+25bf fdbf 		  STA	  COLAC
+25c1 fdc1 		  LDA	  COLAC+1
+25c3 fdc3 		  ADC	  DELTAC+1
+25c5 fdc5 		  STA	  COLAC+1
+25c7 fdc7 		  CMP	  ENDPT+1
+25c9 fdc9 		  BCC	  DRAW8
+25cb fdcb 		  BNE	  DRAW6A
+25cd fdcd 		  LDA	  COLAC
+25cf fdcf 		  CMP	  ENDPT
+25d1 fdd1 		  BCC	  DRAW8
+25d3 fdd3 DRAW6A: BIT	  COLINC
+25d5 fdd5 		  BPL	  DRAW6B
+25d7 fdd7 		  DEC	  COLCRS
+25d9 fdd9 		  LDA	  COLCRS
+25db fddb 		  CMP	  #$FF
+25dd fddd 		  BNE	  DRAW7
+25df fddf 		  LDA	  COLCRS+1
+25e1 fde1 		  BEQ	  DRAW7
+25e3 fde3 		  DEC	  COLCRS+1
+25e5 fde5 		  BPL	  DRAW7
+25e7 fde7 DRAW6B: INC	  COLCRS
+25e9 fde9 		  BNE	  DRAW7
+25eb fdeb 		  INC	  COLCRS+1
+25ed fded DRAW7:  LDX	  #2
+25ef fdef 		  JSR	  SUBEND
+25f2 fdf2 DRAW8:  JSR	  RANGE
+25f5 fdf5 		  JSR	  OUTPLT
+25f8 fdf8 		  LDA	  FILFLG
+25fb fdfb 		  BEQ	  DRAW9
+25fd fdfd 		  JSR	  PHACRS
+2600 fe00 		  LDA	  ATACHR
+2603 fe03 		  STA	  HOLD4
+2606 fe06 DRAW8A: LDA	  ROWCRS
+2608 fe08 		  PHA
+2609 fe09 		  JSR	  INCRSA
+260c fe0c 		  PLA
+260d fe0d 		  STA	  ROWCRS
+260f fe0f DRAW8C: JSR	  RANGE
+2612 fe12 		  JSR	  GETPLT
+2615 fe15 		  BNE	  DRAW8B
+2617 fe17 		  LDA	  FILDAT
+261a fe1a 		  STA	  ATACHR
+261d fe1d 		  JSR	  OUTPLT
+2620 fe20 		  JMP	  DRAW8A
+2623 fe23 DRAW8B: LDA	  HOLD4
+2626 fe26 		  STA	  ATACHR
+2629 fe29 		  JSR	  PLACRS
+262c fe2c DRAW9:  SEC
+262d fe2d 		  LDA	  COUNTR
+262f fe2f 		  SBC	  #1
+2631 fe31 		  STA	  COUNTR
+2633 fe33 		  LDA	  COUNTR+1
+2635 fe35 		  SBC	  #0
+2637 fe37 		  STA	  COUNTR+1
+2639 fe39 		  BMI	  DRAW10
+263b fe3b 		  JMP	  DRAW4A
+263e fe3e DRAW10: JMP	  RETUR1
+2641 fe41 ALOCAT: .BYTE	24,16,10,10,16,28,52,100,196,196,196,196
+264d fe4d NUMDLE: .BYTE	23,23,11,23,47,47,95,95,97,97,97,97
+2659 fe59 MXDMDE: .BYTE	19,19,9,19,39,39,79,79,65,65,65,65
+2665 fe65 ANCONV: .BYTE	2,6,7,8,9,$A,$B,$D,$F,$F,$F,$F
+2671 fe71 PAGETB: .BYTE	0,0,0,0,0,0,0,1,1,1,1,1
+267d fe7d DHLINE: .BYTE	2,1,1,0,0,1,1,2,2,2,2,2
+2689 fe89 COLUMN: .BYTE	40,20,20,40,80,80,160,160,64,80,80,80
+2695 fe95 NOROWS: .BYTE	24,24,12,24,48,48,96,96,192,192,192,192
+26a1 fea1 DIV2TB: .BYTE	0,0,0,2,3,2,3,2,3,1,1,1
+26ad fead DMASKT: .BYTE	$00,$FF,$F0,$0F
+26b1 feb1 		  .BYTE	$C0,$30,$0C,$03
+26b5 feb5 MASKTB: .BYTE	$80,$40,$20,$10,$08,$04,$02,$01
+26bd febd COLRTB: .BYTE	$28,$CA,$94,$46,$00
+26c2 fec2 CNTRLS: .BYTE	$1B
+26c3 fec3 		  .WORD	ESCAPE
+26c5 fec5 		  .BYTE	$1C
+26c6 fec6 		  .WORD	CRSRUP
+26c8 fec8 		  .BYTE	$1D
+26c9 fec9 		  .WORD	CRSRDN
+26cb fecb 		  .BYTE	$1E
+26cc fecc 		  .WORD	CRSRLF
+26ce fece 		  .BYTE	$1F
+26cf fecf 		  .WORD	CRSRRT
+26d1 fed1 		  .BYTE	$7D
+26d2 fed2 		  .WORD	CLRSCR
+26d4 fed4 		  .BYTE	$7E
+26d5 fed5 		  .WORD	BS
+26d7 fed7 		  .BYTE	$7F
+26d8 fed8 		  .WORD	TAB
+26da feda 		  .BYTE	$9B
+26db fedb 		  .WORD	DOCRWS
+26dd fedd 		  .BYTE	$9C
+26de fede 		  .WORD	DELLIN
+26e0 fee0 		  .BYTE	$9D
+26e1 fee1 		  .WORD	INSLIN
+26e3 fee3 		  .BYTE	$9E
+26e4 fee4 		  .WORD	CLRTAB
+26e6 fee6 		  .BYTE	$9F
+26e7 fee7 		  .WORD	SETTAB
+26e9 fee9 		  .BYTE	$FD
+26ea feea 		  .WORD	BELL
+26ec feec 		  .BYTE	$FE
+26ed feed 		  .WORD	DELCHR
+26ef feef 		  .BYTE	$FF
+26f0 fef0 		  .WORD	INSCHR
+26f2 fef2 ATAINT: .BYTE	$40,$00,$20,$60
+26f6 fef6 INTATA: .BYTE	$20,$40,$00,$60
+26fa fefa ATASCI: .BYTE	$6C,$6A,$3B,$80,$80,$6B,$2B,$2A
+2702 ff02 		  .BYTE	$6F,$80,$70,$75,$9B,$69,$2D,$3D
+270a ff0a 		  .BYTE	$76,$80,$63,$80,$80,$62,$78,$7A
+2712 ff12 		  .BYTE	$34,$80,$33,$36,$1B,$35,$32,$31
+271a ff1a 		  .BYTE	$2C,$20,$2E,$6E,$80,$6D,$2F,$81
+2722 ff22 		  .BYTE	$72,$80,$65,$79,$7F,$74,$77,$71
+272a ff2a 		  .BYTE	$39,$80,$30,$37,$7E,$38,$3C,$3E
+2732 ff32 		  .BYTE	$66,$68,$64,$80,$82,$67,$73,$61
+273a ff3a 		  .BYTE	$4C,$4A,$3A,$80,$80,$4B,$5C,$5E
+2742 ff42 		  .BYTE	$4F,$80,$50,$55,$9B,$49,$5F,$7C
+274a ff4a 		  .BYTE	$56,$80,$43,$80,$80,$42,$58,$5A
+2752 ff52 		  .BYTE	$24,$80,$23,$26,$1B,$25,$22,$21
+275a ff5a 		  .BYTE	$5B,$20,$5D,$4E,$80,$4D,$3F,$81
+2762 ff62 		  .BYTE	$52,$80,$45,$59,$9F,$54,$57,$51
+276a ff6a 		  .BYTE	$28,$80,$29,$27,$9C,$40,$7D,$9D
+2772 ff72 		  .BYTE	$46,$48,$44,$80,$83,$47,$53,$41
+277a ff7a 		  .BYTE	$0C,$0A,$7B,$80,$80,$0B,$1E,$1F
+2782 ff82 		  .BYTE	$0F,$80,$10,$15,$9B,$09,$1C,$1D
+278a ff8a 		  .BYTE	$16,$80,$03,$80,$80,$02,$18,$1A
+2792 ff92 		  .BYTE	$80,$80,$85,$80,$1B,$80,$FD,$80
+279a ff9a 		  .BYTE	$00,$20,$60,$0E,$80,$0D,$80,$81
+27a2 ffa2 		  .BYTE	$12,$80,$05,$19,$9E,$14,$17,$11
+27aa ffaa 		  .BYTE	$80,$80,$80,$80,$FE,$80,$7D,$FF
+27b2 ffb2 		  .BYTE	$06,$08,$04,$80,$84,$07,$13,$01
+27ba ffba PIRQ5:  LDA	  KBCODE
+27bd ffbd 		  CMP	  CH1
+27c0 ffc0 		  BNE	  PIRQ3
+27c2 ffc2 		  LDA	  KEYDEL
+27c5 ffc5 		  BNE	  PIRQ4
+27c7 ffc7 PIRQ3:  LDA	  KBCODE
+27ca ffca 		  CMP	  #CNTL1
+27cc ffcc 		  BNE	  PIRQ1
+27ce ffce 		  LDA	  SSFLAG
+27d1 ffd1 		  EOR	  #$FF
+27d3 ffd3 		  STA	  SSFLAG
+27d6 ffd6 		  BCS	  PIRQ4
+27d8 ffd8 PIRQ1:  STA	  CH
+27db ffdb 		  STA	  CH1
+27de ffde 		  LDA	  #3
+27e0 ffe0 		  STA	  KEYDEL
+27e3 ffe3 		  LDA	  #0
+27e5 ffe5 		  STA	  ATRACT
+27e7 ffe7 PIRQ4:  LDA	  #$30
+27e9 ffe9 		  STA	  SRTIMR
+27ec ffec PIRQ2:  PLA
+27ed ffed 		  RTI
+27ee ffee 		  .BYTE	$FF,$FF,$FF,$FF,$FF,$FF
+0014 d814 KBDSPR: .BYTE	$FFF8-CRNTPC
+Unresolved: .END 
+0015 d815 		  .END
+0c56 e456 		  JMP	  CIO
+0c6e e46e 		  JMP	  CIOINT
+0ca6 e4a6 CIOINT: LDX	  #0
+0ca8 e4a8 CIOI1:  LDA	  #IOCFRE
+0caa e4aa 		  STA	  ICHID,X
+0cad e4ad 		  LDA	  #ERRTNL
+0caf e4af 		  STA	  ICPTL,X
+0cb2 e4b2 		  LDA	  #ERRTNH
+0cb4 e4b4 		  STA	  ICPTH,X
+0cb7 e4b7 		  TXA
+0cb8 e4b8 		  CLC
+0cb9 e4b9 		  ADC	  #IOCBSZ
+0cbb e4bb 		  TAX
+0cbc e4bc 		  CMP	  #MAXIOC
+0cbe e4be 		  BCC	  CIOI1
+0cc0 e4c0 		  RTS
+0cc1 e4c1 		  LDY	  #NOTOPN
+0cc3 e4c3 		  RTS
+0cc4 e4c4 CIO:	 STA	  CIOCHR
+0cc6 e4c6 		  STX	  ICIDNO
+0cc8 e4c8 		  TXA
+0cc9 e4c9 		  AND	  #$F
+0ccb e4cb 		  BNE	  CIERR1
+0ccd e4cd 		  CPX	  #MAXIOC
+0ccf e4cf 		  BCC	  IOC1
+0cd1 e4d1 CIERR1: LDY	  #BADIOC
+0cd3 e4d3 		  JMP	  CIRTN1
+0cd6 e4d6 IOC1:	LDY	  #0
+0cd8 e4d8 IOC1A:  LDA	  IOCB,X
+0cdb e4db 		  STA	  IOCBAS,Y
+0cdd e4dd 		  INX
+0cde e4de 		  INY
+0cdf e4df 		  CPY	  #12
+0ce1 e4e1 		  BCC	  IOC1A
+0ce3 e4e3 		  LDY	  #NVALID
+0ce5 e4e5 		  LDA	  ICCOMZ
+0ce7 e4e7 		  CMP	  #OPEN
+0ce9 e4e9 		  BCC	  CIERR4
+0ceb e4eb 		  TAY
+0cec e4ec 		  CPY	  #SPECIL
+0cee e4ee 		  BCC	  IOC2
+0cf0 e4f0 		  LDY	  #SPECIL
+0cf2 e4f2 IOC2:	STY	  ICCOMT
+0cf4 e4f4 		  LDA	  COMTAB-3,Y
+0cf7 e4f7 		  BEQ	  CIOPEN
+0cf9 e4f9 		  CMP	  #2
+0cfb e4fb 		  BEQ	  CICLOS
+0cfd e4fd 		  CMP	  #8
+0cff e4ff 		  BCS	  CISTSP
+0d01 e501 		  CMP	  #4
+0d03 e503 		  BEQ	  CIREAD
+0d05 e505 		  JMP	  CIWRIT
+0d08 e508 CIOPEN: LDA	  ICHIDZ
+0d0a e50a 		  CMP	  #IOCFRE
+0d0c e50c 		  BEQ	  IOC6
+0d0e e50e CIERR3: LDY	  #PRVOPN
+0d10 e510 CIERR4: JMP	  CIRTN1
+0d13 e513 IOC6:	JSR	  DEVSRC
+0d16 e516 		  BCS	  CIERR4
+0d18 e518 IOC7:	JSR	  COMENT
+0d1b e51b 		  BCS	  CIERR4
+0d1d e51d 		  JSR	  GOHAND
+0d20 e520 		  LDA	  #PUTCHR
+0d22 e522 		  STA	  ICCOMT
+0d24 e524 		  JSR	  COMENT
+0d27 e527 		  LDA	  ICSPRZ
+0d29 e529 		  STA	  ICPTLZ
+0d2b e52b 		  LDA	  ICSPRZ+1
+0d2d e52d 		  STA	  ICPTHZ
+0d2f e52f 		  JMP	  CIRTN2
+0d32 e532 CICLOS: LDY	  #SUCCES
+0d34 e534 		  STY	  ICSTAZ
+0d36 e536 		  JSR	  COMENT
+0d39 e539 		  BCS	  CICLO2
+0d3b e53b 		  JSR	  GOHAND
+0d3e e53e CICLO2: LDA	  #IOCFRE
+0d40 e540 		  STA	  ICHIDZ
+0d42 e542 		  LDA	  #ERRTNH
+0d44 e544 		  STA	  ICPTHZ
+0d46 e546 		  LDA	  #ERRTNL
+0d48 e548 		  STA	  ICPTLZ
+0d4a e54a 		  JMP	  CIRTN2
+0d4d e54d CISTSP: LDA	  ICHIDZ
+0d4f e54f 		  CMP	  #IOCFRE
+0d51 e551 		  BNE	  CIST1
+0d53 e553 		  JSR	  DEVSRC
+0d56 e556 		  BCS	  CIERR4
+0d58 e558 CIST1:  JSR	  COMENT
+0d5b e55b 		  JSR	  GOHAND
+0d5e e55e 		  LDX	  ICIDNO
+0d60 e560 		  LDA	  ICHID,X
+0d63 e563 		  STA	  ICHIDZ
+0d65 e565 		  JMP	  CIRTN2
+0d68 e568 CIREAD: LDA	  ICCOMZ
+0d6a e56a 		  AND	  ICAX1Z
+0d6c e56c 		  BNE	  RCI1A
+0d6e e56e 		  LDY	  #WRONLY
+0d70 e570 RCI1B:  JMP	  CIRTN1
+0d73 e573 RCI1A:  JSR	  COMENT
+0d76 e576 		  BCS	  RCI1B
+0d78 e578 		  LDA	  ICBLLZ
+0d7a e57a 		  ORA	  ICBLLZ+1
+0d7c e57c 		  BNE	  RCI3
+0d7e e57e 		  JSR	  GOHAND
+0d81 e581 		  STA	  CIOCHR
+0d83 e583 		  JMP	  CIRTN2
+0d86 e586 RCI3:	JSR	  GOHAND
+0d89 e589 		  STA	  CIOCHR
+0d8b e58b 		  BMI	  RCI4
+0d8d e58d 		  LDY	  #0
+0d8f e58f 		  STA	  (ICBALZ),Y
+0d91 e591 		  JSR	  INCBFP
+0d94 e594 		  LDA	  ICCOMZ
+0d96 e596 		  AND	  #2
+0d98 e598 		  BNE	  RCI1
+0d9a e59a 		  LDA	  CIOCHR
+0d9c e59c 		  CMP	  #EOL
+0d9e e59e 		  BNE	  RCI1
+0da0 e5a0 		  JSR	  DECBFL
+0da3 e5a3 		  JMP	  RCI4
+0da6 e5a6 RCI1:	JSR	  DECBFL
+0da9 e5a9 		  BNE	  RCI3
+0dab e5ab RCI2:	LDA	  ICCOMZ
+0dad e5ad 		  AND	  #2
+0daf e5af 		  BNE	  RCI4
+0db1 e5b1 RCI6:	JSR	  GOHAND
+0db4 e5b4 		  STA	  CIOCHR
+0db6 e5b6 		  BMI	  RCI4
+0db8 e5b8 		  LDA	  CIOCHR
+0dba e5ba 		  CMP	  #EOL
+0dbc e5bc 		  BNE	  RCI6
+0dbe e5be RCI1I:  LDA	  #TRNRCD
+0dc0 e5c0 		  STA	  ICSTAZ
+0dc2 e5c2 RCI4:	JSR	  SUBBFL
+0dc5 e5c5 		  JMP	  CIRTN2
+0dc8 e5c8 CIWRIT: LDA	  ICCOMZ
+0dca e5ca 		  AND	  ICAX1Z
+0dcc e5cc 		  BNE	  WCIIA
+0dce e5ce 		  LDY	  #RDONLY
+0dd0 e5d0 WCI1B:  JMP	  CIRTN1
+0dd3 e5d3 WCIIA:  JSR	  COMENT
+0dd6 e5d6 		  BCS	  WCI1B
+0dd8 e5d8 		  LDA	  ICBLLZ
+0dda e5da 		  ORA	  ICBLLZ+1
+0ddc e5dc 		  BNE	  WCI3
+0dde e5de 		  LDA	  CIOCHR
+0de0 e5e0 		  INC	  ICBLLZ
+0de2 e5e2 		  BNE	  WCI4
+0de4 e5e4 WCI3:	LDY	  #0
+0de6 e5e6 		  LDA	  (ICBALZ),Y
+0de8 e5e8 		  STA	  CIOCHR
+0dea e5ea WCI4:	JSR	  GOHAND
+0ded e5ed 		  BMI	  WCI5
+0def e5ef 		  JSR	  INCBFP
+0df2 e5f2 		  LDA	  ICCOMZ
+0df4 e5f4 		  AND	  #2
+0df6 e5f6 		  BNE	  WCI1
+0df8 e5f8 		  LDA	  CIOCHR
+0dfa e5fa 		  CMP	  #EOL
+0dfc e5fc 		  BNE	  WCI1
+0dfe e5fe 		  JSR	  DECBFL
+0e01 e601 		  JMP	  WCI5
+0e04 e604 WCI1:	JSR	  DECBFL
+0e07 e607 		  BNE	  WCI3
+0e09 e609 WCI2:	LDA	  ICCOMZ
+0e0b e60b 		  AND	  #2
+0e0d e60d 		  BNE	  WCI5
+0e0f e60f 		  LDA	  #EOL
+0e11 e611 		  JSR	  GOHAND
+0e14 e614 WCI5:	JSR	  SUBBFL
+0e17 e617 		  JMP	  CIRTN2
+0e1a e61a CIRTN1: STY	  ICSTAZ
+0e1c e61c CIRTN2: LDY	  ICIDNO
+0e1e e61e 		  LDA	  ICBAL,Y
+0e21 e621 		  STA	  ICBALZ
+0e23 e623 		  LDA	  ICBAH,Y
+0e26 e626 		  STA	  ICBAHZ
+0e28 e628 		  LDX	  #0
+0e2a e62a CIRT3:  LDA	  IOCBAS,X
+0e2c e62c 		  STA	  IOCB,Y
+0e2f e62f 		  INX
+0e30 e630 		  INY
+0e31 e631 		  CPX	  #12
+0e33 e633 		  BCC	  CIRT3
+0e35 e635 		  LDA	  CIOCHR
+0e37 e637 		  LDX	  ICIDNO
+0e39 e639 		  LDY	  ICSTAZ
+0e3b e63b 		  RTS
+0e3c e63c COMENT: LDY	  ICHIDZ
+0e3e e63e 		  CPY	  #MAXDEV+1
+0e40 e640 		  BCC	  COM1
+0e42 e642 		  LDY	  #NOTOPN
+0e44 e644 		  BCS	  COM2
+0e46 e646 COM1:	LDA	  HATABS+1,Y
+0e49 e649 		  STA	  ICSPRZ
+0e4b e64b 		  LDA	  HATABS+2,Y
+0e4e e64e 		  STA	  ICSPRZ+1
+0e50 e650 		  LDY	  ICCOMT
+0e52 e652 		  LDA	  COMTAB-3,Y
+0e55 e655 		  TAY
+0e56 e656 		  LDA	  (ICSPRZ),Y
+0e58 e658 		  TAX
+0e59 e659 		  INY
+0e5a e65a 		  LDA	  (ICSPRZ),Y
+0e5c e65c 		  STA	  ICSPRZ+1
+0e5e e65e 		  STX	  ICSPRZ
+0e60 e660 		  CLC
+0e61 e661 COM2:	RTS
+0e62 e662 DECBFL: DEC	  ICBLLZ
+0e64 e664 		  LDA	  ICBLLZ
+0e66 e666 		  CMP	  #$FF
+0e68 e668 		  BNE	  DECBF1
+0e6a e66a 		  DEC	  ICBLLZ+1
+0e6c e66c DECBF1: ORA	  ICBLLZ+1
+0e6e e66e 		  RTS
+0e6f e66f INCBFP: INC	  ICBALZ
+0e71 e671 		  BNE	  INCBF1
+0e73 e673 		  INC	  ICBALZ+1
+0e75 e675 INCBF1: RTS
+0e76 e676 SUBBFL: LDX	  ICIDNO
+0e78 e678 		  SEC
+0e79 e679 		  LDA	  ICBLL,X
+0e7c e67c 		  SBC	  ICBLLZ
+0e7e e67e 		  STA	  ICBLLZ
+0e80 e680 		  LDA	  ICBLH,X
+0e83 e683 		  SBC	  ICBLLZ+1
+0e85 e685 		  STA	  ICBLHZ
+0e87 e687 		  RTS
+0e88 e688 GOHAND: LDY	  #FNCNOT
+0e8a e68a 		  JSR	  CIJUMP
+0e8d e68d 		  STY	  ICSTAZ
+0e8f e68f 		  CPY	  #0
+0e91 e691 		  RTS
+0e92 e692 CIJUMP: TAX
+0e93 e693 		  LDA	  ICSPRZ+1
+0e95 e695 		  PHA
+0e96 e696 		  LDA	  ICSPRZ
+0e98 e698 		  PHA
+0e99 e699 		  TXA
+0e9a e69a 		  LDX	  ICIDNO
+0e9c e69c 		  RTS
+0e9d e69d DEVSRC: LDY	  #0
+0e9f e69f 		  LDA	  (ICBALZ),Y
+0ea1 e6a1 		  BEQ	  CIERR2
+0ea3 e6a3 		  LDY	  #MAXDEV
+0ea5 e6a5 DEVS1:  CMP	  HATABS,Y
+0ea8 e6a8 		  BEQ	  DEVS2
+0eaa e6aa 		  DEY
+0eab e6ab 		  DEY
+0eac e6ac 		  DEY
+0ead e6ad 		  BPL	  DEVS1
+0eaf e6af CIERR2: LDY	  #NONDEV
+0eb1 e6b1 		  SEC
+0eb2 e6b2 		  BCS	  DEVS4
+0eb4 e6b4 DEVS2:  TYA
+0eb5 e6b5 		  STA	  ICHIDZ
+0eb7 e6b7 		  SEC
+0eb8 e6b8 		  LDY	  #1
+0eba e6ba 		  LDA	  (ICBALZ),Y
+0ebc e6bc 		  SBC	  #ASCZER
+0ebe e6be 		  CMP	  #$A
+0ec0 e6c0 		  BCC	  DEVS3
+0ec2 e6c2 		  LDA	  #1
+0ec4 e6c4 DEVS3:  STA	  ICDNOZ
+0ec6 e6c6 		  CLC
+0ec7 e6c7 DEVS4:  RTS
+0ec8 e6c8 COMTAB: BYTE	 0,4,4,4,4,6,6,6,6,2,8,10
+0014 d814 CIOSPR: BYTE	 INTORG-CRNTP1
+e912 1c112 		  JMP	  SETVBL
+0c5c e45c 		  JMP	  SETVBL
+0c5f e45f 		  JMP	  SYSVBL
+0c62 e462 		  JMP	  XITVBL
+0c6b e46b 		  JMP	  IHINIT
+NO SYMBOL: VCTABL+INTABS-VDSLST
+0c6e e46e 		  .WORD	SYRTI
+0c70 e470 		  .WORD	SYIRQB
+0c72 e472 		  .WORD	SYIRQB
+0c74 e474 		  .WORD	SYIRQB
+0c76 e476 		  .WORD	SYIRQB
+0c78 e478 		  .WORD	SYIRQB
+0c7a e47a 		  .WORD	SYIRQB
+0c7c e47c 		  .WORD	SYIRQ
+0c7e e47e 		  .WORD	0,0,0,0,0
+0c88 e488 		  .WORD	SYSVBL
+0c8a e48a 		  .WORD	XITVBL
+900c 1680c 		  LDA	  #PIRQH
+900e 1680e 		  STA	  $FFF9
+9010 16810 		  LDA	  #PIRQL
+9012 16812 		  STA	  $FFF8
+9014 16814 		  LDA	  #PNMIH
+9016 16816 		  STA	  $FFFB
+9018 16818 		  LDA	  #PNMIL
+901a 1681a 		  STA	  $FFFA
+901c 1681c 		  RTS
+0ed5 e6d5 IHINIT: LDA	  #$40
+0ed7 e6d7 		  STA	  NMIEN
+0eda e6da 		  LDA	  #$38
+0edc e6dc 		  STA	  PACTL
+0edf e6df 		  STA	  PBCTL
+0ee2 e6e2 		  LDA	  #0
+0ee4 e6e4 		  STA	  PORTA
+0ee7 e6e7 		  STA	  PORTB
+0eea e6ea 		  LDA	  #$3C
+0eec e6ec 		  STA	  PACTL
+0eef e6ef 		  STA	  PBCTL
+0ef2 e6f2 		  RTS
+0ef3 e6f3 PIRQ:	JMP	  (VIMIRU)
+0ef6 e6f6 CMPTAB: .BYTE	$80
+0ef7 e6f7 		  .BYTE	$40
+0ef8 e6f8 		  .BYTE	$04
+0ef9 e6f9 		  .BYTE	$02
+0efa e6fa 		  .BYTE	$01
+0efb e6fb 		  .BYTE	$08
+0efc e6fc 		  .BYTE	$10
+0efd e6fd 		  .BYTE	$20
+0efe e6fe ADRTAB: .BYTE	BRKKY-INTABS
+0eff e6ff 		  .BYTE	VKEYBD-INTABS
+0f00 e700 		  .BYTE	VTIMR4-INTABS
+0f01 e701 		  .BYTE	VTIMR2-INTABS
+0f02 e702 		  .BYTE	VTIMR1-INTABS
+0f03 e703 		  .BYTE	VSEROC-INTABS
+0f04 e704 		  .BYTE	VSEROR-INTABS
+0f05 e705 		  .BYTE	VSERIN-INTABS
+0f06 e706 SYIRQ:  PHA
+0f07 e707 		  LDA	  IRQST
+0f0a e70a 		  AND	  #$20
+0f0c e70c 		  BNE	  SYIRQ2
+0f0e e70e 		  LDA	  #$DF
+0f10 e710 		  STA	  IRQEN
+0f13 e713 		  LDA	  POKMSK
+0f15 e715 		  STA	  IRQEN
+0f18 e718 		  JMP	  (VSERIN)
+0f1b e71b SYIRQ2: TXA
+0f1c e71c 		  PHA
+0f1d e71d 		  LDX	  #$6
+Unresolved: LDA CMPTAB,X
+0f1f e71f LOOPM:  LDA	  CMPTAB,X
+0f22 e722 		  CPX	  #5
+0f24 e724 		  BNE	  LOOPM2
+0f26 e726 		  AND	  POKMSK
+0f28 e728 		  BEQ	  LL
+0f2a e72a LOOPM2: BIT	  IRQST
+0f2d e72d 		  BEQ	  JMPP
+0f2f e72f LL:	  DEX
+0f30 e730 		  BPL	  LOOPM
+0f32 e732 		  JMP	  SYIRQ8
+0f35 e735 JMPP:	EOR	  #$FF
+0f37 e737 		  STA	  IRQEN
+0f3a e73a 		  LDA	  POKMSK
+0f3c e73c 		  STA	  IRQEN
+Unresolved: LDA ADRTAB,X
+0f3f e73f 		  LDA	  ADRTAB,X
+0f42 e742 		  TAX
+0f43 e743 		  LDA	  INTABS,X
+0f46 e746 		  STA	  JVECK
+0f49 e749 		  LDA	  INTABS+1,X
+0f4c e74c 		  STA	  JVECK+1
+0f4f e74f 		  PLA
+0f50 e750 		  TAX
+0f51 e751 		  JMP	  (JVECK)
+0f54 e754 BRKKY2: LDA	  #0
+0f56 e756 		  STA	  BRKKEY
+0f58 e758 		  STA	  SSFLAG
+0f5b e75b 		  STA	  CRSINH
+0f5e e75e 		  STA	  ATRACT
+0f60 e760 		  PLA
+0f61 e761 		  RTI
+0f62 e762 SYIRQ8: PLA
+0f63 e763 		  TAX
+0f64 e764 		  BIT	  PACTL
+0f67 e767 		  BPL	  SYIRQ9
+0f69 e769 		  LDA	  PORTA
+0f6c e76c 		  JMP	  (VPRCED)
+0f6f e76f SYIRQ9: BIT	  PBCTL
+0f72 e772 		  BPL	  SYIRQA
+0f74 e774 		  LDA	  PORTB
+0f77 e777 		  JMP	  (VINTER)
+0f7a e77a SYIRQA: PLA
+0f7b e77b 		  STA	  JVECK
+0f7e e77e 		  PLA
+0f7f e77f 		  PHA
+0f80 e780 		  AND	  #$10
+0f82 e782 		  BEQ	  SYRTI2
+0f84 e784 		  LDA	  JVECK
+0f87 e787 		  PHA
+0f88 e788 		  JMP	  (VBREAK)
+0f8b e78b SYRTI2: LDA	  JVECK
+0f8e e78e 		  PHA
+0f8f e78f SYIRQB: PLA
+0f90 e790 SYRTI:  RTI
+0f91 e791 PNMI:	BIT	  NMIST
+0f94 e794 		  BPL	  PNMI1
+0f96 e796 		  JMP	  (VDSLST)
+0f99 e799 PNMI1:  PHA
+0f9a e79a 		  LDA	  NMIST
+0f9d e79d 		  AND	  #$20
+0f9f e79f 		  BEQ	  *+5
+0fa1 e7a1 		  JMP	  WARMSV
+0fa4 e7a4 		  TXA
+0fa5 e7a5 		  PHA
+0fa6 e7a6 		  TYA
+0fa7 e7a7 		  PHA
+0fa8 e7a8 		  STA	  NMIRES
+0fab e7ab 		  JMP	  (VVBLKI)
+0fae e7ae SYSVBL: INC	  RTCLOK+2
+0fb0 e7b0 		  BNE	  SYSVB1
+0fb2 e7b2 		  INC	  ATRACT
+0fb4 e7b4 		  INC	  RTCLOK+1
+0fb6 e7b6 		  BNE	  SYSVB1
+0fb8 e7b8 		  INC	  RTCLOK
+0fba e7ba SYSVB1: LDA	  #$FE
+0fbc e7bc 		  LDX	  #0
+0fbe e7be 		  LDY	  ATRACT
+0fc0 e7c0 		  BPL	  VBATRA
+0fc2 e7c2 		  STA	  ATRACT
+0fc4 e7c4 		  LDX	  RTCLOK+1
+0fc6 e7c6 		  LDA	  #$F6
+0fc8 e7c8 VBATRA: STA	  DRKMSK
+0fca e7ca 		  STX	  COLRSH
+0fcc e7cc 		  LDX	  #0
+0fce e7ce 		  JSR	  DCTIMR
+0fd1 e7d1 		  BNE	  SYSVB2
+0fd3 e7d3 		  JSR	  JTIMR1
+0fd6 e7d6 SYSVB2: LDA	  CRITIC
+0fd8 e7d8 		  BNE	  XXIT
+0fda e7da 		  TSX
+Unresolved: LDA $104,X
+0fdb e7db 		  LDA	  $104,X
+0fde e7de 		  AND	  #$04
+0fe0 e7e0 		  BEQ	  SYSVB3
+0fe2 e7e2 XXIT:	JMP	  XITVBL
+0fe5 e7e5 SYSVB3: LDA	  PENV
+0fe8 e7e8 		  STA	  LPENV
+0feb e7eb 		  LDA	  PENH
+0fee e7ee 		  STA	  LPENH
+0ff1 e7f1 		  LDA	  SDLSTH
+0ff4 e7f4 		  STA	  DLISTH
+0ff7 e7f7 		  LDA	  SDLSTL
+0ffa e7fa 		  STA	  DLISTL
+0ffd e7fd 		  LDA	  SDMCTL
+1000 e800 		  STA	  DMACTL
+1003 e803 		  LDA	  GPRIOR
+1006 e806 		  STA	  PRIOR
+1009 e809 		  LDX	  #$08
+100b e80b 		  STX	  CONSOL
+100e e80e SCOLLP: CLI
+1012 e812 		  EOR	  COLRSH
+1014 e814 		  AND	  DRKMSK
+1016 e816 		  STA	  COLPM0,X
+1019 e819 		  DEX
+101a e81a 		  BPL	  SCOLLP
+101c e81c 		  LDA	  CHBAS
+101f e81f 		  STA	  CHBASE
+1022 e822 		  LDA	  CHACT
+1025 e825 		  STA	  CHACTL
+1028 e828 		  LDX	  #2
+102a e82a 		  JSR	  DCTIMR
+102d e82d 		  BNE	  SYSVB4
+102f e82f 		  JSR	  JTIMR2
+1032 e832 SYSVB4: LDX	  #2
+1034 e834 SYSVBB: INX
+1035 e835 		  INX
+1036 e836 		  LDA	  CDTMV1,X
+1039 e839 		  ORA	  CDTMV1+1,X
+103c e83c 		  BEQ	  SYSVBA
+103e e83e 		  JSR	  DCTIMR
+1041 e841 		  STA	  CDTMF3-4,X
+1044 e844 SYSVBA: CPX	  #8
+1046 e846 		  BNE	  SYSVBB
+1048 e848 		  LDA	  SKSTAT
+104b e84b 		  AND	  #$04
+104d e84d 		  BEQ	  SYVB6A
+104f e84f 		  LDA	  KEYDEL
+1052 e852 		  BEQ	  SYVB6A
+1054 e854 		  DEC	  KEYDEL
+1057 e857 SYVB6A: LDA	  SRTIMR
+105a e85a 		  BEQ	  SYSVB7
+105c e85c 		  LDA	  SKSTAT
+105f e85f 		  AND	  #$04
+1061 e861 		  BNE	  SYSVB6
+1063 e863 		  DEC	  SRTIMR
+1066 e866 		  BNE	  SYSVB7
+1068 e868 		  LDA	  #SRTIM2
+106a e86a 		  STA	  SRTIMR
+106d e86d 		  LDA	  KBCODE
+1070 e870 		  STA	  CH
+1073 e873 SYSVB7: LDY	  #1
+1075 e875 		  LDX	  #3
+1077 e877 STLOOP: LDA	  PORTA,Y
+107a e87a 		  LSR	  A
+107b e87b 		  LSR	  A
+107c e87c 		  LSR	  A
+107d e87d 		  LSR	  A
+107e e87e 		  STA	  STICK0,X
+1081 e881 		  DEX
+1082 e882 		  LDA	  PORTA,Y
+1085 e885 		  AND	  #$F
+1087 e887 		  STA	  STICK0,X
+108a e88a 		  DEX
+108b e88b 		  DEY
+108c e88c 		  BPL	  STLOOP
+108e e88e 		  LDX	  #3
+1090 e890 STRL:	LDA	  TRIG0,X
+1093 e893 		  STA	  STRIG0,X
+1096 e896 		  LDA	  POT0,X
+1099 e899 		  STA	  PADDL0,X
+109c e89c 		  LDA	  POT4,X
+109f e89f 		  STA	  PADDL4,X
+10a2 e8a2 		  DEX
+10a3 e8a3 		  BPL	  STRL
+10a5 e8a5 		  STA	  POTGO
+10a8 e8a8 		  LDX	  #6
+10aa e8aa 		  LDY	  #3
+10ac e8ac PTRLP:  LDA	  STICK0,Y
+10af e8af 		  LSR	  A
+10b0 e8b0 		  LSR	  A
+10b1 e8b1 		  LSR	  A
+10b2 e8b2 		  STA	  PTRIG1,X
+10b5 e8b5 		  LDA	  #0
+10b7 e8b7 		  ROL	  A
+10b8 e8b8 		  STA	  PTRIG0,X
+10bb e8bb 		  DEX
+10bc e8bc 		  DEX
+10bd e8bd 		  DEY
+10be e8be 		  BPL	  PTRLP
+10c0 e8c0 		  JMP	  (VVBLKD)
+10c3 e8c3 SYSVB6: LDA	  #0
+10c5 e8c5 		  STA	  SRTIMR
+10c8 e8c8 		  BEQ	  SYSVB7
+10ca e8ca JTIMR1: JMP	  (CDTMA1)
+10cd e8cd JTIMR2: JMP	  (CDTMA2)
+10d0 e8d0 DCTIMR: LDY	  CDTMV1,X
+10d3 e8d3 		  BNE	  DCTIM1
+10d5 e8d5 		  LDY	  CDTMV1+1,X
+10d8 e8d8 		  BEQ	  DCTXF
+10da e8da 		  DEC	  CDTMV1+1,X
+10dd e8dd DCTIM1: DEC	  CDTMV1,X
+10e0 e8e0 		  BNE	  DCTXF
+10e2 e8e2 		  LDY	  CDTMV1+1,X
+10e5 e8e5 		  BNE	  DCTXF
+10e7 e8e7 		  LDA	  #0
+10e9 e8e9 		  RTS
+10ea e8ea DCTXF:  LDA	  #$FF
+10ec e8ec 		  RTS
+10ed e8ed SETVBL: ASL	  A
+10ee e8ee 		  STA	  INTEMP
+10f1 e8f1 		  TXA
+10f2 e8f2 		  LDX	  #5
+10f4 e8f4 		  STA	  WSYNC
+10f7 e8f7 SETLOP: DEX
+10f8 e8f8 		  BNE	  SETLOP
+10fa e8fa 		  LDX	  INTEMP
+10fd e8fd 		  STA	  CDTMV1-1,X
+1100 e900 		  TYA
+1101 e901 		  STA	  CDTMV1-2,X
+1104 e904 		  RTS
+1105 e905 XITVBL: PLA
+1106 e906 		  TAY
+1107 e907 		  PLA
+1108 e908 		  TAX
+1109 e909 		  PLA
+110a e90a 		  RTI
+0014 d814 INTSPR: .BYTE	SIOORG-CRNTP2
+0c59 e459 		  JMP	  SIO
+0c65 e465 		  JMP	  SIOINT
+0c68 e468 		  JMP	  SENDEN
+NO SYMBOL: VCTABL-INTABS+VSERIN
+0c6b e46b 		  .WORD	  ISRSIR
+0c6d e46d 		  .WORD	  ISRODN
+0c6f e46f 		  .WORD	  ISRTD
+1144 e944 SIOINT: LDA	  #MOTRST
+1146 e946 		  STA	  PACTL
+1149 e949 		  LDA	  #NCOMHI
+114b e94b 		  STA	  PBCTL
+114e e94e 		  LDA	  #3
+1150 e950 		  STA	  SSKCTL
+1153 e953 		  STA	  SOUNDR
+1155 e955 		  STA	  SKCTL
+1158 e958 		  RTS
+1159 e959 SIO:	 TSX
+115a e95a 		  STX	  STACKP
+115d e95d 		  LDA	  #1
+115f e95f 		  STA	  CRITIC
+1161 e961 		  LDA	  DDEVIC
+1164 e964 		  CMP	  #CASET
+1166 e966 		  BNE	  NOTCST
+1168 e968 		  JMP	  CASENT
+116b e96b NOTCST: LDA	  #0
+116d e96d 		  STA	  CASFLG
+1170 e970 		  LDA	  #DRETRI
+1172 e972 		  STA	  DRETRY
+1174 e974 COMMND: LDA	  #CRETRI
+1176 e976 		  STA	  CRETRY
+1178 e978 COMFRM: LDA	  #B192LO
+117a e97a 		  STA	  AUDF3
+117d e97d 		  LDA	  #B192HI
+117f e97f 		  STA	  AUDF4
+1182 e982 		  CLC
+1183 e983 		  LDA	  DDEVIC
+1186 e986 		  ADC	  DUNIT
+1189 e989 		  ADC	  #$FF
+118b e98b 		  STA	  CDEVIC
+118e e98e 		  LDA	  DCOMND
+1191 e991 		  STA	  CCOMND
+1194 e994 		  LDA	  DAUX1
+1197 e997 		  STA	  CAUX1
+119a e99a 		  LDA	  DAUX2
+119d e99d 		  STA	  CAUX2
+11a0 e9a0 		  CLC
+11a1 e9a1 		  LDA	  #CBUFLO
+11a3 e9a3 		  STA	  BUFRLO
+11a5 e9a5 		  ADC	  #4
+11a7 e9a7 		  STA	  BFENLO
+11a9 e9a9 		  LDA	  #CBUFHI
+11ab e9ab 		  STA	  BUFRHI
+11ad e9ad 		  STA	  BFENHI
+11af e9af 		  LDA	  #NCOMLO
+11b1 e9b1 		  STA	  PBCTL
+11b4 e9b4 		  JSR	  SENDIN
+11b7 e9b7 		  LDA	  ERRFLG
+11ba e9ba 		  BNE	  BADCOM
+11bc e9bc 		  TYA
+11bd e9bd 		  BNE	  ACKREC
+11bf e9bf BADCOM: DEC	  CRETRY
+11c1 e9c1 		  BPL	  COMFRM
+11c3 e9c3 		  JMP	  DERR1
+11c6 e9c6 ACKREC: LDA	  DSTATS
+11c9 e9c9 		  BPL	  WATCOM
+11cb e9cb 		  LDA	  #CRETRI
+11cd e9cd 		  STA	  CRETRY
+11cf e9cf 		  JSR	  LDPNTR
+11d2 e9d2 		  JSR	  SENDIN
+11d5 e9d5 		  BEQ	  BADCOM
+11d7 e9d7 WATCOM: JSR	  STTMOT
+11da e9da 		  LDA	  #$00
+11dc e9dc 		  STA	  ERRFLG
+11df e9df 		  JSR	  WAITER
+11e2 e9e2 		  BEQ	  DERR
+11e4 e9e4 		  BIT	  DSTATS
+11e7 e9e7 		  BVS	  MODATA
+11e9 e9e9 		  LDA	  ERRFLG
+11ec e9ec 		  BNE	  DERR1
+11ee e9ee 		  BEQ	  RETURN
+11f0 e9f0 MODATA: JSR	  LDPNTR
+11f3 e9f3 		  JSR	  RECEIV
+11f6 e9f6 DERR:	LDA	  ERRFLG
+11f9 e9f9 		  BEQ	  NOTERR
+11fb e9fb 		  LDA	  TSTAT
+11fe e9fe 		  STA	  STATUS
+1200 ea00 NOTERR: LDA	  STATUS
+1202 ea02 		  CMP	  #SUCCES
+1204 ea04 		  BEQ	  RETURN
+1206 ea06 DERR1:  DEC	  DRETRY
+1208 ea08 		  BMI	  RETURN
+120a ea0a 		  JMP	  COMMND
+120d ea0d RETURN: JSR	  SENDDS
+1210 ea10 		  LDA	  #0
+1212 ea12 		  STA	  CRITIC
+1214 ea14 		  LDY	  STATUS
+1216 ea16 		  STY	  DSTATS
+1219 ea19 		  RTS	  RETURN
+121a ea1a WAIT:	LDA	  #$00
+121c ea1c 		  STA	  ERRFLG
+121f ea1f 		  CLC
+1220 ea20 		  LDA	  #TEMPLO
+1222 ea22 		  STA	  BUFRLO
+1224 ea24 		  ADC	  #1
+1226 ea26 		  STA	  BFENLO
+1228 ea28 		  LDA	  #TEMPHI
+122a ea2a 		  STA	  BUFRHI
+122c ea2c 		  STA	  BFENHI
+122e ea2e 		  LDA	  #$FF
+1230 ea30 		  STA	  NOCKSM
+1232 ea32 		  JSR	  RECEIV
+1235 ea35 		  LDY	  #$FF
+1237 ea37 		  LDA	  STATUS
+1239 ea39 		  CMP	  #SUCCES
+123b ea3b 		  BNE	  NWOK
+123d ea3d WOK:	 LDA	  TEMP
+1240 ea40 		  CMP	  #ACK
+1242 ea42 		  BEQ	  GOOD
+1244 ea44 		  CMP	  #COMPLT
+1246 ea46 		  BEQ	  GOOD
+1248 ea48 		  CMP	  #ERROR
+124a ea4a 		  BNE	  NOTDER
+124c ea4c 		  LDA	  #DERROR
+124e ea4e 		  STA	  STATUS
+1250 ea50 		  BNE	  NWOK
+1252 ea52 NOTDER: LDA	  #DNACK
+1254 ea54 		  STA	  STATUS
+1256 ea56 NWOK:	LDA	  STATUS
+1258 ea58 		  CMP	  #TIMOUT
+125a ea5a 		  BEQ	  BAD
+125c ea5c 		  LDA	  #$FF
+125e ea5e 		  STA	  ERRFLG
+1261 ea61 		  BNE	  GOOD
+1263 ea63 BAD:	 LDY	  #0
+1265 ea65 GOOD:	LDA	  STATUS
+1267 ea67 		  STA	  TSTAT
+126a ea6a 		  RTS
+126b ea6b SEND:	LDA	  #SUCCES
+126d ea6d 		  STA	  STATUS
+126f ea6f 		  JSR	  SENDEN
+1272 ea72 		  LDY	  #0
+1274 ea74 		  STY	  CHKSUM
+1276 ea76 		  STY	  CHKSNT
+1278 ea78 		  STY	  XMTDON
+127a ea7a 		  LDA	  (BUFRLO),Y
+127c ea7c 		  STA	  SEROUT
+127f ea7f 		  STA	  CHKSUM
+1281 ea81 NOTDON: LDA	  BRKKEY
+1283 ea83 		  BNE	  NTBRKO
+1285 ea85 		  JMP	  BROKE
+1288 ea88 NTBRKO: LDA	  XMTDON
+128a ea8a 		  BEQ	  NOTDON
+128c ea8c 		  JSR	  SENDDS
+128f ea8f 		  RTS	  RETURN
+1290 ea90 ISRODN: TYA
+1291 ea91 		  PHA
+1292 ea92 		  INC	  BUFRLO
+1294 ea94 		  BNE	  NOWRPO
+1296 ea96 		  INC	  BUFRHI
+1298 ea98 NOWRPO: LDA	  BUFRLO
+129a ea9a 		  CMP	  BFENLO
+129c ea9c 		  LDA	  BUFRHI
+129e ea9e 		  SBC	  BFENHI
+12a0 eaa0 		  BCC	  NOTEND
+12a2 eaa2 		  LDA	  CHKSNT
+12a4 eaa4 		  BNE	  RELONE
+12a6 eaa6 		  LDA	  CHKSUM
+12a8 eaa8 		  STA	  SEROUT
+12ab eaab 		  LDA	  #$FF
+12ad eaad 		  STA	  CHKSNT
+12af eaaf 		  BNE	  CHKDON
+12b1 eab1 RELONE: LDA	  POKMSK
+12b3 eab3 		  ORA	  #$08
+12b5 eab5 		  STA	  POKMSK
+12b7 eab7 		  STA	  IRQEN
+12ba eaba CHKDON: PLA
+12bb eabb 		  TAY
+12bc eabc 		  PLA
+12bd eabd 		  RTI
+12be eabe NOTEND: LDY	  #0
+12c0 eac0 		  LDA	  (BUFRLO),Y
+12c2 eac2 		  STA	  SEROUT
+12c5 eac5 		  CLC
+12c6 eac6 		  ADC	  CHKSUM
+12c8 eac8 		  ADC	  #0
+12ca eaca 		  STA	  CHKSUM
+12cc eacc 		  JMP	  CHKDON
+12cf eacf ISRTD:  LDA	  CHKSNT
+12d1 ead1 		  BEQ	  FOOEY
+12d3 ead3 		  STA	  XMTDON
+12d5 ead5 		  LDA	  POKMSK
+12d7 ead7 		  AND	  #$F7
+12d9 ead9 		  STA	  POKMSK
+12db eadb 		  STA	  IRQEN
+12de eade FOOEY:  PLA
+12df eadf 		  RTI
+12e0 eae0 RECEIV: LDA	  #0
+12e2 eae2 		  LDY	  CASFLG
+12e5 eae5 		  BNE	  NOCLR
+12e7 eae7 		  STA	  CHKSUM
+12e9 eae9 NOCLR:  STA	  BUFRFL
+12eb eaeb 		  STA	  RECVDN
+12ed eaed 		  LDA	  #SUCCES
+12ef eaef 		  STA	  STATUS
+12f1 eaf1 		  JSR	  RECVEN
+12f4 eaf4 		  LDA	  #NCOMHI
+12f6 eaf6 		  STA	  PBCTL
+12f9 eaf9 CHKTIM: LDA	  BRKKEY
+12fb eafb 		  BNE	  NTBRK1
+12fd eafd 		  JMP	  BROKE
+1300 eb00 NTBRK1: LDA	  TIMFLG
+1303 eb03 		  BEQ	  TOUT
+1305 eb05 		  LDA	  RECVDN
+1307 eb07 		  BEQ	  CHKTIM
+1309 eb09 GOBACK: RTS
+130a eb0a TOUT:	LDA	  #TIMOUT
+130c eb0c 		  STA	  STATUS
+130e eb0e RRETRN: RTS
+130f eb0f ISRSIR: TYA
+1310 eb10 		  PHA
+1311 eb11 		  LDA	  SKSTAT
+1314 eb14 		  STA	  SKRES
+1317 eb17 		  BMI	  NTFRAM
+1319 eb19 		  LDY	  #FRMERR
+131b eb1b 		  STY	  STATUS
+131d eb1d NTFRAM: AND	  #$20
+131f eb1f 		  BNE	  NTOVRN
+1321 eb21 		  LDY	  #OVRRUN
+1323 eb23 		  STY	  STATUS
+1325 eb25 NTOVRN: LDA	  BUFRFL
+1327 eb27 		  BEQ	  NOTYET
+1329 eb29 		  LDA	  SERIN
+132c eb2c 		  CMP	  CHKSUM
+132e eb2e 		  BEQ	  SRETRN
+1330 eb30 		  LDY	  #CHKERR
+1332 eb32 		  STY	  STATUS
+1334 eb34 SRETRN: LDA	  #$FF
+1336 eb36 		  STA	  RECVDN
+1338 eb38 SUSUAL: PLA
+1339 eb39 		  TAY
+133a eb3a 		  PLA
+133b eb3b 		  RTI
+133c eb3c NOTYET: LDA	  SERIN
+133f eb3f 		  LDY	  #0
+1341 eb41 		  STA	  (BUFRLO),Y
+1343 eb43 		  CLC
+1344 eb44 		  ADC	  CHKSUM
+1346 eb46 		  ADC	  #0
+1348 eb48 		  STA	  CHKSUM
+134a eb4a 		  INC	  BUFRLO
+134c eb4c 		  BNE	  NTWRP1
+134e eb4e 		  INC	  BUFRHI
+1350 eb50 NTWRP1: LDA	  BUFRLO
+1352 eb52 		  CMP	  BFENLO
+1354 eb54 		  LDA	  BUFRHI
+1356 eb56 		  SBC	  BFENHI
+Unresolved: DCC SUSUAL
+1358 eb58 		  DCC	  SUSUAL
+135b eb5b 		  LDA	  NOCKSM
+135d eb5d 		  BEQ	  GOON
+135f eb5f 		  LDA	  #0
+1361 eb61 		  STA	  NOCKSM
+1363 eb63 		  BEQ	  SRETRN
+1365 eb65 GOON:	LDA	  #$FF
+1367 eb67 		  STA	  BUFRFL
+1369 eb69 		  BNE	  SUSUAL
+136b eb6b LDPNTR: CLC
+136c eb6c 		  LDA	  DBUFLO
+136f eb6f 		  STA	  BUFRLO
+1371 eb71 		  ADC	  DBYTLO
+1374 eb74 		  STA	  BFENLO
+1376 eb76 		  LDA	  DBUFHI
+1379 eb79 		  STA	  BUFRHI
+137b eb7b 		  ADC	  DBYTHI
+137e eb7e 		  STA	  BFENHI
+1380 eb80 		  RTS
+1381 eb81 CASENT: LDA	  DSTATS
+1384 eb84 		  BPL	  CASRED
+1386 eb86 		  LDA	  #B600LO
+1388 eb88 		  STA	  AUDF3
+138b eb8b 		  LDA	  #B600HI
+138d eb8d 		  STA	  AUDF4
+1390 eb90 		  JSR	  SENDEN
+1393 eb93 		  LDY	  #WSIRG
+1395 eb95 		  LDA	  DAUX2
+1398 eb98 		  BMI	  SRTIR0
+139a eb9a 		  LDY	  #WIRGLO
+139c eb9c SRTIR0: LDX	  #WIRGHI
+139e eb9e 		  JSR	  SETVBX
+13a1 eba1 		  LDA	  #MOTRGO
+13a3 eba3 		  STA	  PACTL
+13a6 eba6 TIMIT:  LDA	  TIMFLG
+13a9 eba9 		  BNE	  TIMIT
+13ab ebab 		  JSR	  LDPNTR
+13ae ebae 		  JSR	  SEND
+13b1 ebb1 		  JMP	  CRETRN
+13b4 ebb4 CASRED: LDA	  #$FF
+13b6 ebb6 		  STA	  CASFLG
+13b9 ebb9 		  LDY	  #RSIRG
+13bb ebbb 		  LDA	  DAUX2
+13be ebbe 		  BMI	  SRTIR1
+13c0 ebc0 		  LDY	  #RIRGLO
+13c2 ebc2 SRTIR1: LDX	  #RIRGHI
+13c4 ebc4 		  JSR	  SETVBX
+13c7 ebc7 		  LDA	  #MOTRGO
+13c9 ebc9 		  STA	  PACTL
+13cc ebcc TIMIT1: LDA	  TIMFLG
+13cf ebcf 		  BNE	  TIMIT1
+13d1 ebd1 		  JSR	  LDPNTR
+13d4 ebd4 		  JSR	  STTMOT
+13d7 ebd7 		  JSR	  SETVBX
+13da ebda 		  JSR	  BEGIN
+13dd ebdd 		  JSR	  RECEIV
+13e0 ebe0 CRETRN: LDA	  DAUX2
+13e3 ebe3 		  BMI	  SRTIR2
+13e5 ebe5 		  LDA	  #MOTRST
+13e7 ebe7 		  STA	  PACTL
+13ea ebea SRTIR2: JMP	  RETURN
+13ed ebed JTIMER: LDA	  #$00
+13ef ebef 		  STA	  TIMFLG
+13f2 ebf2 		  RTS
+13f3 ebf3 SENDEN: LDA	  #$07
+13f5 ebf5 		  AND	  SSKCTL
+13f8 ebf8 		  ORA	  #$20
+13fa ebfa 		  LDY	  DDEVIC
+13fd ebfd 		  CPY	  #CASET
+13ff ebff 		  BNE	  NOTCAS
+1401 ec01 		  ORA	  #$08
+1403 ec03 		  LDY	  #LOTONE
+1405 ec05 		  STY	  AUDF2
+1408 ec08 		  LDY	  #HITONE
+140a ec0a 		  STY	  AUDF1
+140d ec0d NOTCAS: STA	  SSKCTL
+1410 ec10 		  STA	  SKCTL
+1413 ec13 		  LDA	  #$C7
+1415 ec15 		  AND	  POKMSK
+1417 ec17 		  ORA	  #$10
+1419 ec19 		  JMP	  CONTIN
+141c ec1c RECVEN: LDA	  #$07
+141e ec1e 		  AND	  SSKCTL
+1421 ec21 		  ORA	  #$10
+1423 ec23 		  STA	  SSKCTL
+1426 ec26 		  STA	  SKCTL
+1429 ec29 		  STA	  SKRES
+142c ec2c 		  LDA	  #$C7
+142e ec2e 		  AND	  POKMSK
+1430 ec30 		  ORA	  #$20
+1432 ec32 CONTIN: STA	  POKMSK
+1434 ec34 		  STA	  IRQEN
+1437 ec37 		  LDA	  #$28
+1439 ec39 		  STA	  AUDCTL
+143c ec3c 		  LDX	  #6
+143e ec3e 		  LDA	  #$A8
+1440 ec40 		  LDY	  SOUNDR
+1442 ec42 		  BNE	  NOISE1
+1444 ec44 		  LDA	  #$A0
+1446 ec46 NOISE1: STA	  AUDC1,X
+1449 ec49 		  DEX
+144a ec4a 		  DEX
+144b ec4b 		  BPL	  NOISE1
+144d ec4d 		  LDA	  #$A0
+144f ec4f 		  STA	  AUDC3
+1452 ec52 		  LDY	  DDEVIC
+1455 ec55 		  CPY	  #CASET
+1457 ec57 		  BEQ	  CAS31
+1459 ec59 		  STA	  AUDC1
+145c ec5c 		  STA	  AUDC2
+145f ec5f CAS31:	RTS
+1460 ec60 SENDDS: NOP
+1461 ec61 RECVDS: LDA	  #$C7
+1463 ec63 		  AND	  POKMSK
+1465 ec65 		  STA	  POKMSK
+1467 ec67 		  STA	  IRQEN
+146a ec6a 		  LDX	  #6
+146c ec6c 		  LDA	  #0
+Unresolved: STA AUDC11X
+146e ec6e ZERIT:  STA	  AUDC11X
+1471 ec71 		  DEX
+1472 ec72 		  DEX
+1473 ec73 		  BPL	  ZERIT
+1475 ec75 		  RTS
+1476 ec76 STTMOT: LDA	  DTIMLO
+1479 ec79 		  ROR	  A
+147a ec7a 		  ROR	  A
+147b ec7b 		  TAY
+147c ec7c 		  AND	  #$3F
+147e ec7e 		  TAX
+147f ec7f 		  TYA
+1480 ec80 		  ROR	  A
+1481 ec81 		  AND	  #$C0
+1483 ec83 		  TAY
+1484 ec84 		  RTS
+1485 ec85 INTTBL: .WORD	ISRSIR
+1487 ec87 		  .WORD	ISRODN
+1489 ec89 		  .WORD	ISRTD
+148b ec8b SENDIN: LDX	  #$01
+148d ec8d DELAY0: LDY	  #$FF
+148f ec8f DELAY1: DEY
+1490 ec90 		  BNE	  DELAY1
+1492 ec92 		  DEX
+1493 ec93 		  BNE	  DELAY0
+1495 ec95 		  JSR	  SEND
+1498 ec98 		  LDY	  #CTIMLO
+149a ec9a 		  LDX	  #CTIMHI
+149c ec9c WAITER: JSR	  SETVBX
+149f ec9f 		  JSR	  WAIT
+14a2 eca2 		  TYA
+14a3 eca3 		  RTS
+14a4 eca4 COMPUT: STA	  TIMER2
+14a7 eca7 		  STY	  TIMER2+1
+14aa ecaa 		  JSR	  ADJUST
+14ad ecad 		  STA	  TIMER2
+14b0 ecb0 		  LDA	  TIMER1
+14b3 ecb3 		  JSR	  ADJUST
+14b6 ecb6 		  STA	  TIMER1
+14b9 ecb9 		  LDA	  TIMER2
+14bc ecbc 		  SEC
+14bd ecbd 		  SBC	  TIMER1
+14c0 ecc0 		  STA	  TEMP1
+14c3 ecc3 		  LDA	  TIMER2+1
+14c6 ecc6 		  SEC
+14c7 ecc7 		  SBC	  TIMER1+1
+14ca ecca 		  TAY
+14cb eccb 		  LDA	  #-$83
+14cd eccd HITIMR: CLC
+14ce ecce 		  ADC	  #$83
+14d0 ecd0 		  DEY
+14d1 ecd1 		  BPL	  HITIMR
+14d3 ecd3 		  CLC
+14d4 ecd4 		  ADC	  TEMP1
+14d7 ecd7 FINDX:  TAY
+14d8 ecd8 		  LSR	  A
+14d9 ecd9 		  LSR	  A
+14da ecda 		  LSR	  A
+14db ecdb 		  ASL	  A
+14dc ecdc 		  SEC
+14dd ecdd 		  SBC	  #22
+14df ecdf 		  TAX
+14e0 ece0 		  TYA
+14e1 ece1 		  AND	  #7
+14e3 ece3 		  TAY
+14e4 ece4 		  LDA	  #-11
+14e6 ece6 DOINTP: CLC
+14e7 ece7 		  ADC	  #11
+14e9 ece9 		  DEY
+14ea ecea 		  BPL	  DOINTP
+14ec ecec ENINTP: LDY	  #0
+14ee ecee 		  STY	  ADDCOR
+14f1 ecf1 		  SEC
+14f2 ecf2 		  SBC	  #7
+14f4 ecf4 		  BPL	  PLUS
+14f6 ecf6 		  DEC	  ADDCOR
+14f9 ecf9 PLUS:	CLC
+Unresolved: ADC POKTAB,X
+14fa ecfa 		  ADC	  POKTAB,X
+14fd ecfd 		  TAY
+14fe ecfe 		  LDA	  ADDCOR
+Unresolved: ADC POKTAB+1,X
+1501 ed01 		  ADC	  POKTAB+1,X
+1504 ed04 		  RTS
+1505 ed05 ADJUST: CMP	  #$7C
+1507 ed07 		  BMI	  ADJ1
+1509 ed09 		  SEC
+150a ed0a 		  SBC	  #$7C
+150c ed0c 		  RTS
+150d ed0d ADJ1:	CLC
+150e ed0e 		  ADC	  #$7
+1510 ed10 		  RTS
+1511 ed11 BEGIN:  LDA	  BRKKEY
+1513 ed13 		  BNE	  NTBRK2
+1515 ed15 		  JMP	  BROKE
+1518 ed18 NTBRK2: SEI
+1519 ed19 		  LDA	  TIMFLG
+151c ed1c 		  BNE	  OKTIM1
+151e ed1e 		  BEQ	  TOUT1
+1520 ed20 OKTIM1: LDA	  SKSTAT
+1523 ed23 		  AND	  #$10
+1525 ed25 		  BNE	  BEGIN
+1527 ed27 		  STA	  SAVIO
+152a ed2a 		  LDX	  VCOUNT
+152d ed2d 		  LDY	  RTCLOK+2
+152f ed2f 		  STX	  TIMER1
+1532 ed32 		  STY	  TIMER1+1
+1535 ed35 		  LDX	  #1
+1537 ed37 		  STX	  TEMP3
+153a ed3a 		  LDY	  #10
+153c ed3c COUNT:  LDA	  BRKKEY
+153e ed3e 		  BEQ	  BROKE
+1540 ed40 		  LDA	  TIMFLG
+1543 ed43 		  BNE	  OKTIMR
+1545 ed45 TOUT1:  CLI
+1546 ed46 		  JMP	  TOUT
+1549 ed49 OKTIMR: LDA	  SKSTAT
+154c ed4c 		  AND	  #$10
+154e ed4e 		  CMP	  SAVIO
+1551 ed51 		  BEQ	  COUNT
+1553 ed53 		  STA	  SAVIO
+1556 ed56 		  DEY
+1557 ed57 		  BNE	  COUNT
+1559 ed59 		  DEC	  TEMP3
+155c ed5c 		  BMI	  GOREAD
+155e ed5e 		  LDA	  VCOUNT
+1561 ed61 		  LDY	  RTCLOK+2
+1563 ed63 		  JSR	  COMPUT
+1566 ed66 		  STY	  CBAUDL
+1569 ed69 		  STA	  CBAUDH
+156c ed6c 		  LDY	  #9
+156e ed6e 		  BNE	  COUNT
+1570 ed70 GOREAD: LDA	  CBAUDL
+1573 ed73 		  STA	  AUDF3
+1576 ed76 		  LDA	  CBAUDH
+1579 ed79 		  STA	  AUDF4
+157c ed7c 		  LDA	  #0
+157e ed7e 		  STA	  SKSTAT
+1581 ed81 		  LDA	  SSKCTL
+1584 ed84 		  STA	  SKSTAT
+1587 ed87 		  LDA	  #$55
+1589 ed89 		  STA	  (BUFRLO),Y
+158b ed8b 		  INY
+158c ed8c 		  STA	  (BUFRLO),Y
+158e ed8e 		  LDA	  #$AA
+1590 ed90 		  STA	  CHKSUM
+1592 ed92 		  CLC
+1593 ed93 		  LDA	  BUFRLO
+1595 ed95 		  ADC	  #2
+1597 ed97 		  STA	  BUFRLO
+1599 ed99 		  LDA	  BUFRHI
+159b ed9b 		  ADC	  #0
+159d ed9d 		  STA	  BUFRHI
+159f ed9f 		  CLI
+15a0 eda0 		  RTS
+15a1 eda1 BROKE:  JSR	  SENDDS
+15a4 eda4 		  LDA	  #MOTRST
+15a6 eda6 		  STA	  PACTL
+15a9 eda9 		  STA	  PBCTL
+15ac edac 		  LDA	  #BRKABT
+15ae edae 		  STA	  STATUS
+15b0 edb0 		  LDX	  STACKP
+15b3 edb3 		  TXS
+15b4 edb4 		  DEC	  BRKKEY
+15b6 edb6 		  CLI
+15b7 edb7 		  JMP	  RETURN
+15ba edba SETVBX: LDA	  #JTADRL
+15bc edbc 		  STA	  CDTMA1
+15bf edbf 		  LDA	  #JTADRH
+15c1 edc1 		  STA	  CDTMA1+1
+15c4 edc4 		  LDA	  #1
+15c6 edc6 		  SEI
+15c7 edc7 		  JSR	  SETVBV
+15ca edca 		  LDA	  #1
+15cc edcc 		  STA	  TIMFLG
+15cf edcf 		  CLI
+15d0 edd0 		  RTS
+15d1 edd1 POKTAB: .WORD	$3E8
+15d3 edd3 		  .WORD	$443
+15d5 edd5 		  .WORD	$49E
+15d7 edd7 		  .WORD	$4F9
+15d9 edd9 		  .WORD	$554
+15db eddb 		  .WORD	$5AF
+15dd eddd 		  .WORD	$60A
+15df eddf 		  .WORD	$665
+15e1 ede1 		  .WORD	$6C0
+15e3 ede3 		  .WORD	$71A
+15e5 ede5 		  .WORD	$775
+15e7 ede7 		  .WORD	$7D0
+0014 d814 SIOSPR: .BYTE	DSKORG-CRNTP3
+e450 1bc50 		  JMP	  DINIT
+e453 1bc53 		  JMP	  DSKIF
+15ea edea DINIT:  LDA	  #160
+15ec edec 		  STA	  DSKTIM
+15ef edef 		  RTS
+15f0 edf0 DSKIF:  LDA	  #DISKID
+15f2 edf2 		  STA	  DDEVIC
+15f5 edf5 		  LDA	  DSKTIM
+15f8 edf8 		  LDX	  DCOMND
+15fb edfb 		  CPX	  #FOMAT
+15fd edfd 		  BEQ	  PUTDTO
+15ff edff 		  LDA	  #7
+1601 ee01 PUTDTO: STA	  DTIMLO
+1604 ee04 		  LDX	  #GETDAT
+1606 ee06 		  LDY	  #$80
+1608 ee08 		  LDA	  DCOMND
+160b ee0b 		  CMP	  #WRITE
+160d ee0d 		  BNE	  CKSTC
+160f ee0f 		  LDX	  #PUTDAT
+1611 ee11 CKSTC:  CMP	  #STATC
+1613 ee13 		  BNE	  PUTCNT
+1615 ee15 		  LDA	  #STATVL
+1617 ee17 		  STA	  DBUFLO
+161a ee1a 		  LDA	  #STATVH
+161c ee1c 		  STA	  DBUFHI
+161f ee1f 		  LDY	  #4
+1621 ee21 PUTCNT: STX	  DSTATS
+1624 ee24 		  STY	  DBYTLO
+1627 ee27 		  LDA	  #0
+1629 ee29 		  STA	  DBYTHI
+162c ee2c 		  JSR	  SIOV
+162f ee2f 		  BPL	  GOODST
+1631 ee31 		  RTS
+1632 ee32 GOODST: LDA	  DCOMND
+1635 ee35 		  CMP	  #STATC
+1637 ee37 		  BNE	  PUTBC
+1639 ee39 		  JSR	  PUTADR
+163c ee3c 		  LDY	  #2
+163e ee3e 		  LDA	  (BUFADR),Y
+1640 ee40 		  STA	  DSKTIM
+1643 ee43 PUTBC:  LDA	  DCOMND
+1646 ee46 		  CMP	  #FOMAT
+1648 ee48 		  BNE	  ENDDIF
+164a ee4a FMTD:	JSR	  PUTADR
+164d ee4d 		  LDY	  #$FE
+164f ee4f TWICE:  INY
+1650 ee50 		  INY
+1651 ee51 RDBAD:  LDA	  (BUFADR),Y
+1653 ee53 		  CMP	  #$FF
+1655 ee55 		  BNE	  TWICE
+1657 ee57 		  INY
+1658 ee58 		  LDA	  (BUFADR),Y
+165a ee5a 		  INY
+165b ee5b 		  CMP	  #$FF
+165d ee5d 		  BNE	  RDBAD
+165f ee5f 		  DEY
+1660 ee60 		  DEY
+1661 ee61 		  STY	  DBYTLO
+1664 ee64 		  LDA	  #0
+1666 ee66 		  STA	  DBYTHI
+1669 ee69 ENDDIF: LDY	  DSTATS
+166c ee6c 		  RTS
+166d ee6d PUTADR: LDA	  DBUFLO
+1670 ee70 		  STA	  BUFADR
+1672 ee72 		  LDA	  DBUFHI
+1675 ee75 		  STA	  BUFADR+1
+1677 ee77 		  RTS
+1678 ee78 DSKSPR: .BYTE	PRNORG-CRNTP4
+e430 1bc30 		  .WORD	PHOPEN-1
+e432 1bc32 		  .WORD	PHCLOS-1
+e434 1bc34 		  .WORD	BADST-1
+e436 1bc36 		  .WORD	PHWRIT-1
+e438 1bc38 		  .WORD	PHSTAT-1
+e43a 1bc3a 		  .WORD	BADST-1
+e43c 1bc3c 		  JMP	  PHINIT
+e43f 1bc3f 		  .BYTE	0
+1678 ee78 PHINIT: LDA	  #30
+167a ee7a 		  STA	  PTIMOT
+167c ee7c 		  RTS
+167d ee7d PHSTLO: .WORD	DVSTAT
+167f ee7f PHCHLO: .WORD	PRNBUF
+1681 ee81 PHSTAT: LDA	  #4
+1683 ee83 		  STA	  PBUFSZ
+1685 ee85 		  LDX	  PHSTLO
+1687 ee87 		  LDY	  PHSTLO+1
+1689 ee89 		  LDA	  #STATC
+168b ee8b 		  STA	  DCOMND
+168e ee8e 		  STA	  DAUX1
+1691 ee91 		  JSR	  SETDCB
+1694 ee94 		  JSR	  SIOV
+1697 ee97 		  BMI	  BADST
+1699 ee99 		  JSR	  PHPUT
+169c ee9c BADST:  RTS
+169d ee9d PHOPEN: JSR	  PHSTAT
+16a0 eea0 		  LDA	  #0
+16a2 eea2 		  STA	  PBPNT
+16a4 eea4 		  RTS
+16a5 eea5 PHWRIT: STA	  PTEMP
+16a7 eea7 		  JSR	  PRMODE
+16aa eeaa 		  LDX	  PBPNT
+16ac eeac 		  LDA	  PTEMP
+16ae eeae 		  STA	  PRNBUF,X
+16b1 eeb1 		  INX
+16b2 eeb2 		  CPX	  PBUFSZ
+16b4 eeb4 		  BEQ	  BUFFUL
+16b6 eeb6 		  STX	  PBPNT
+16b8 eeb8 		  CMP	  #CR
+16ba eeba 		  BEQ	  BLFILL
+16bc eebc 		  LDY	  #SUCCES
+16be eebe 		  RTS
+16bf eebf BLFILL: LDA	  #SPACE
+16c1 eec1 FILLBF: STA	  PRNBUF,X
+16c4 eec4 		  INX
+16c5 eec5 		  CPX	  PBUFSZ
+16c7 eec7 		  BNE	  FILLBF
+16c9 eec9 BUFFUL: LDA	  #0
+16cb eecb 		  STA	  PBPNT
+16cd eecd 		  LDX	  PHCHLO
+16cf eecf 		  LDY	  PHCHLO+1
+16d1 eed1 		  JSR	  SETDCB
+16d4 eed4 		  JSR	  SIOV
+16d7 eed7 		  RTS
+16d8 eed8 PHCLOS: JSR	  PRMODE
+16db eedb 		  LDX	  PBPNT
+16dd eedd 		  BNE	  BLFILL
+16df eedf 		  LDY	  #SUCCES
+16e1 eee1 		  RTS
+16e2 eee2 SETDCB: STX	  DBUFLO
+16e5 eee5 		  STY	  DBUFHI
+16e8 eee8 		  LDA	  #PDEVN
+16ea eeea 		  STA	  DDEVIC
+16ed eeed 		  LDA	  #1
+16ef eeef 		  STA	  DUNIT
+16f2 eef2 		  LDA	  #$80
+16f4 eef4 		  LDX	  DCOMND
+16f7 eef7 		  CPX	  #STATC
+16f9 eef9 		  BNE	  PSIOC
+16fb eefb 		  LDA	  #$40
+16fd eefd PSIOC:  STA	  DSTATS
+1700 ef00 		  LDA	  PBUFSZ
+1702 ef02 		  STA	  DBYTLO
+1705 ef05 		  LDA	  #0
+1707 ef07 		  STA	  DBYTHI
+170a ef0a 		  LDA	  PTIMOT
+170c ef0c 		  STA	  DTIMLO
+170f ef0f 		  RTS
+1710 ef10 PHPUT:  LDA	  DVSTAT+2
+1713 ef13 		  STA	  PTIMOT
+1715 ef15 		  RTS
+1716 ef16 PRMODE: LDY	  #WRITEC
+1718 ef18 		  LDA	  ICAX2Z
+171a ef1a CMODE:  CMP	  #N
+171c ef1c 		  BNE	  CDUBL
+171e ef1e 		  LDX	  #NBUFSZ
+1720 ef20 		  BNE	  SETBSZ
+1722 ef22 CDUBL:  CMP	  #D
+1724 ef24 		  BNE	  CSIDE
+1726 ef26 		  LDX	  #DBUFSZ
+1728 ef28 		  BNE	  SETBSZ
+172a ef2a CSIDE:  CMP	  #S
+172c ef2c 		  BNE	  GOERR
+172e ef2e 		  LDX	  #SBUFSZ
+1730 ef30 SETBSZ: STX	  PBUFSZ
+1732 ef32 		  STY	  DCOMND
+1735 ef35 		  STA	  DAUX1
+1738 ef38 		  RTS
+1739 ef39 GOERR:  LDA	  #N
+173b ef3b 		  BNE	  CMODE
+173d ef3d PRNSPR: .BYTE	CASORG-CRNTP5
+0c40 e440 		  .WORD	OPENC-1,CLOSEC-1,GBYTE-1,PBYTE-1,STATU-1,SPECIAL-1
+0c4c e44c 		  JMP	  INIT
+0c4f e44f 		  .BYTE	0
+0c7a e47a 		  JMP	  RBLOK
+0c7d e47d 		  JMP	  OPINP
+1741 ef41 INIT:	LDA	  #$CC
+1743 ef43 		  STA	  CBAUDL
+1746 ef46 		  LDA	  #$05
+1748 ef48 		  STA	  CBAUDH
+Unresolved: SPECIAL: 
+174b ef4b SPECIAL:
+174e ef4e 		  RTS
+174f ef4f OPENC:  LDA	  ICAX2Z
+1751 ef51 		  STA	  FTYPE
+1753 ef53 		  LDA	  ICAX1Z
+1755 ef55 		  AND	  #$0C
+1757 ef57 		  CMP	  #$04
+1759 ef59 		  BEQ	  OPINP
+175b ef5b 		  CMP	  #$08
+175d ef5d 		  BEQ	  OPOUT
+175f ef5f 		  RTS
+1760 ef60 OPINP:  LDA	  #0
+1762 ef62 		  STA	  WMODE
+1765 ef65 		  STA	  FEOF
+1767 ef67 SFH:	 LDA	  #TONE2
+1769 ef69 		  JSR	  BEEP
+176c ef6c 		  BMI	  OPNRTN
+176e ef6e 		  LDA	  #MOTRGO
+1770 ef70 		  STA	  PACTL
+1773 ef73 		  LDY	  #$40
+1775 ef75 		  LDX	  #2
+1777 ef77 		  LDA	  #3
+1779 ef79 		  STA	  CDTMF3
+177c ef7c 		  JSR	  SETVBV
+177f ef7f WAITTM: LDA	  CDTMF3
+1782 ef82 		  BNE	  WAITTM
+1784 ef84 		  LDA	  #$80
+1786 ef86 		  STA	  BPTR
+1788 ef88 		  STA	  BLIM
+178b ef8b 		  JMP	  OPOK
+178e ef8e PBRK:	LDY	  #BRKABT
+1790 ef90 		  DEC	  BRKKEY
+1792 ef92 OPNRTN: LDA	  #0
+1794 ef94 		  STA	  WMODE
+1797 ef97 		  RTS
+1798 ef98 OPOUT:  LDA	  #$80
+179a ef9a 		  STA	  WMODE
+179d ef9d 		  LDA	  #TONE1
+179f ef9f 		  JSR	  BEEP
+17a2 efa2 		  BMI	  OPNRTN
+17a4 efa4 		  LDA	  #$CC
+17a6 efa6 		  STA	  AUDF3
+17a9 efa9 		  LDA	  #$05
+17ab efab 		  STA	  AUDF4
+17ae efae 		  LDA	  #$60
+17b0 efb0 		  STA	  DDEVIC
+17b3 efb3 		  JSR	  SENDEV
+17b6 efb6 		  LDA	  #MOTRGO
+17b8 efb8 		  STA	  PACTL
+17bb efbb 		  LDA	  #3
+17bd efbd 		  LDX	  #4
+17bf efbf 		  LDY	  #$80
+17c1 efc1 		  JSR	  SETVBV
+17c4 efc4 		  LDA	  #$FF
+17c6 efc6 		  STA	  CDTMF3
+17c9 efc9 WDLR:	LDA	  BRKKEY
+17cb efcb 		  BEQ	  PBRK
+17cd efcd 		  LDA	  CDTMF3
+17d0 efd0 		  BNE	  WDLR
+17d2 efd2 		  LDA	  #0
+17d4 efd4 		  STA	  BPTR
+17d6 efd6 OPOK:	LDY	  #SUCCES
+17d8 efd8 		  RTS
+17d9 efd9 GBYTE:  LDA	  FEOF
+17db efdb 		  BMI	  ISEOF
+17dd efdd 		  LDX	  BPTR
+17df efdf 		  CPX	  BLIM
+17e2 efe2 		  BEQ	  RBLOK
+17e4 efe4 		  LDA	  CASBUF+3,X
+17e7 efe7 		  INC	  BPTR
+17e9 efe9 		  LDY	  #SUCCES
+17eb efeb GBX:	 RTS
+17ec efec RBLOK:  LDA	  #'R
+17ee efee 		  JSR	  SIOSB
+17f1 eff1 		  TYA
+17f2 eff2 		  BMI	  GBX
+17f4 eff4 		  LDA	  #0
+17f6 eff6 		  STA	  BPTR
+17f8 eff8 		  LDX	  #$80
+17fa effa 		  LDA	  CASBUF+2
+17fd effd 		  CMP	  #EOT
+17ff efff 		  BEQ	  ATEOF
+1801 f001 		  CMP	  #DT1
+1803 f003 		  BNE	  NLR
+1805 f005 		  LDX	  CASBUF+130
+1808 f008 NLR:	 STX	  BLIM
+180b f00b 		  JMP	  GBYTE
+180e f00e ATEOF:  DEC	  FEOF
+1810 f010 ISEOF:  LDY	  #EOFERR
+1812 f012 		  RTS
+1813 f013 PBYTE:  LDX	  BPTR
+1815 f015 		  STA	  CASBUF+3,X
+1818 f018 		  INC	  BPTR
+181a f01a 		  LDY	  #SUCCES
+181c f01c 		  CPX	  #127
+181e f01e 		  BEQ	  *+3
+1820 f020 		  RTS
+1821 f021 		  LDA	  #DTA
+1823 f023 		  JSR	  WSIOSB
+1826 f026 		  LDA	  #0
+1828 f028 		  STA	  BPTR
+182a f02a 		  RTS
+182b f02b STATU:  LDY	  #SUCCES
+182d f02d 		  RTS
+182e f02e CLOSEC: LDA	  WMODE
+1831 f031 		  BMI	  CLWRT
+1833 f033 		  LDY	  #SUCCES
+1835 f035 FCAX:	LDA	  #MOTRST
+1837 f037 		  STA	  PACTL
+183a f03a 		  RTS
+183b f03b CLWRT:  LDX	  BPTR
+183d f03d 		  BEQ	  WTLR
+183f f03f 		  STX	  CASBUF+130
+1842 f042 		  LDA	  #DT1
+1844 f044 		  JSR	  WSIOSB
+1847 f047 		  BMI	  FCAX
+1849 f049 WTLR:	LDX	  #127
+184b f04b 		  LDA	  #0
+184d f04d ZTBUF:  STA	  CASBUF+3,X
+1850 f050 		  DEX
+1851 f051 		  BPL	  ZTBUF
+1853 f053 		  LDA	  #EOT
+1855 f055 		  JSR	  WSIOSB
+1858 f058 		  JMP	  FCAX
+185b f05b BEEP:	STA	  FREQ
+185d f05d BEEP1:  LDA	  RTCLOK+2
+185f f05f 		  CLC
+1860 f060 		  ADC	  #30
+1862 f062 		  TAX
+1863 f063 WFL:	 LDA	  #$FF
+1865 f065 		  STA	  CONSOL
+1868 f068 		  LDA	  #0
+186a f06a 		  LDY	  #$F0
+186c f06c 		  DEY
+186d f06d 		  BNE	  *-1
+186f f06f 		  STA	  CONSOL
+1872 f072 		  LDY	  #$F0
+1874 f074 		  DEY
+1875 f075 		  BNE	  *-1
+1877 f077 		  CPX	  RTCLOK+2
+1879 f079 		  BNE	  WFL
+187b f07b 		  DEC	  FREQ
+187d f07d 		  BEQ	  WFAK
+187f f07f 		  TXA
+1880 f080 		  CLC
+1881 f081 		  ADC	  #10
+1883 f083 		  TAX
+1884 f084 		  CPX	  RTCLOK+2
+1886 f086 		  BNE	  *-2
+1888 f088 		  BEQ	  BEEP1
+188a f08a WEAK:	JSR	  WFAK1
+188d f08d 		  TYA
+188e f08e 		  RTS
+Unresolved: LDA KEYBDV
+188f f08f WFAK1:  LDA	  KEYBDV+5
+1892 f092 		  PHA
+Unresolved: LDA KEYBDV
+1893 f093 		  LDA	  KEYBDV+4
+1896 f096 		  PHA
+1897 f097 		  RTS
+1898 f098 SIOSB:  STA	  DCOMND
+189b f09b 		  LDA	  #0
+189d f09d 		  STA	  DBYTHI
+18a0 f0a0 		  LDA	  #131
+18a2 f0a2 		  STA	  DBYTLO
+18a5 f0a5 		  LDA	  #CBUFH
+18a7 f0a7 		  STA	  DBUFHI
+18aa f0aa 		  LDA	  #CBUFL
+18ac f0ac 		  STA	  DBUFLO
+18af f0af CSIO:	LDA	  #$60
+18b1 f0b1 		  STA	  DDEVIC
+18b4 f0b4 		  LDA	  #0
+18b6 f0b6 		  STA	  DUNIT
+18b9 f0b9 		  LDA	  #35
+18bb f0bb 		  STA	  DTIMLO
+18be f0be 		  LDA	  DCOMND
+18c1 f0c1 		  LDY	  #SRSTA
+18c3 f0c3 		  CMP	  #'R
+18c5 f0c5 		  BEQ	  *+4
+18c7 f0c7 		  LDY	  #SWSTA
+18c9 f0c9 		  STY	  DSTATS
+18cc f0cc 		  LDA	  FTYPE
+18ce f0ce 		  STA	  DAUX2
+18d1 f0d1 		  JSR	  SIOV
+18d4 f0d4 		  RTS
+18d5 f0d5 WSIOSB: STA	  CASBUF+2
+18d8 f0d8 		  LDA	  #$55
+18da f0da 		  STA	  CASBUF+0
+18dd f0dd 		  STA	  CASBUF+1
+18e0 f0e0 		  LDA	  #'W
+18e2 f0e2 		  JSR	  SIOSB
+18e5 f0e5 		  RTS	  AND
+0014 d814 CASSPR: .BYTE	MONORG-CRNTP6
+0c71 e471 		  JMP	  SIGNON
+0c74 e474 		  JMP	  RESET
+0c77 e477 		  JMP	  PWRUP
+9000 16800 		  JSR	  $900C
+9002 16802 		  JMP	  PWRUP
+9005 16805 		  JSR	  $900C
+9007 16807 		  JMP	  RESET
+18e3 f0e3 TBLENT: .BYTE	'P'
+18e4 f0e4 		  .WORD	PRINTV
+18e6 f0e6 		  .BYTE	'C'
+18e7 f0e7 		  .WORD	CASETV
+18e9 f0e9 		  .BYTE	'E'
+18ea f0ea 		  .WORD	EDITRV
+18ec f0ec 		  .BYTE	'S'
+18ed f0ed 		  .WORD	SCRENV
+18ef f0ef 		  .BYTE	'K'
+18f0 f0f0 		  .WORD	KEYBDV
+18f2 f0f2 OPNEDT: .BYTE	'E:',CR
+18f4 f0f4 RESET:  SEI
+18f5 f0f5 		  LDA	  COLDST
+18f8 f0f8 		  BNE	  PWRUP
+18fa f0fa 		  LDA	  #$FF
+18fc f0fc 		  BNE	  PWRUP1
+18fe f0fe PWRUP:  SEI
+18ff f0ff 		  LDA	  #0
+1901 f101 PWRUP1: STA	  WARMST
+1903 f103 		  CLD
+1904 f104 		  LDX	  #$FF
+1906 f106 		  TXS
+1907 f107 		  JSR	  SPECL
+190a f10a 		  JSR	  HARDI
+190d f10d 		  LDA	  WARMST
+190f f10f 		  BNE	  ZOSRAM
+1911 f111 ZERORM: LDA	  #0
+1913 f113 		  LDY	  #WARMST
+1915 f115 		  STA	  RAMLO
+1917 f117 		  STA	  RAMLO+1
+1919 f119 CLRRAM: STA	  (RAMLO),Y
+191b f11b 		  INY
+191c f11c 		  CPY	  #0
+191e f11e 		  BNE	  CLRRAM
+1920 f120 		  INC	  RAMLO+1
+1922 f122 		  LDX	  RAMLO+1
+1924 f124 		  CPX	  TRAMSZ
+1926 f126 		  BNE	  CLRRAM
+Unresolved: LDA BLKBDV
+1928 f128 		  LDA	  BLKBDV+1
+192b f12b 		  STA	  DOSVEC
+Unresolved: LDA BLKBDV
+192d f12d 		  LDA	  BLKBDV+2
+1930 f130 		  STA	  DOSVEC+1
+1932 f132 		  LDA	  #$FF
+1934 f134 		  STA	  COLDST
+1937 f137 		  BNE	  ESTSCM
+1939 f139 ZOSRAM: LDX	  #0
+193b f13b 		  TXA
+Unresolved: STA $200,X
+193c f13c ZOSRM2: STA	  $200,X
+Unresolved: STA $300,X
+193f f13f 		  STA	  $300,X
+1942 f142 		  DEX
+1943 f143 		  BNE	  ZOSRM2
+1945 f145 		  LDX	  #INTZBS
+Unresolved: STA 0,X
+1947 f147 ZOSRM3: STA	  0,X
+194a f14a 		  INX
+194b f14b 		  BPL	  ZOSRM3
+194d f14d ESTSCM: LDA	  #LEDGE
+194f f14f 		  STA	  LMARGN
+1951 f151 		  LDA	  #REDGE
+1953 f153 		  STA	  RMARGN
+1955 f155 OPSYS:  LDX	  #$25
+Unresolved: LDA VCTABL,X
+1957 f157 MOVVEC: LDA	  VCTABL,X
+195a f15a 		  STA	  INTABS,X
+195d f15d 		  DEX
+195e f15e 		  BPL	  MOVVEC
+1960 f160 		  JSR	  OSRAM
+1963 f163 		  CLI
+1964 f164 		  LDX	  #TBLLEN
+Unresolved: LDA TBLENT,X
+1966 f166 NXTENT: LDA	  TBLENT,X
+1969 f169 		  STA	  HATABS,X
+196c f16c 		  DEX
+196d f16d 		  BPL	  NXTENT
+196f f16f 		  LDX	  #0
+1971 f171 		  STX	  TSTDAT
+1973 f173 		  STX	  TRAMSZ
+1975 f175 		  LDX	  RAMSIZ
+1978 f178 		  CPX	  #$90
+197a f17a 		  BCS	  ENDBCK
+Unresolved: LDA CART-$2000
+197c f17c 		  LDA	  CART-$2000
+197f f17f 		  BNE	  ENDBCK
+1981 f181 		  INC	  TSTDAT
+1983 f183 		  JSR	  CBINI
+1986 f186 ENDBCK: LDX	  RAMSIZ
+1989 f189 		  CPX	  #$B0
+198b f18b 		  BCS	  ENDACK
+198d f18d 		  LDX	  CART
+1990 f190 		  BNE	  ENDACK
+1992 f192 		  INC	  TRAMSZ
+1994 f194 		  JSR	  CAINI
+1997 f197 ENDACK: LDA	  #3
+1999 f199 		  LDX	  #SEX
+199b f19b 		  STA	  ICCOM,X
+199e f19e 		  LDA	  #OPNL
+19a0 f1a0 		  STA	  ICBAL,X
+19a3 f1a3 		  LDA	  #OPNH
+19a5 f1a5 		  STA	  ICBAH,X
+19a8 f1a8 		  LDA	  #$C
+19aa f1aa 		  STA	  ICAX1,X
+19ad f1ad 		  JSR	  CIOV
+19b0 f1b0 		  BPL	  SCRNOK
+19b2 f1b2 		  JMP	  PWRUP
+19b5 f1b5 SCRNOK: INX
+19b6 f1b6 		  BNE	  SCRNOK
+19b8 f1b8 		  INY
+19b9 f1b9 		  BPL	  SCRNOK
+19bb f1bb 		  JSR	  CSBOOT
+19be f1be 		  LDA	  TRAMSZ
+19c0 f1c0 		  ORA	  TSTDAT
+19c2 f1c2 		  BEQ	  NOCART
+19c4 f1c4 		  LDA	  TRAMSZ
+19c6 f1c6 		  BEQ	  NOA1
+19c8 f1c8 		  LDA	  CARTFG
+19cb f1cb NOA1:	LDX	  TSTDAT
+19cd f1cd 		  BEQ	  NOB1
+Unresolved: ORA CARTFG-$2000
+19cf f1cf 		  ORA	  CARTFG-$2000
+19d2 f1d2 NOB1:	AND	  #1
+19d4 f1d4 		  BEQ	  NOBOOT
+19d6 f1d6 NOCART: JSR	  BOOT
+19d9 f1d9 NOBOOT: LDA	  #0
+19db f1db 		  STA	  COLDST
+19de f1de 		  LDA	  TRAMSZ
+19e0 f1e0 		  BEQ	  NOA2
+19e2 f1e2 		  LDA	  CARTFG
+19e5 f1e5 		  AND	  #4
+19e7 f1e7 		  BEQ	  NOA2
+19e9 f1e9 		  JMP	  (CARTCS)
+19ec f1ec NOA2:	LDA	  TSTDAT
+19ee f1ee 		  BEQ	  NOCAR2
+Unresolved: LDA CARTFG-$2000
+19f0 f1f0 		  LDA	  CARTFG-$2000
+19f3 f1f3 		  AND	  #4
+19f5 f1f5 		  BEQ	  NOCART
+19f7 f1f7 		  JMP	  (CARTCS-$2000)
+19fa f1fa NOCAR2: JMP	  (DOSVEC)
+19fd f1fd SIGNON: LDX	  #IDENTL
+19ff f1ff 		  LDY	  #IDENTH
+1a01 f201 		  JSR	  PUTLIN
+1a04 f204 BLACKB: JSR	  BLKB2
+1a07 f207 		  JMP	  BLACKB
+Unresolved: LDA EDITRV
+1a0a f20a BLKB2:  LDA	  EDITRV+5
+1a0d f20d 		  PHA
+Unresolved: LDA EDITRV
+1a0e f20e 		  LDA	  EDITRV+4
+1a11 f211 		  PHA
+1a12 f212 		  RTS
+1a13 f213 CAINI:  JMP	  (CARTAD)
+1a16 f216 CBINI:  JMP	  (CARTAD-$2000)
+1a19 f219 SPECL:  LDA	  CART
+1a1c f21c 		  BNE	  ENSPE2
+1a1e f21e 		  INC	  CART
+1a21 f221 		  LDA	  CART
+1a24 f224 		  BNE	  ENSPEC
+1a26 f226 		  LDA	  CARTFG
+1a29 f229 		  BPL	  ENSPEC
+1a2b f22b 		  JMP	  (CARTAD)
+1a2e f22e ENSPEC: DEC	  CART
+1a31 f231 ENSPE2: LDY	  #0
+1a33 f233 		  STY	  RAMLO+1
+1a35 f235 		  LDA	  #$10
+1a37 f237 		  STA	  TRAMSZ
+1a39 f239 HOWMCH: LDA	  (RAMLO+1),Y
+1a3b f23b 		  EOR	  #$FF
+1a3d f23d 		  STA	  (RAMLO+1),Y
+1a3f f23f 		  CMP	  (RAMLO+1),Y
+1a41 f241 		  BNE	  ENDRAM
+1a43 f243 		  EOR	  #$FF
+1a45 f245 		  STA	  (RAMLO+1),Y
+1a47 f247 		  LDA	  TRAMSZ
+1a49 f249 		  CLC
+1a4a f24a 		  ADC	  #$10
+1a4c f24c 		  STA	  TRAMSZ
+1a4e f24e 		  BNE	  HOWMCH
+1a50 f250 ENDRAM: RTS
+1a51 f251 HARDI:  LDA	  #0
+1a53 f253 		  TAX
+Unresolved: STA $D000,X
+1a54 f254 CLRCHP: STA	  $D000,X
+Unresolved: STA $D400,X
+1a57 f257 		  STA	  $D400,X
+Unresolved: STA $D200,X
+1a5a f25a 		  STA	  $D200,X
+Unresolved: STA $D300,X
+1a5d f25d 		  STA	  $D300,X
+1a60 f260 		  INX
+1a61 f261 		  BNE	  CLRCHP
+1a63 f263 		  RTS
+1a64 f264 OSRAM:  DEC	  BRKKEY
+1a66 f266 		  LDA	  #.LOW.BRKKY2
+1a68 f268 		  STA	  BRKKY
+1a6b f26b 		  LDA	  #.HIGH.BRKKY2
+1a6d f26d 		  STA	  BRKKY+1
+1a70 f270 		  LDA	  TRAMSZ
+1a72 f272 		  STA	  RAMSIZ
+1a75 f275 		  STA	  MEMTOP+1
+1a78 f278 		  LDA	  #0
+1a7a f27a 		  STA	  MEMTOP
+1a7d f27d 		  LDA	  #INIMLL
+1a7f f27f 		  STA	  MEMLO
+1a82 f282 		  LDA	  #INIMLH
+1a84 f284 		  STA	  MEMLO+1
+1a87 f287 		  JSR	  EDITRV+$C
+1a8a f28a 		  JSR	  SCRENV+$C
+1a8d f28d 		  JSR	  KEYBDV+$C
+1a90 f290 		  JSR	  PRINTV+$C
+1a93 f293 		  JSR	  CASETV+$C
+1a96 f296 		  JSR	  CIOINV
+1a99 f299 		  JSR	  SIOINV
+1a9c f29c 		  JSR	  INTINV
+1a9f f29f 		  LDA	  CONSOL
+1aa2 f2a2 		  AND	  #$1
+1aa4 f2a4 		  BNE	  NOKEY
+1aa6 f2a6 		  INC	  CKEY
+1aa8 f2a8 NOKEY:  RTS
+1aa9 f2a9 BOOT:	LDA	  WARMST
+1aab f2ab 		  BEQ	  NOWARM
+1aad f2ad 		  LDA	  BOOT?
+1aaf f2af 		  AND	  #1
+1ab1 f2b1 		  BEQ	  NOINIT
+1ab3 f2b3 		  JSR	  DINI
+1ab6 f2b6 NOINIT: RTS
+1ab7 f2b7 NOWARM: LDA	  #1
+1ab9 f2b9 		  STA	  DUNIT
+1abc f2bc 		  LDA	  #STATC
+1abe f2be 		  STA	  DCOMND
+1ac1 f2c1 		  JSR	  DSKINV
+1ac4 f2c4 		  BPL	  DOBOOT
+1ac6 f2c6 		  RTS
+1ac7 f2c7 DOBOOT: LDA	  #0
+1ac9 f2c9 		  STA	  DAUX2
+1acc f2cc 		  LDA	  #1
+1ace f2ce 		  STA	  DAUX1
+1ad1 f2d1 		  LDA	  #BUFFL
+1ad3 f2d3 		  STA	  DBUFLO
+1ad6 f2d6 		  LDA	  #BUFFH
+1ad8 f2d8 		  STA	  DBUFHI
+1adb f2db SECT1:  JSR	  GETSEC
+1ade f2de 		  BPL	  ALLSEC
+1ae0 f2e0 BADDSK: JSR	  DSKRDE
+1ae3 f2e3 		  LDA	  CASSBT
+1ae5 f2e5 		  BEQ	  DOBOOT
+1ae7 f2e7 		  RTS
+1ae8 f2e8 ALLSEC: LDX	  #3
+1aea f2ea RDBYTE: LDA	  CASBUF+3,X
+1aed f2ed 		  STA	  DFLAGS,X
+1af0 f2f0 		  DEX
+1af1 f2f1 		  BPL	  RDBYTE
+1af3 f2f3 		  LDA	  BOOTAD
+1af6 f2f6 		  STA	  RAMLO
+1af8 f2f8 		  LDA	  BOOTAD+1
+1afb f2fb 		  STA	  RAMLO+1
+1afd f2fd 		  LDA	  CASBUF+7
+1b00 f300 		  STA	  DOSINI
+1b02 f302 		  LDA	  CASBUF+8
+1b05 f305 		  STA	  DOSINI+1
+1b07 f307 MVBUFF: LDY	  #$7F
+1b09 f309 MVNXB:  LDA	  CASBUF+3,Y
+1b0c f30c 		  STA	  (RAMLO),Y
+1b0e f30e 		  DEY
+1b0f f30f 		  BPL	  MVNXB
+1b11 f311 		  CLC
+1b12 f312 		  LDA	  RAMLO
+1b14 f314 		  ADC	  #$80
+1b16 f316 		  STA	  RAMLO
+1b18 f318 		  LDA	  RAMLO+1
+1b1a f31a 		  ADC	  #0
+1b1c f31c 		  STA	  RAMLO+1
+1b1e f31e 		  DEC	  DBSECT
+1b21 f321 		  BEQ	  ENBOOT
+1b23 f323 		  INC	  DAUX1
+1b26 f326 SECTX:  JSR	  GETSEC
+1b29 f329 		  BPL	  MVBUFF
+1b2b f32b 		  JSR	  DSKRDE
+1b2e f32e 		  LDA	  CASSBT
+1b30 f330 		  BNE	  BADDSK
+1b32 f332 		  BEQ	  SECTX
+1b34 f334 ENBOOT: LDA	  CASSBT
+1b36 f336 		  BEQ	  XBOOT
+1b38 f338 		  JSR	  GETSEC
+1b3b f33b XBOOT:  JSR	  BLOAD
+1b3e f33e 		  BCS	  BADDSK
+1b40 f340 		  JSR	  DINI
+1b43 f343 		  INC	  BOOT?
+1b45 f345 		  RTS
+1b46 f346 BLOAD:  CLC
+1b47 f347 		  LDA	  BOOTAD
+1b4a f34a 		  ADC	  #6
+1b4c f34c 		  STA	  RAMLO
+1b4e f34e 		  LDA	  BOOTAD+1
+1b51 f351 		  ADC	  #0
+1b53 f353 		  STA	  RAMLO+1
+1b55 f355 		  JMP	  (RAMLO)
+1b58 f358 DINI:	JMP	  (DOSINI)
+1b5b f35b DSKRDE: LDX	  #DERRL
+1b5d f35d 		  LDY	  #DERRH
+1b5f f35f PUTLIN: TXA
+1b60 f360 		  LDX	  #SEX
+1b62 f362 		  STA	  ICBAL,X
+1b65 f365 		  TYA
+1b66 f366 		  STA	  ICBAH,X
+1b69 f369 		  LDA	  #PUTTXT
+1b6b f36b 		  STA	  ICCOM,X
+1b6e f36e 		  LDA	  #$FF
+1b70 f370 		  STA	  ICBLL,X
+1b73 f373 		  JSR	  CIOV
+1b76 f376 		  RTS
+1b77 f377 GETSEC: LDA	  CASSBT
+1b79 f379 		  BEQ	  DISKM
+1b7b f37b 		  JMP	  RBLOKV
+1b7e f37e DISKM:  LDA	  #READ
+1b80 f380 		  STA	  DCOMND
+1b83 f383 		  LDA	  #1
+1b85 f385 		  STA	  DUNIT
+1b88 f388 		  JSR	  DSKINV
+1b8b f38b 		  RTS
+1b8c f38c CSBOOT: LDA	  WARMST
+1b8e f38e 		  BEQ	  CSBOT2
+1b90 f390 		  LDA	  BOOT?
+1b92 f392 		  AND	  #2
+1b94 f394 		  BEQ	  NOCSB2
+1b96 f396 		  JSR	  CINI
+1b99 f399 NOCSB2: RTS
+1b9a f39a CSBOT2: LDA	  CKEY
+1b9c f39c 		  BEQ	  NOCSBT
+1b9e f39e 		  LDA	  #$80
+1ba0 f3a0 		  STA	  FTYPE
+1ba2 f3a2 		  INC	  CASSBT
+1ba4 f3a4 		  JSR	  CSOPIV
+1ba7 f3a7 		  JSR	  SECT1
+1baa f3aa 		  LDA	  #0
+1bac f3ac 		  STA	  CASSBT
+1bae f3ae 		  STA	  CKEY
+1bb0 f3b0 		  ASL	  BOOT?
+1bb2 f3b2 		  LDA	  DOSINI
+1bb4 f3b4 		  STA	  CASINI
+1bb6 f3b6 		  LDA	  DOSINI+1
+1bb8 f3b8 		  STA	  CASINI+1
+1bba f3ba NOCSBT: RTS
+1bbb f3bb CINI:	JMP	  (CASINI)
+0014 d814 MONSPR: .BYTE	KBDORG-CRNTP7
+0c00 e400 EDITOR: .WORD	EOPEN-1
+0c02 e402 		  .WORD	RETUR1-1
+0c04 e404 		  .WORD	EGETCH-1
+0c06 e406 		  .WORD	EOUTCH-1
+0c08 e408 		  .WORD	RETUR1-1
+0c0a e40a 		  .WORD	NOFUNC-1
+0c0c e40c 		  JMP	  PWRONA
+0c0f e40f 		  .BYTE	0
+0c10 e410 DISPLA: .WORD	DOPEN-1
+0c12 e412 		  .WORD	RETUR1-1
+0c14 e414 		  .WORD	GETCH-1
+0c16 e416 		  .WORD	OUTCH-1
+0c18 e418 		  .WORD	RETUR1-1
+0c1a e41a 		  .WORD	DRAW-1
+0c1c e41c 		  JMP	  PWRONA
+0c1f e41f 		  .BYTE	0
+0c20 e420 KBDHND: .WORD	RETUR1-1
+0c22 e422 		  .WORD	RETUR1-1
+0c24 e424 		  .WORD	KGETCH-1
+0c26 e426 		  .WORD	NOFUNC-1
+0c28 e428 		  .WORD	RETUR1-1
+0c2a e42a 		  .WORD	NOFUNC-1
+0c2c e42c 		  JMP	  PWRONA
+0c2f e42f 		  .BYTE	0
+NO SYMBOL: VCTABL-INTABS+VKEYBD
+0c30 e430 		  .WORD	PIRQ5
+1be4 f3e4 PWRONA: LDA	  #$FF
+1be6 f3e6 		  STA	  CH
+1be9 f3e9 		  LDA	  MEMTOP+1
+1bec f3ec 		  AND	  #$F0
+1bee f3ee 		  STA	  RAMTOP
+1bf0 f3f0 		  LDA	  #$40
+1bf2 f3f2 		  STA	  SHFLOK
+1bf5 f3f5 		  RTS
+1bf6 f3f6 DOPEN:  LDA	  ICAX2Z
+1bf8 f3f8 		  AND	  #$F
+1bfa f3fa 		  BNE	  OPNCOM
+1bfc f3fc EOPEN:  LDA	  ICAX1Z
+1bfe f3fe 		  AND	  #$F
+1c00 f400 		  STA	  ICAX1Z
+1c02 f402 		  LDA	  #0
+1c04 f404 OPNCOM: STA	  DINDEX
+1c06 f406 		  LDA	  #$E0
+1c08 f408 		  STA	  CHBAS
+1c0b f40b 		  LDA	  #2
+1c0d f40d 		  STA	  CHACT
+1c10 f410 		  STA	  SDMCTL
+1c13 f413 		  LDA	  #SUCCES
+1c15 f415 		  STA	  DSTAT
+1c17 f417 		  LDA	  #$C0
+1c19 f419 		  ORA	  POKMSK
+1c1b f41b 		  STA	  POKMSK
+1c1d f41d 		  STA	  IRQEN
+1c20 f420 		  LDA	  #0
+1c22 f422 		  STA	  TINDEX
+1c25 f425 		  STA	  ADRESS
+1c27 f427 		  STA	  SWPFLG
+1c29 f429 		  STA	  CRSINH
+1c2c f42c 		  LDY	  #14
+1c2e f42e 		  LDA	  #1
+1c30 f430 CLRTBS: STA	  TABMAP,Y
+1c33 f433 		  DEY
+1c34 f434 		  BPL	  CLRTBS
+1c36 f436 		  LDX	  #4
+Unresolved: LDA COLRTB,X
+1c38 f438 DOPEN8: LDA	  COLRTB,X
+1c3b f43b 		  STA	  COLOR0,X
+1c3e f43e 		  DEX
+1c3f f43f 		  BPL	  DOPEN8
+1c41 f441 		  LDY	  RAMTOP
+1c43 f443 		  DEY
+1c44 f444 		  STY	  TXTMSC+1
+1c47 f447 		  LDA	  #$60
+1c49 f449 		  STA	  TXTMSC
+1c4c f44c 		  LDX	  DINDEX
+Unresolved: LDA ANCONV,X
+1c4e f44e 		  LDA	  ANCONV,X
+1c51 f451 		  BNE	  DOPENA
+1c53 f453 OPNERR: LDA	  #BADMOD
+1c55 f455 		  STA	  DSTAT
+1c57 f457 DOPENA: STA	  HOLD1
+1c59 f459 		  LDA	  RAMTOP
+1c5b f45b 		  STA	  ADRESS+1
+1c5d f45d 		  LDY	  ALOCAT,X
+1c5f f45f DOPEN1: LDA	  #40
+1c61 f461 		  JSR	  DBSUB
+1c64 f464 		  DEY
+1c65 f465 		  BNE	  DOPEN1
+1c67 f467 		  LDA	  GPRIOR
+1c6a f46a 		  AND	  #$3F
+1c6c f46c 		  STA	  OPNTMP+1
+1c6e f46e 		  TAY
+1c6f f46f 		  CPX	  #8
+1c71 f471 		  BCC	  NOT8
+1c73 f473 		  TXA
+1c74 f474 		  ROR	  A
+1c75 f475 		  ROR	  A
+1c76 f476 		  ROR	  A
+1c77 f477 		  AND	  #$C0
+1c79 f479 		  ORA	  OPNTMP+1
+1c7b f47b 		  TAY
+1c7c f47c 		  LDA	  #16
+1c7e f47e 		  JSR	  DBSUB
+1c81 f481 		  CPX	  #11
+1c83 f483 		  BNE	  NOT8
+1c85 f485 		  LDA	  #6
+1c87 f487 		  STA	  COLOR4
+1c8a f48a NOT8:	STY	  GPRIOR
+1c8d f48d 		  LDA	  ADRESS
+1c8f f48f 		  STA	  SAVMSC
+1c91 f491 		  LDA	  ADRESS+1
+1c93 f493 		  STA	  SAVMSC+1
+1c95 f495 VBWAIT: LDA	  VCOUNT
+1c98 f498 		  CMP	  #$7A
+1c9a f49a 		  BNE	  VBWAIT
+1c9c f49c 		  JSR	  DBDEC
+Unresolved: LDA PAGETB,X
+1c9f f49f 		  LDA	  PAGETB,X
+1ca2 f4a2 		  BEQ	  NOMOD
+1ca4 f4a4 		  LDA	  #$FF
+1ca6 f4a6 		  STA	  ADRESS
+1ca8 f4a8 		  DEC	  ADRESS+1
+1caa f4aa NOMOD:  LDA	  ADRESS
+1cac f4ac 		  STA	  SAVADR
+1cae f4ae 		  LDA	  ADRESS+1
+1cb0 f4b0 		  STA	  SAVADR+1
+1cb2 f4b2 		  JSR	  DBDDEC
+1cb5 f4b5 		  LDA	  #$41
+1cb7 f4b7 		  JSR	  STORE
+1cba f4ba 		  STX	  OPNTMP
+1cbc f4bc 		  LDA	  #24
+1cbe f4be 		  STA	  BOTSCR
+1cc1 f4c1 		  LDA	  DINDEX
+1cc3 f4c3 		  CMP	  #9
+1cc5 f4c5 		  BCS	  NOTMXD
+1cc7 f4c7 		  LDA	  ICAX1Z
+1cc9 f4c9 		  AND	  #$10
+1ccb f4cb 		  BEQ	  NOTMXD
+1ccd f4cd 		  LDA	  #4
+1ccf f4cf 		  STA	  BOTSCR
+1cd2 f4d2 		  LDX	  #2
+1cd4 f4d4 DOPEN2: LDA	  #2
+1cd6 f4d6 		  JSR	  STORE
+1cd9 f4d9 		  DEX
+1cda f4da 		  BPL	  DOPEN2
+1cdc f4dc 		  LDY	  RAMTOP
+1cde f4de 		  DEY
+1cdf f4df 		  TYA
+1ce0 f4e0 		  JSR	  STORE
+1ce3 f4e3 		  LDA	  #$60
+1ce5 f4e5 		  JSR	  STORE
+1ce8 f4e8 		  LDA	  #$42
+1cea f4ea 		  JSR	  STORE
+1ced f4ed 		  CLC
+1cee f4ee 		  LDA	  #MXDMDE-NUMDLE
+1cf0 f4f0 		  ADC	  OPNTMP
+1cf2 f4f2 		  STA	  OPNTMP
+1cf4 f4f4 NOTMXD: LDY	  OPNTMP
+1cf6 f4f6 		  LDX	  NUMDLE,Y
+1cf8 f4f8 DOPEN3: LDA	  HOLD1
+1cfa f4fa 		  JSR	  STORE
+1cfd f4fd 		  DEX
+1cfe f4fe 		  BNE	  DOPEN3
+1d00 f500 		  LDA	  DINDEX
+1d02 f502 		  CMP	  #8
+1d04 f504 		  BCC	  DOPEN5
+1d06 f506 		  LDX	  #93
+1d08 f508 		  LDA	  RAMTOP
+1d0a f50a 		  SEC
+1d0b f50b 		  SBC	  #$10
+1d0d f50d 		  JSR	  STORE
+1d10 f510 		  LDA	  #0
+1d12 f512 		  JSR	  STORE
+1d15 f515 		  LDA	  #$4F
+1d17 f517 		  JSR	  STORE
+1d1a f51a DOPEN4: LDA	  HOLD1
+1d1c f51c 		  JSR	  STORE
+1d1f f51f 		  DEX
+1d20 f520 		  BNE	  DOPEN4
+1d22 f522 DOPEN5: LDA	  SAVMSC+1
+1d24 f524 		  JSR	  STORE
+1d27 f527 		  LDA	  SAVMSC
+1d29 f529 		  JSR	  STORE
+1d2c f52c 		  LDA	  HOLD1
+1d2e f52e 		  ORA	  #$40
+1d30 f530 		  JSR	  STORE
+1d33 f533 		  LDA	  #$70
+1d35 f535 		  JSR	  STORE
+1d38 f538 		  LDA	  #$70
+1d3a f53a 		  JSR	  STORE
+1d3d f53d 		  LDA	  ADRESS
+1d3f f53f 		  STA	  SDLSTL
+1d42 f542 		  LDA	  ADRESS+1
+1d44 f544 		  STA	  SDLSTL+1
+1d47 f547 		  LDA	  #$70
+1d49 f549 		  JSR	  STORE
+1d4c f54c 		  LDA	  ADRESS
+1d4e f54e 		  STA	  MEMTOP
+1d51 f551 		  LDA	  ADRESS+1
+1d53 f553 		  STA	  MEMTOP+1
+1d56 f556 		  LDA	  SAVADR
+1d58 f558 		  STA	  ADRESS
+1d5a f55a 		  LDA	  SAVADR+1
+1d5c f55c 		  STA	  ADRESS+1
+1d5e f55e 		  LDA	  SDLSTL+1
+1d61 f561 		  JSR	  STORE
+1d64 f564 		  LDA	  SDLSTL
+1d67 f567 		  JSR	  STORE
+1d6a f56a 		  LDA	  DSTAT
+1d6c f56c 		  BPL	  DOPEN9
+1d6e f56e 		  PHA
+1d6f f56f 		  JSR	  EOPEN
+1d72 f572 		  PLA
+1d73 f573 		  TAY
+1d74 f574 		  RTS
+1d75 f575 DOPEN9: LDA	  ICAX1Z
+1d77 f577 		  AND	  #$20
+1d79 f579 		  BNE	  DOPEN7
+1d7b f57b 		  JSR	  CLRSCR
+1d7e f57e 		  STA	  TXTROW
+1d81 f581 		  LDA	  LMARGN
+1d83 f583 		  STA	  TXTCOL
+1d86 f586 DOPEN7: LDA	  #$22
+1d88 f588 		  ORA	  SDMCTL
+1d8b f58b 		  STA	  SDMCTL
+1d8e f58e 		  JMP	  RETUR2
+1d91 f591 GETCH:  JSR	  RANGE
+1d94 f594 		  JSR	  GETPLT
+1d97 f597 		  JSR	  INATAC
+1d9a f59a 		  JSR	  INCRSB
+1d9d f59d 		  JMP	  RETUR1
+1da0 f5a0 GETPLT: JSR	  CONVRT
+1da3 f5a3 		  LDA	  (ADRESS),Y
+1da5 f5a5 		  AND	  DMASK
+1da8 f5a8 SHIFTD: LSR	  SHFAMT
+1daa f5aa 		  BCS	  SHIFT1
+1dac f5ac 		  LSR	  A
+1dad f5ad 		  BPL	  SHIFTD
+1daf f5af SHIFT1: STA	  CHAR
+1db2 f5b2 		  CMP	  #0
+1db4 f5b4 		  RTS
+1db5 f5b5 OUTCH:  STA	  ATACHR
+1db8 f5b8 		  JSR	  RANGE
+1dbb f5bb OUTCHA: LDA	  ATACHR
+1dbe f5be 		  CMP	  #CLRCOD
+1dc0 f5c0 		  BNE	  OUTCHE
+1dc2 f5c2 		  JSR	  CLRSCR
+1dc5 f5c5 		  JMP	  RETUR2
+1dc8 f5c8 OUTCHE: LDA	  ATACHR
+1dcb f5cb 		  CMP	  #CR
+1dcd f5cd 		  BNE	  OUTCHB
+1dcf f5cf 		  JSR	  DOCRWS
+1dd2 f5d2 		  JMP	  RETUR2
+1dd5 f5d5 OUTCHB: JSR	  OUTPLT
+1dd8 f5d8 		  JSR	  INCRSR
+1ddb f5db 		  JMP	  RETUR2
+1dde f5de OUTPLT: LDA	  SSFLAG
+1de1 f5e1 		  BNE	  OUTPLT
+1de3 f5e3 		  LDX	  #2
+1de5 f5e5 CRLOOP: LDA	  ROWCRS,X
+1de7 f5e7 		  STA	  OLDROW,X
+1de9 f5e9 		  DEX
+1dea f5ea 		  BPL	  CRLOOP
+1dec f5ec 		  LDA	  ATACHR
+1def f5ef 		  TAY
+1df0 f5f0 		  ROL	  A
+1df1 f5f1 		  ROL	  A
+1df2 f5f2 		  ROL	  A
+1df3 f5f3 		  ROL	  A
+1df4 f5f4 		  AND	  #3
+1df6 f5f6 		  TAX
+1df7 f5f7 		  TYA
+1df8 f5f8 		  AND	  #$9F
+Unresolved: ORA ATAINT,X
+1dfa f5fa 		  ORA	  ATAINT,X
+1dfd f5fd OUTCH2: STA	  CHAR
+1e00 f600 		  JSR	  CONVRT
+1e03 f603 		  LDA	  CHAR
+1e06 f606 SHIFTU: LSR	  SHFAMT
+1e08 f608 		  BCS	  SHIFT2
+1e0a f60a 		  ASL	  A
+1e0b f60b 		  JMP	  SHIFTU
+1e0e f60e SHIFT2: AND	  DMASK
+1e11 f611 		  STA	  TMPCHR
+1e13 f613 		  LDA	  DMASK
+1e16 f616 		  EOR	  #$FF
+1e18 f618 		  AND	  (ADRESS),Y
+1e1a f61a 		  ORA	  TMPCHR
+1e1c f61c 		  STA	  (ADRESS),Y
+1e1e f61e 		  RTS
+1e1f f61f RETUR2: JSR	  GETPLT
+1e22 f622 		  STA	  OLDCHR
+1e24 f624 		  LDX	  DINDEX
+1e26 f626 		  BNE	  RETUR1
+1e28 f628 		  LDX	  CRSINH
+1e2b f62b 		  BNE	  RETUR1
+1e2d f62d 		  EOR	  #$80
+1e2f f62f 		  JSR	  OUTCH2
+1e32 f632 RETUR1: LDY	  DSTAT
+1e34 f634 		  LDA	  #SUCCES
+1e36 f636 		  STA	  DSTAT
+1e38 f638 		  LDA	  ATACHR
+1e3b f63b NOFUNC: RTS
+1e3c f63c EGETCH: JSR	  SWAP
+1e3f f63f 		  JSR	  ERANGE
+1e42 f642 		  LDA	  BUFCNT
+1e44 f644 		  BNE	  EGETC3
+1e46 f646 		  LDA	  ROWCRS
+1e48 f648 		  STA	  BUFSTR
+1e4a f64a 		  LDA	  COLCRS
+1e4c f64c 		  STA	  BUFSTR+1
+1e4e f64e EGETC1: JSR	  KGETCH
+1e51 f651 		  STY	  DSTAT
+1e53 f653 		  LDA	  ATACHR
+1e56 f656 		  CMP	  #CR
+1e58 f658 		  BEQ	  EGETC2
+1e5a f65a 		  JSR	  DOSS
+1e5d f65d 		  JSR	  SWAP
+1e60 f660 		  LDA	  LOGCOL
+1e62 f662 		  CMP	  #113
+1e64 f664 		  BNE	  EGETC6
+1e66 f666 		  JSR	  BELL
+1e69 f669 EGETC6: JMP	  EGETC1
+1e6c f66c EGETC2: JSR	  OFFCRS
+1e6f f66f 		  JSR	  DOBUFC
+1e72 f672 		  LDA	  BUFSTR
+1e74 f674 		  STA	  ROWCRS
+1e76 f676 		  LDA	  BUFSTR+1
+1e78 f678 		  STA	  COLCRS
+1e7a f67a EGETC3: LDA	  BUFCNT
+1e7c f67c 		  BEQ	  EGETC5
+1e7e f67e EGETC7: DEC	  BUFCNT
+1e80 f680 		  BEQ	  EGETC5
+1e82 f682 		  LDA	  DSTAT
+1e84 f684 		  BMI	  EGETC7
+1e86 f686 		  JSR	  GETCH
+1e89 f689 		  STA	  ATACHR
+1e8c f68c 		  JMP	  SWAP
+1e8f f68f EGETC5: JSR	  DOCRWS
+1e92 f692 		  LDA	  #CR
+1e94 f694 		  STA	  ATACHR
+1e97 f697 		  JSR	  RETUR2
+1e9a f69a 		  STY	  DSTAT
+1e9c f69c 		  JMP	  SWAP
+1e9f f69f JSRIND: JMP	  (ADRESS)
+1ea2 f6a2 EOUTCH: STA	  ATACHR
+1ea5 f6a5 		  JSR	  SWAP
+1ea8 f6a8 		  JSR	  ERANGE
+1eab f6ab DOSS:	JSR	  OFFCRS
+1eae f6ae 		  JSR	  TSTCTL
+1eb1 f6b1 		  BEQ	  EOUTC5
+1eb3 f6b3 EOUTC6: ASL	  ESCFLG
+1eb6 f6b6 		  JSR	  OUTCHE
+1eb9 f6b9 ERETN:  JMP	  SWAP
+1ebc f6bc EOUTC5: LDA	  DSPFLG
+1ebf f6bf 		  ORA	  ESCFLG
+1ec2 f6c2 		  BNE	  EOUTC6
+1ec4 f6c4 		  ASL	  ESCFLG
+1ec7 f6c7 		  INX
+Unresolved: LDA CNTRLS,X
+1ec8 f6c8 		  LDA	  CNTRLS,X
+1ecb f6cb 		  STA	  ADRESS
+Unresolved: LDA CNTRLS+1,X
+1ecd f6cd 		  LDA	  CNTRLS+1,X
+1ed0 f6d0 		  STA	  ADRESS+1
+1ed2 f6d2 		  JSR	  JSRIND
+1ed5 f6d5 		  JSR	  RETUR2
+1ed8 f6d8 		  JMP	  SWAP
+1edb f6db KGETC2: LDA	  #$FF
+1edd f6dd 		  STA	  CH
+1ee0 f6e0 KGETCH: LDA	  ICAX1Z
+1ee2 f6e2 		  LSR	  A
+1ee3 f6e3 		  BCS	  GETOUT
+1ee5 f6e5 		  LDA	  #BRKABT
+1ee7 f6e7 		  LDX	  BRKKEY
+1ee9 f6e9 		  BEQ	  K7
+1eeb f6eb 		  LDA	  CH
+1eee f6ee 		  CMP	  #$FF
+1ef0 f6f0 		  BEQ	  KGETCH
+1ef2 f6f2 		  STA	  HOLDCH
+1ef4 f6f4 		  LDX	  #$FF
+1ef6 f6f6 		  STX	  CH
+1ef9 f6f9 		  JSR	  CLICK
+1efc f6fc KGETC3: TAX
+1efd f6fd 		  CPX	  #$C0
+1eff f6ff 		  BCC	  ASCCO1
+1f01 f701 		  LDX	  #3
+Unresolved: LDA ATASCI,X
+1f03 f703 ASCCO1: LDA	  ATASCI,X
+1f06 f706 		  STA	  ATACHR
+1f09 f709 		  CMP	  #$80
+1f0b f70b 		  BEQ	  KGETC2
+1f0d f70d 		  CMP	  #$81
+1f0f f70f 		  BNE	  KGETC1
+1f11 f711 		  LDA	  INVFLG
+1f14 f714 		  EOR	  #$80
+1f16 f716 		  STA	  INVFLG
+1f19 f719 		  JMP	  KGETC2
+1f1c f71c KGETC1: CMP	  #$82
+1f1e f71e 		  BNE	  K1
+1f20 f720 		  LDA	  #0
+1f22 f722 		  STA	  SHFLOK
+1f25 f725 		  BEQ	  KGETC2
+1f27 f727 K1:	  CMP	  #$83
+1f29 f729 		  BNE	  K2
+1f2b f72b 		  LDA	  #$40
+1f2d f72d 		  STA	  SHFLOK
+1f30 f730 		  BNE	  KGETC2
+1f32 f732 K2:	  CMP	  #$84
+1f34 f734 		  BNE	  K3
+1f36 f736 		  LDA	  #$80
+1f38 f738 		  STA	  SHFLOK
+1f3b f73b 		  BNE	  KGETC2
+1f3d f73d K3:	  CMP	  #$85
+1f3f f73f 		  BNE	  K6
+1f41 f741 		  LDA	  #EOFERR
+1f43 f743 K7:	  STA	  DSTAT
+1f45 f745 		  STA	  BRKKEY
+1f47 f747 GETOUT: LDA	  #CR
+1f49 f749 		  BNE	  K8
+1f4b f74b K6:	  LDA	  HOLDCH
+1f4d f74d 		  CMP	  #$40
+1f4f f74f 		  BCS	  K5
+1f51 f751 		  LDA	  ATACHR
+1f54 f754 		  CMP	  #$61
+1f56 f756 		  BCC	  K5
+1f58 f758 		  CMP	  #$7B
+1f5a f75a 		  BCS	  K5
+1f5c f75c 		  LDA	  SHFLOK
+1f5f f75f 		  BEQ	  K5
+1f61 f761 		  ORA	  HOLDCH
+1f63 f763 		  JMP	  KGETC3
+1f66 f766 K5:	  JSR	  TSTCTL
+1f69 f769 		  BEQ	  K4
+1f6b f76b 		  LDA	  ATACHR
+1f6e f76e 		  EOR	  INVFLG
+1f71 f771 K8:	  STA	  ATACHR
+1f74 f774 K4:	  JMP	  RETUR1
+1f77 f777 ESCAPE: LDA	  #$80
+1f79 f779 		  STA	  ESCFLG
+1f7c f77c 		  RTS
+1f7d f77d CRSRUP: DEC	  ROWCRS
+1f7f f77f 		  BPL	  COMRET
+1f81 f781 		  LDX	  BOTSCR
+1f84 f784 		  DEX
+1f85 f785 UPDNCM: STX	  ROWCRS
+1f87 f787 COMRET: JMP	  STRBEG
+1f8a f78a CRSRDN: INC	  ROWCRS
+1f8c f78c 		  LDA	  ROWCRS
+1f8e f78e 		  CMP	  BOTSCR
+1f91 f791 		  BCC	  COMRET
+1f93 f793 		  LDX	  #0
+1f95 f795 		  BEQ	  UPDNCM
+1f97 f797 CRSRLF: DEC	  COLCRS
+1f99 f799 		  LDA	  COLCRS
+1f9b f79b 		  BMI	  CRSRL1
+1f9d f79d 		  CMP	  LMARGN
+1f9f f79f 		  BCS	  COMRE1
+1fa1 f7a1 CRSRL1: LDA	  RMARGN
+1fa3 f7a3 LFRTCM: STA	  COLCRS
+1fa5 f7a5 COMRE1: JMP	  DOLCOL
+1fa8 f7a8 CRSRRT: INC	  COLCRS
+1faa f7aa 		  LDA	  COLCRS
+1fac f7ac 		  CMP	  RMARGN
+1fae f7ae 		  BCC	  COMRE1
+1fb0 f7b0 		  BEQ	  COMRE1
+1fb2 f7b2 		  LDA	  LMARGN
+1fb4 f7b4 		  JMP	  LFRTCM
+1fb7 f7b7 CLRSCR: JSR	  PUTMSC
+1fba f7ba 		  LDY	  #0
+1fbc f7bc 		  TYA
+1fbd f7bd CLRSC2: STA	  (ADRESS),Y
+1fbf f7bf 		  INY
+1fc0 f7c0 		  BNE	  CLRSC2
+1fc2 f7c2 		  INC	  ADRESS+1
+1fc4 f7c4 		  LDX	  ADRESS+1
+1fc6 f7c6 		  CPX	  RAMTOP
+1fc8 f7c8 		  BCC	  CLRSC2
+1fca f7ca 		  LDA	  #$FF
+1fcc f7cc CLRSC3: STA	  LOGMAP,Y
+1fcf f7cf 		  INY
+1fd0 f7d0 		  CPY	  #4
+1fd2 f7d2 		  BCC	  CLRSC3
+1fd4 f7d4 HOME:	JSR	  COLCR
+1fd7 f7d7 		  STA	  LOGCOL
+1fd9 f7d9 		  STA	  BUFSTR+1
+1fdb f7db 		  LDA	  #0
+1fdd f7dd 		  STA	  ROWCRS
+1fdf f7df 		  STA	  COLCRS+1
+1fe1 f7e1 		  STA	  BUFSTR
+1fe3 f7e3 		  RTS
+1fe4 f7e4 BS:	  LDA	  LOGCOL
+1fe6 f7e6 		  CMP	  LMARGN
+1fe8 f7e8 		  BEQ	  BS1
+1fea f7ea BSA:	 LDA	  COLCRS
+1fec f7ec 		  CMP	  LMARGN
+1fee f7ee 		  BNE	  BS3
+1ff0 f7f0 		  JSR	  DELTIM
+1ff3 f7f3 BS3:	 JSR	  CRSRLF
+1ff6 f7f6 		  LDA	  COLCRS
+1ff8 f7f8 		  CMP	  RMARGN
+1ffa f7fa 		  BNE	  BS2
+1ffc f7fc 		  LDA	  ROWCRS
+1ffe f7fe 		  BEQ	  BS2
+2000 f800 		  JSR	  CRSRUP
+2003 f803 BS2:	 LDA	  #$20
+2005 f805 		  STA	  ATACHR
+2008 f808 		  JSR	  OUTPLT
+200b f80b BS1:	 JMP	  DOLCOL
+200e f80e TAB:	 JSR	  CRSRRT
+2011 f811 		  LDA	  COLCRS
+2013 f813 		  CMP	  LMARGN
+2015 f815 		  BNE	  TAB1
+2017 f817 		  JSR	  DOCR
+201a f81a 		  JSR	  LOGGET
+201d f81d 		  BCC	  TAB1
+201f f81f 		  BCS	  TAB2
+2021 f821 TAB1:	LDA	  LOGCOL
+2023 f823 		  JSR	  BITGET
+2026 f826 		  BCC	  TAB
+2028 f828 TAB2:	JMP	  DOLCOL
+202b f82b SETTAB: LDA	  LOGCOL
+202d f82d 		  JMP	  BITSET
+2030 f830 CLRTAB: LDA	  LOGCOL
+2032 f832 		  JMP	  BITCLR
+2035 f835 INSCHR: JSR	  PHACRS
+2038 f838 		  JSR	  GETPLT
+203b f83b 		  STA	  INSDAT
+203d f83d 		  LDA	  #0
+203f f83f 		  STA	  SCRFLG
+2042 f842 INSCH4: JSR	  OUTCH2
+2045 f845 		  LDA	  LOGCOL
+2047 f847 		  PHA
+2048 f848 		  JSR	  INCRSA
+204b f84b 		  PLA
+204c f84c 		  CMP	  LOGCOL
+204e f84e 		  BCS	  INSCH3
+2050 f850 INSCH1: LDA	  INSDAT
+2052 f852 		  PHA
+2053 f853 		  JSR	  GETPLT
+2056 f856 		  STA	  INSDAT
+2058 f858 		  PLA
+2059 f859 		  JMP	  INSCH4
+205c f85c INSCH3: JSR	  PLACRS
+205f f85f INSCH6: DEC	  SCRFLG
+2062 f862 		  BMI	  INSCH5
+2064 f864 		  DEC	  ROWCRS
+2066 f866 		  BNE	  INSCH6
+2068 f868 INSCH5: JMP	  DOLCOL
+206b f86b DELCHR: JSR	  PHACRS
+206e f86e DELCH1: JSR	  CONVRT
+2071 f871 		  LDA	  ADRESS
+2073 f873 		  STA	  SAVADR
+2075 f875 		  LDA	  ADRESS+1
+2077 f877 		  STA	  SAVADR+1
+2079 f879 		  LDA	  LOGCOL
+207b f87b 		  PHA
+207c f87c 		  JSR	  INCRSB
+207f f87f 		  PLA
+2080 f880 		  CMP	  LOGCOL
+2082 f882 		  BCS	  DELCH2
+2084 f884 		  LDA	  ROWCRS
+2086 f886 		  CMP	  BOTSCR
+2089 f889 		  BCS	  DELCH2
+208b f88b 		  JSR	  GETPLT
+208e f88e 		  LDY	  #0
+2090 f890 		  STA	  (SAVADR),Y
+2092 f892 		  BEQ	  DELCH1
+2094 f894 DELCH2: LDY	  #0
+2096 f896 		  TYA
+2097 f897 		  STA	  (SAVADR),Y
+2099 f899 		  JSR	  DELTIA
+209c f89c 		  JSR	  PLACRS
+209f f89f 		  JMP	  DOLCOL
+20a2 f8a2 INSLIN: SEC
+20a3 f8a3 INSLIA: JSR	  EXTEND
+20a6 f8a6 		  LDA	  LMARGN
+20a8 f8a8 		  STA	  COLCRS
+20aa f8aa 		  JSR	  CONVRT
+20ad f8ad 		  LDA	  ADRESS
+20af f8af 		  STA	  FRMADR
+20b1 f8b1 		  CLC
+20b2 f8b2 		  ADC	  #40
+20b4 f8b4 		  STA	  TOADR
+20b6 f8b6 		  LDA	  ADRESS+1
+20b8 f8b8 		  STA	  FRMADR+1
+20ba f8ba 		  ADC	  #0
+20bc f8bc 		  STA	  TOADR+1
+20be f8be 		  LDX	  ROWCRS
+20c0 f8c0 		  CPX	  #23
+20c2 f8c2 		  BEQ	  INSLI2
+20c4 f8c4 INSLI1: JSR	  MOVLIN
+20c7 f8c7 		  INX
+20c8 f8c8 		  CPX	  #23
+20ca f8ca 		  BNE	  INSLI1
+20cc f8cc INSLI2: JSR	  CLRLIN
+20cf f8cf 		  JMP	  DOLCOL
+20d2 f8d2 DELLIN: JSR	  DOLCOL
+20d5 f8d5 DELLIA: LDY	  HOLD1
+20d7 f8d7 		  STY	  ROWCRS
+20d9 f8d9 DELLIB: LDY	  ROWCRS
+20db f8db DELLI1: TYA
+20dc f8dc 		  SEC
+20dd f8dd 		  JSR	  LO2GET
+20e0 f8e0 		  PHP
+20e1 f8e1 		  TYA
+20e2 f8e2 		  CLC
+20e3 f8e3 		  ADC	  #120
+20e5 f8e5 		  PLP
+20e6 f8e6 		  JSR	  BITPUT
+20e9 f8e9 		  INY
+20ea f8ea 		  CPY	  #24
+20ec f8ec 		  BNE	  DELLI1
+20ee f8ee 		  LDA	  LOGMAP+2
+20f1 f8f1 		  ORA	  #1
+20f3 f8f3 		  STA	  LOGMAP+2
+20f6 f8f6 DELLI2: LDA	  LMARGN
+20f8 f8f8 		  STA	  COLCRS
+20fa f8fa 		  JSR	  CONVRT
+20fd f8fd 		  JSR	  SCROL1
+2100 f900 		  JSR	  LOGGET
+2103 f903 		  BCC	  DELLIB
+2105 f905 		  JMP	  DOLCOL
+2108 f908 BELL:	LDY	  #$20
+210a f90a BELL1:  JSR	  CLICK
+210d f90d 		  DEY
+210e f90e 		  BPL	  BELL1
+2110 f910 		  RTS
+2111 f911 DBDDEC: LDA	  #2
+2113 f913 		  BNE	  DBSUB
+2115 f915 STORE:  LDY	  DSTAT
+2117 f917 		  BMI	  STROK
+2119 f919 		  LDY	  #0
+211b f91b STOREI: STA	  (ADRESS),Y
+211d f91d DBDEC:  LDA	  #1
+211f f91f DBSUB:  STA	  SUBTMP
+2122 f922 		  LDA	  DSTAT
+2124 f924 		  BMI	  STROK
+2126 f926 		  LDA	  ADRESS
+2128 f928 		  SEC
+2129 f929 		  SBC	  SUBTMP
+212c f92c 		  STA	  ADRESS
+212e f92e 		  BCS	  DBSUB1
+2130 f930 		  DEC	  ADRESS+1
+2132 f932 DBSUB1: LDA	  APPMHI+1
+2134 f934 		  CMP	  ADRESS+1
+2136 f936 		  BCC	  STROK
+2138 f938 		  BNE	  STRERR
+213a f93a 		  LDA	  APPMHI
+213c f93c 		  CMP	  ADRESS
+213e f93e 		  BCC	  STROK
+2140 f940 STRERR: LDA	  #SCRMEM
+2142 f942 		  STA	  DSTAT
+2144 f944 STROK:  RTS
+2145 f945 CONVRT: LDA	  ROWCRS
+2147 f947 		  PHA
+2148 f948 		  LDA	  COLCRS
+214a f94a 		  PHA
+214b f94b 		  LDA	  COLCRS+1
+214d f94d 		  PHA
+214e f94e 		  JSR	  PUTMSC
+2151 f951 		  LDA	  ROWCRS
+2153 f953 		  STA	  MLTTMP
+2155 f955 		  LDA	  #0
+2157 f957 		  STA	  MLTTMP+1
+2159 f959 		  LDA	  MLTTMP
+215b f95b 		  ASL	  A
+215c f95c 		  ROL	  MLTTMP+1
+215e f95e 		  STA	  HOLD1
+2160 f960 		  LDY	  MLTTMP+1
+2162 f962 		  STY	  HOLD2
+2165 f965 		  ASL	  A
+2166 f966 		  ROL	  MLTTMP+1
+2168 f968 		  ASL	  A
+2169 f969 		  ROL	  MLTTMP+1
+216b f96b 		  CLC
+216c f96c 		  ADC	  HOLD1
+216e f96e 		  STA	  MLTTMP
+2170 f970 		  LDA	  MLTTMP+1
+2172 f972 		  ADC	  HOLD2
+2175 f975 		  STA	  MLTTMP+1
+2177 f977 		  LDX	  DINDEX
+2179 f979 		  LDY	  DHLINE,X
+217b f97b CONVR1: DEY
+217c f97c 		  BMI	  CONVR2
+217e f97e 		  ASL	  MLTTMP
+2180 f980 		  ROL	  MLTTMP+1
+2182 f982 		  JMP	  CONVR1
+2185 f985 CONVR2: LDY	  DIV2TB,X
+2187 f987 		  LDA	  COLCRS
+2189 f989 		  LDX	  #7
+218b f98b CONVR3: DEY
+218c f98c 		  BMI	  CONVR4
+218e f98e 		  DEX
+218f f98f 		  LSR	  COLCRS+1
+2191 f991 		  ROR	  A
+2192 f992 		  ROR	  TMPLBT
+2195 f995 		  JMP	  CONVR3
+2198 f998 CONVR4: INY
+2199 f999 		  CLC
+219a f99a 		  ADC	  MLTTMP
+219c f99c 		  STA	  MLTTMP
+219e f99e 		  BCC	  CONVR5
+21a0 f9a0 		  INC	  MLTTMP+1
+21a2 f9a2 CONVR5: SEC
+21a3 f9a3 CONVR6: ROR	  TMPLBT
+21a6 f9a6 		  CLC
+21a7 f9a7 		  DEX
+21a8 f9a8 		  BPL	  CONVR6
+21aa f9aa 		  LDX	  TMPLBT
+21ad f9ad 		  LDA	  MLTTMP
+21af f9af 		  CLC
+21b0 f9b0 		  ADC	  ADRESS
+21b2 f9b2 		  STA	  ADRESS
+21b4 f9b4 		  STA	  OLDADR
+21b6 f9b6 		  LDA	  MLTTMP+1
+21b8 f9b8 		  ADC	  ADRESS+1
+21ba f9ba 		  STA	  ADRESS+1
+21bc f9bc 		  STA	  OLDADR+1
+Unresolved: LDA DMASKT,X
+21be f9be 		  LDA	  DMASKT,X
+21c1 f9c1 		  STA	  DMASK
+21c4 f9c4 		  STA	  SHFAMT
+21c6 f9c6 		  PLA
+21c7 f9c7 		  STA	  COLCRS+1
+21c9 f9c9 		  PLA
+21ca f9ca 		  STA	  COLCRS
+21cc f9cc 		  PLA
+21cd f9cd 		  STA	  ROWCRS
+21cf f9cf 		  RTS
+21d0 f9d0 INCRSB: LDA	  #0
+21d2 f9d2 		  BEQ	  INCREC
+21d4 f9d4 INCRSR: LDA	  #$9B
+21d6 f9d6 INCREC: STA	  INSDAT
+21d8 f9d8 INCRSA: INC	  LOGCOL
+21da f9da 		  INC	  COLCRS
+21dc f9dc 		  BNE	  INCRS2
+21de f9de 		  INC	  COLCRS+1
+21e0 f9e0 INCRS2: LDA	  COLCRS
+21e2 f9e2 		  LDX	  DINDEX
+Unresolved: CMP COLUMN,X
+21e4 f9e4 		  CMP	  COLUMN,X
+21e7 f9e7 		  BEQ	  INC2A
+21e9 f9e9 		  CPX	  #0
+21eb f9eb 		  BNE	  INCRS3
+21ed f9ed 		  CMP	  RMARGN
+21ef f9ef 		  BEQ	  INCRS3
+21f1 f9f1 		  BCS	  INC2A
+21f3 f9f3 INCRS3: RTS
+21f4 f9f4 INC2A:  CPX	  #8
+21f6 f9f6 		  BCC	  DOCR1
+21f8 f9f8 		  LDA	  COLCRS+1
+21fa f9fa 		  BEQ	  INCRS3
+21fc f9fc DOCR1:  LDA	  DINDEX
+21fe f9fe 		  BNE	  DOCR
+2200 fa00 		  LDA	  LOGCOL
+2202 fa02 		  CMP	  #81
+2204 fa04 		  BCC	  DOCR1B
+2206 fa06 		  LDA	  INSDAT
+2208 fa08 		  BEQ	  DOCR
+220a fa0a 		  JSR	  DOCRWS
+220d fa0d 		  JMP	  INCRS1
+2210 fa10 DOCR1B: JSR	  DOCR
+2213 fa13 		  LDA	  ROWCRS
+2215 fa15 		  CLC
+2216 fa16 		  ADC	  #120
+2218 fa18 		  JSR	  BITGET
+221b fa1b 		  BCC	  DOCR1A
+221d fa1d 		  LDA	  INSDAT
+221f fa1f 		  BEQ	  DOCR1A
+2221 fa21 		  CLC
+2222 fa22 		  JSR	  INSLIA
+2225 fa25 DOCR1A: JMP	  DOLCOL
+2228 fa28 NOSCRL: LDA	  #0
+222a fa2a 		  BEQ	  NOSCR1
+222c fa2c DOCRWS: LDA	  #$9B
+222e fa2e NOSCR1: STA	  INSDAT
+2230 fa30 DOCR:	JSR	  COLCR
+2233 fa33 		  LDA	  #0
+2235 fa35 		  STA	  COLCRS+1
+2237 fa37 		  INC	  ROWCRS
+2239 fa39 DOCR2:  LDX	  DINDEX
+223b fa3b 		  LDY	  #24
+223d fa3d 		  BIT	  SWPFLG
+223f fa3f 		  BPL	  DOCR2A
+2241 fa41 		  LDY	  #4
+2243 fa43 		  TYA
+2244 fa44 		  BNE	  DOCR2B
+Unresolved: LDA NOROWS,X
+2246 fa46 DOCR2A: LDA	  NOROWS,X
+2249 fa49 DOCR2B: CMP	  ROWCRS
+224b fa4b 		  BNE	  INCRS1
+224d fa4d 		  STY	  HOLD3
+2250 fa50 		  TXA
+2251 fa51 		  BNE	  INCRS1
+2253 fa53 		  LDA	  INSDAT
+2255 fa55 		  BEQ	  INCRS1
+2257 fa57 		  CMP	  #$9B
+2259 fa59 		  SEC
+225a fa5a 		  BEQ	  DOCR4B
+225c fa5c 		  CLC
+225d fa5d DOCR4B: JSR	  SCROLL
+2260 fa60 		  INC	  SCRFLG
+2263 fa63 		  DEC	  BUFSTR
+2265 fa65 		  DEC	  HOLD3
+2268 fa68 		  LDA	  LOGMAP
+226b fa6b 		  SEC
+226c fa6c 		  BPL	  DOCR4B
+226e fa6e 		  LDA	  HOLD3
+2271 fa71 		  STA	  ROWCRS
+2273 fa73 INCRS1: JMP	  DOLCOL
+2276 fa76 SUBEND: SEC
+2277 fa77 		  LDA	  ROWAC,X
+2279 fa79 		  SBC	  ENDPT
+227b fa7b 		  STA	  ROWAC,X
+227d fa7d 		  LDA	  ROWAC+1,X
+227f fa7f 		  SBC	  ENDPT+1
+2281 fa81 		  STA	  ROWAC+1,X
+2283 fa83 		  RTS
+2284 fa84 ERANGE: LDA	  BOTSCR
+2287 fa87 		  CMP	  #4
+2289 fa89 		  BEQ	  RANGE
+228b fa8b 		  LDA	  DINDEX
+228d fa8d 		  BEQ	  RANGE
+228f fa8f 		  JSR	  EOPEN
+2292 fa92 RANGE:  LDA	  #39
+2294 fa94 		  CMP	  RMARGN
+2296 fa96 		  BCS	  RANGE3
+2298 fa98 		  STA	  RMARGN
+229a fa9a RANGE3: LDX	  DINDEX
+Unresolved: LDA NOROWS,X
+229c fa9c 		  LDA	  NOROWS,X
+229f fa9f 		  CMP	  ROWCRS
+22a1 faa1 		  BCC	  RNGERR
+22a3 faa3 		  BEQ	  RNGERR
+22a5 faa5 		  CPX	  #8
+22a7 faa7 		  BNE	  RANGE1
+22a9 faa9 		  LDA	  COLCRS+1
+22ab faab 		  BEQ	  RNGOK
+22ad faad 		  CMP	  #1
+22af faaf 		  BNE	  RNGERR
+22b1 fab1 		  BEQ	  RANGE2
+22b3 fab3 RANGE1: LDA	  COLCRS+1
+22b5 fab5 		  BNE	  RNGERR
+Unresolved: LDA COLUMN,X
+22b7 fab7 RANGE2: LDA	  COLUMN,X
+22ba faba 		  CMP	  COLCRS
+22bc fabc 		  BCC	  RNGERR
+22be fabe 		  BEQ	  RNGERR
+22c0 fac0 RNGOK:  LDA	  #SUCCES
+22c2 fac2 		  STA	  DSTAT
+22c4 fac4 		  LDA	  #BRKABT
+22c6 fac6 		  LDX	  BRKKEY
+22c8 fac8 		  STA	  BRKKEY
+22ca faca 		  BEQ	  RNGER2
+22cc facc 		  RTS
+22cd facd RNGERR: JSR	  HOME
+22d0 fad0 		  LDA	  #CRSROR
+22d2 fad2 RNGER2: STA	  DSTAT
+22d4 fad4 RNGER1: PLA
+22d5 fad5 		  PLA
+22d6 fad6 		  LDA	  SWPFLG
+22d8 fad8 		  BPL	  RETUR3
+22da fada 		  JSR	  SWAPA
+22dd fadd RETUR3: JMP	  RETUR1
+22e0 fae0 OFFCRS: LDY	  #0
+22e2 fae2 		  LDA	  OLDCHR
+22e4 fae4 		  STA	  (OLDADR),Y
+22e6 fae6 		  RTS
+22e7 fae7 BITCON: PHA
+22e8 fae8 		  AND	  #7
+22ea faea 		  TAX
+Unresolved: LDA MASKTB,X
+22eb faeb 		  LDA	  MASKTB,X
+22ee faee 		  STA	  BITMSK
+22f0 faf0 		  PLA
+22f1 faf1 		  LSR	  A
+22f2 faf2 		  LSR	  A
+22f3 faf3 		  LSR	  A
+22f4 faf4 		  TAX
+22f5 faf5 		  RTS
+22f6 faf6 BITROL: ROL	  LOGMAP+2
+22f9 faf9 		  ROL	  LOGMAP+1
+22fc fafc 		  ROL	  LOGMAP
+22ff faff 		  RTS
+2300 fb00 BITPUT: BCC	  BITCLR
+2302 fb02 BITSET: JSR	  BITCON
+2305 fb05 		  LDA	  TABMAP,X
+2308 fb08 		  ORA	  BITMSK
+230a fb0a 		  STA	  TABMAP,X
+230d fb0d 		  RTS
+230e fb0e BITCLR: JSR	  BITCON
+2311 fb11 		  LDA	  BITMSK
+2313 fb13 		  EOR	  #$FF
+2315 fb15 		  AND	  TABMAP,X
+2318 fb18 		  STA	  TABMAP,X
+231b fb1b 		  RTS
+231c fb1c LOGGET: LDA	  ROWCRS
+231e fb1e LO1GET: CLC
+231f fb1f LO2GET: ADC	  #120
+2321 fb21 BITGET: JSR	  BITCON
+2324 fb24 		  CLC
+2325 fb25 		  LDA	  TABMAP,X
+2328 fb28 		  AND	  BITMSK
+232a fb2a 		  BEQ	  BITGE1
+232c fb2c 		  SEC
+232d fb2d BITGE1: RTS
+232e fb2e INATAC: LDA	  CHAR
+2331 fb31 		  LDY	  DINDEX
+2333 fb33 		  CPY	  #3
+2335 fb35 		  BCS	  INATA1
+2337 fb37 		  ROL	  A
+2338 fb38 		  ROL	  A
+2339 fb39 		  ROL	  A
+233a fb3a 		  ROL	  A
+233b fb3b 		  AND	  #3
+233d fb3d 		  TAX
+233e fb3e 		  LDA	  CHAR
+2341 fb41 		  AND	  #$9F
+Unresolved: ORA INTATA,X
+2343 fb43 		  ORA	  INTATA,X
+2346 fb46 INATA1: STA	  ATACHR
+2349 fb49 		  RTS
+234a fb4a MOVLIN: LDA	  #LINBUF/256
+234c fb4c 		  STA	  ADRESS+1
+234e fb4e 		  LDA	  #LINBUF.AND.$FF
+2350 fb50 		  STA	  ADRESS
+2352 fb52 		  LDY	  #39
+2354 fb54 MOVLI1: LDA	  (TOADR),Y
+2356 fb56 		  STA	  TMPCHR
+2358 fb58 		  LDA	  (FRMADR),Y
+235a fb5a 		  STA	  (TOADR),Y
+235c fb5c 		  LDA	  TMPCHR
+235e fb5e 		  STA	  (ADRESS),Y
+2360 fb60 		  DEY
+2361 fb61 		  BPL	  MOVLI1
+2363 fb63 		  LDA	  ADRESS+1
+2365 fb65 		  STA	  FRMADR+1
+2367 fb67 		  LDA	  ADRESS
+2369 fb69 		  STA	  FRMADR
+236b fb6b 		  CLC
+236c fb6c 		  LDA	  TOADR
+236e fb6e 		  ADC	  #40
+2370 fb70 		  STA	  TOADR
+2372 fb72 		  BCC	  MOVLI2
+2374 fb74 		  INC	  TOADR+1
+2376 fb76 MOVLI2: RTS
+2377 fb77 EXTEND: PHP
+2378 fb78 		  LDY	  #23
+237a fb7a EXTEN1: TYA
+237b fb7b 		  JSR	  LO1GET
+237e fb7e 		  PHP
+237f fb7f 		  TYA
+2380 fb80 		  CLC
+2381 fb81 		  ADC	  #121
+2383 fb83 		  PLP
+2384 fb84 		  JSR	  BITPUT
+2387 fb87 EXTEN3: DEY
+2388 fb88 		  BMI	  EXTEN4
+238a fb8a 		  CPY	  ROWCRS
+238c fb8c 		  BCS	  EXTEN1
+238e fb8e EXTEN4: LDA	  ROWCRS
+2390 fb90 		  CLC
+2391 fb91 		  ADC	  #120
+2393 fb93 		  PLP
+2394 fb94 		  JMP	  BITPUT
+2397 fb97 CLRLIN: LDA	  LMARGN
+2399 fb99 		  STA	  COLCRS
+239b fb9b 		  JSR	  CONVRT
+239e fb9e 		  LDY	  #39
+23a0 fba0 		  LDA	  #0
+23a2 fba2 CLRLI1: STA	  (ADRESS),Y
+23a4 fba4 		  DEY
+23a5 fba5 		  BPL	  CLRLI1
+23a7 fba7 		  RTS
+23a8 fba8 SCROLL: JSR	  BITROL
+23ab fbab 		  LDA	  SAVMSC
+23ad fbad 		  STA	  ADRESS
+23af fbaf 		  LDA	  SAVMSC+1
+23b1 fbb1 		  STA	  ADRESS+1
+23b3 fbb3 SCROL1: LDY	  #40
+23b5 fbb5 		  LDA	  (ADRESS),Y
+23b7 fbb7 		  LDX	  RAMTOP
+23b9 fbb9 		  DEX
+23ba fbba 		  CPX	  ADRESS+1
+23bc fbbc 		  BNE	  SCROL2
+23be fbbe 		  LDX	  #$D7
+23c0 fbc0 		  CPX	  ADRESS
+23c2 fbc2 		  BCS	  SCROL2
+23c4 fbc4 		  LDA	  #0
+23c6 fbc6 SCROL2: LDY	  #0
+23c8 fbc8 		  STA	  (ADRESS),Y
+23ca fbca 		  INC	  ADRESS
+23cc fbcc 		  BNE	  SCROL1
+23ce fbce 		  INC	  ADRESS+1
+23d0 fbd0 		  LDA	  ADRESS+1
+23d2 fbd2 		  CMP	  RAMTOP
+23d4 fbd4 		  BNE	  SCROL1
+23d6 fbd6 		  JMP	  DOLCOL
+23d9 fbd9 DOLCOL: LDA	  #0
+23db fbdb 		  STA	  LOGCOL
+23dd fbdd 		  LDA	  ROWCRS
+23df fbdf 		  STA	  HOLD1
+23e1 fbe1 DOLCO1: LDA	  HOLD1
+23e3 fbe3 		  JSR	  LO1GET
+23e6 fbe6 		  BCS	  DOLCO2
+23e8 fbe8 		  LDA	  LOGCOL
+23ea fbea 		  CLC
+23eb fbeb 		  ADC	  #40
+23ed fbed 		  STA	  LOGCOL
+23ef fbef 		  DEC	  HOLD1
+23f1 fbf1 		  JMP	  DOLCO1
+23f4 fbf4 DOLCO2: CLC
+23f5 fbf5 		  LDA	  LOGCOL
+23f7 fbf7 		  ADC	  COLCRS
+23f9 fbf9 		  STA	  LOGCOL
+23fb fbfb 		  RTS
+23fc fbfc DOBUFC: JSR	  PHACRS
+23ff fbff 		  LDA	  LOGCOL
+2401 fc01 		  PHA
+2402 fc02 		  LDA	  BUFSTR
+2404 fc04 		  STA	  ROWCRS
+2406 fc06 		  LDA	  BUFSTR+1
+2408 fc08 		  STA	  COLCRS
+240a fc0a 		  LDA	  #1
+240c fc0c 		  STA	  BUFCNT
+240e fc0e DOBUF1: LDX	  #23
+2410 fc10 		  LDA	  SWPFLG
+2412 fc12 		  BPL	  DOB1
+2414 fc14 		  LDX	  #3
+2416 fc16 DOB1:	CPX	  ROWCRS
+2418 fc18 		  BNE	  DOBU1A
+241a fc1a 		  LDA	  COLCRS
+241c fc1c 		  CMP	  RMARGN
+241e fc1e 		  BNE	  DOBU1A
+2420 fc20 		  INC	  BUFCNT
+2422 fc22 		  JMP	  D0BUF2
+2425 fc25 DOBU1A: JSR	  INCRSB
+2428 fc28 		  INC	  BUFCNT
+242a fc2a 		  LDA	  LOGCOL
+242c fc2c 		  CMP	  LMARGN
+242e fc2e 		  BNE	  DOBUF1
+2430 fc30 		  DEC	  ROWCRS
+2432 fc32 		  JSR	  CRSRLF
+2435 fc35 DOBUF2: JSR	  GETPLT
+2438 fc38 		  BNE	  DOBUF4
+243a fc3a 		  DEC	  BUFCNT
+243c fc3c 		  LDA	  LOGCOL
+243e fc3e 		  CMP	  LMARGN
+2440 fc40 		  BEQ	  DOBUF4
+2442 fc42 		  JSR	  CRSRLF
+2445 fc45 		  LDA	  COLCRS
+2447 fc47 		  CMP	  RMARGN
+2449 fc49 		  BNE	  DOBUF3
+244b fc4b 		  DEC	  ROWCRS
+244d fc4d DOBUF3: LDA	  BUFCNT
+244f fc4f 		  BNE	  DOBUF2
+2451 fc51 DOBUF4: PLA
+2452 fc52 		  STA	  LOGCOL
+2454 fc54 		  JSR	  PLACRS
+2457 fc57 		  RTS
+2458 fc58 STRBEG: JSR	  DOLCOL
+245b fc5b 		  LDA	  HOLD1
+245d fc5d 		  STA	  BUFSTR
+245f fc5f 		  LDA	  LMARGN
+2461 fc61 		  STA	  BUFSTR+1
+2463 fc63 		  RTS
+2464 fc64 DELTIA: LDA	  LOGCOL
+2466 fc66 		  CMP	  LMARGN
+2468 fc68 		  BNE	  DELTIG
+246a fc6a 		  DEC	  ROWCRS
+246c fc6c DELTIG: JSR	  DOLCOL
+246f fc6f DELTIM: LDA	  LOGCOL
+2471 fc71 		  CMP	  LMARGN
+2473 fc73 		  BEQ	  DELTI3
+2475 fc75 		  JSR	  CONVRT
+2478 fc78 		  LDA	  RMARGN
+247a fc7a 		  SEC
+247b fc7b 		  SBC	  LMARGN
+247d fc7d 		  TAY
+247e fc7e DELTI1: LDA	  (ADRESS),Y
+2480 fc80 		  BNE	  DELTI3
+2482 fc82 		  DEY
+2483 fc83 		  BPL	  DELTI1
+2485 fc85 DELTI2: JMP	  DELLIB
+2488 fc88 DELTI3: RTS	  
+2489 fc89 TSTCTL: LDX	  #45
+Unresolved: LDA CNTRLS,X
+248b fc8b TSTCT1: LDA	  CNTRLS,X
+248e fc8e 		  CMP	  ATACHR
+2491 fc91 		  BEQ	  TSTCT2
+2493 fc93 		  DEX
+2494 fc94 		  DEX
+2495 fc95 		  DEX
+2496 fc96 		  BPL	  TSTCT1
+2498 fc98 TSTCT2: RTS
+2499 fc99 PHACRS: LDX	  #2
+249b fc9b PHACR1: LDA	  ROWCRS,X
+249d fc9d 		  STA	  TMPROW,X
+24a0 fca0 		  DEX
+24a1 fca1 		  BPL	  PHACR1
+24a3 fca3 		  RTS
+24a4 fca4 PLACRS: LDX	  #2
+24a6 fca6 PLACR1: LDA	  TMPROW,X
+24a9 fca9 		  STA	  ROWCRS,X
+24ab fcab 		  DEX
+24ac fcac 		  BPL	  PLACR1
+24ae fcae 		  RTS
+24af fcaf SWAP:	JSR	  SWAPA
+24b2 fcb2 		  JMP	  RETURI
+24b5 fcb5 SWAPA:  LDA	  BOTSCR
+24b8 fcb8 		  CMP	  #24
+24ba fcba 		  BEQ	  SWAP3
+24bc fcbc 		  LDX	  #11
+24be fcbe SWAP1:  LDA	  ROWCRS,X
+24c0 fcc0 		  PHA
+24c1 fcc1 		  LDA	  TXTROW,X
+24c4 fcc4 		  STA	  ROWCRS,X
+24c6 fcc6 		  PLA
+24c7 fcc7 		  STA	  TXTROW,X
+24ca fcca 		  DEX
+24cb fccb 		  BPL	  SWAP1
+24cd fccd 		  LDA	  SWPFLG
+24cf fccf 		  EOR	  #$FF
+24d1 fcd1 		  STA	  SWPFLG
+24d3 fcd3 SWAP3:  RTS
+24d4 fcd4 CLICK:  LDX	  #$7F
+24d6 fcd6 CLICK1: STX	  CONSOL
+24d9 fcd9 		  STX	  WSYNC
+24dc fcdc 		  DEX
+24dd fcdd 		  BPL	  CLICK1
+24df fcdf 		  RTS
+24e0 fce0 COLCR:  LDA	  #0
+24e2 fce2 		  LDX	  SWPFLG
+24e4 fce4 		  BNE	  COLCR1
+24e6 fce6 		  LDX	  DINDEX
+24e8 fce8 		  BNE	  COLCR2
+24ea fcea COLCR1: LDA	  LMARGN
+24ec fcec COLCR2: STA	  COLCRS
+24ee fcee 		  RTS
+24ef fcef PUTMSC: LDA	  SAVMSC
+24f1 fcf1 		  STA	  ADRESS
+24f3 fcf3 		  LDA	  SAVMSC+1
+24f5 fcf5 		  STA	  ADRESS+1
+24f7 fcf7 		  RTS
+24f8 fcf8 DRAW:	LDX	  #0
+24fa fcfa 		  LDA	  ICCOMZ
+24fc fcfc 		  CMP	  #$11
+24fe fcfe 		  BEQ	  DRAWA
+2500 fd00 		  CMP	  #$12
+2502 fd02 		  BEQ	  DRAWB
+2504 fd04 		  LDY	  #NVALID
+2506 fd06 		  RTS
+2507 fd07 DRAWB:  INX
+2508 fd08 DRAWA:  STX	  FILFLG
+250b fd0b 		  LDA	  ROWCRS
+250d fd0d 		  STA	  NEWROW
+250f fd0f 		  LDA	  COLCRS
+2511 fd11 		  STA	  NEWCOL
+2513 fd13 		  LDA	  COLCRS+1
+2515 fd15 		  STA	  NEWCOL+1
+2517 fd17 		  LDA	  #1
+2519 fd19 		  STA	  ROWINC
+251b fd1b 		  STA	  COLINC
+251d fd1d 		  SEC
+251e fd1e 		  LDA	  NEWROW
+2520 fd20 		  SBC	  OLDROW
+2522 fd22 		  STA	  DELTAR
+2524 fd24 		  BCS	  DRAW1
+2526 fd26 		  LDA	  #$FF
+2528 fd28 		  STA	  ROWINC
+252a fd2a 		  LDA	  DELTAR
+252c fd2c 		  EOR	  #$FF
+252e fd2e 		  CLC
+252f fd2f 		  ADC	  #1
+2531 fd31 		  STA	  DELTAR
+2533 fd33 DRAW1:  SEC
+2534 fd34 		  LDA	  NEWCOL
+2536 fd36 		  SBC	  OLDCOL
+2538 fd38 		  STA	  DELTAC
+253a fd3a 		  LDA	  NEWCOL+1
+253c fd3c 		  SBC	  OLDCOL+1
+253e fd3e 		  STA	  DELTAC+1
+2540 fd40 		  BCS	  DRAW2
+2542 fd42 		  LDA	  #$FF
+2544 fd44 		  STA	  COLINC
+2546 fd46 		  LDA	  DELTAC
+2548 fd48 		  EOR	  #$FF
+254a fd4a 		  STA	  DELTAC
+254c fd4c 		  LDA	  DELTAC+1
+254e fd4e 		  EOR	  #$FF
+2550 fd50 		  STA	  DELTAC+1
+2552 fd52 		  INC	  DELTAC
+2554 fd54 		  BNE	  DRAW2
+2556 fd56 		  INC	  DELTAC+1
+2558 fd58 DRAW2:  LDX	  #2
+255a fd5a 		  LDY	  #0
+255c fd5c 		  STY	  COLAC+1
+255e fd5e DRAW3A: TYA
+255f fd5f 		  STA	  ROWAC,X
+2561 fd61 		  LDA	  OLDROW,X
+2563 fd63 		  STA	  ROWCRS,X
+2565 fd65 		  DEX
+2566 fd66 		  BPL	  DRAW3A
+2568 fd68 		  LDA	  DELTAC
+256a fd6a 		  INX
+256b fd6b 		  TAY
+256c fd6c 		  LDA	  DELTAC+1
+256e fd6e 		  STA	  COUNTR+1
+2570 fd70 		  STA	  ENDPT+1
+2572 fd72 		  BNE	  DRAW3
+2574 fd74 		  LDA	  DELTAC
+2576 fd76 		  CMP	  DELTAR
+2578 fd78 		  BCS	  DRAW3
+257a fd7a 		  LDA	  DELTAR
+257c fd7c 		  LDX	  #2
+257e fd7e 		  TAY
+257f fd7f DRAW3:  TYA
+2580 fd80 		  STA	  COUNTR
+2582 fd82 		  STA	  ENDPT
+2584 fd84 		  PHA
+2585 fd85 		  LDA	  ENDPT+1
+2587 fd87 		  LSR	  A
+2588 fd88 		  PLA
+2589 fd89 		  ROR	  A
+258a fd8a 		  STA	  ROWAC,X
+258c fd8c DRAW4A: LDA	  COUNTR
+258e fd8e 		  ORA	  COUNTR+1
+2590 fd90 		  BNE	  DRAWI1
+2592 fd92 		  JMP	  DRAW10
+2595 fd95 DRAWI1: CLC
+2596 fd96 		  LDA	  ROWAC
+2598 fd98 		  ADC	  DELTAR
+259a fd9a 		  STA	  ROWAC
+259c fd9c 		  BCC	  DRAW5
+259e fd9e 		  INC	  ROWAC+1
+25a0 fda0 DRAW5:  LDA	  ROWAC+1
+25a2 fda2 		  CMP	  ENDPT+1
+25a4 fda4 		  BCC	  DRAW6
+25a6 fda6 		  BNE	  DRAW5A
+25a8 fda8 		  LDA	  ROWAC
+25aa fdaa 		  CMP	  ENDPT
+25ac fdac 		  BCC	  DRAW6
+25ae fdae DRAW5A: CLC
+25af fdaf 		  LDA	  ROWCRS
+25b1 fdb1 		  ADC	  ROWINC
+25b3 fdb3 		  STA	  ROWCRS
+25b5 fdb5 		  LDX	  #0
+25b7 fdb7 		  JSR	  SUBEND
+25ba fdba DRAW6:  CLC
+25bb fdbb 		  LDA	  COLAC
+25bd fdbd 		  ADC	  DELTAC
+25bf fdbf 		  STA	  COLAC
+25c1 fdc1 		  LDA	  COLAC+1
+25c3 fdc3 		  ADC	  DELTAC+1
+25c5 fdc5 		  STA	  COLAC+1
+25c7 fdc7 		  CMP	  ENDPT+1
+25c9 fdc9 		  BCC	  DRAW8
+25cb fdcb 		  BNE	  DRAW6A
+25cd fdcd 		  LDA	  COLAC
+25cf fdcf 		  CMP	  ENDPT
+25d1 fdd1 		  BCC	  DRAW8
+25d3 fdd3 DRAW6A: BIT	  COLINC
+25d5 fdd5 		  BPL	  DRAW6B
+25d7 fdd7 		  DEC	  COLCRS
+25d9 fdd9 		  LDA	  COLCRS
+25db fddb 		  CMP	  #$FF
+25dd fddd 		  BNE	  DRAW7
+25df fddf 		  LDA	  COLCRS+1
+25e1 fde1 		  BEQ	  DRAW7
+25e3 fde3 		  DEC	  COLCRS+1
+25e5 fde5 		  BPL	  DRAW7
+25e7 fde7 DRAW6B: INC	  COLCRS
+25e9 fde9 		  BNE	  DRAW7
+25eb fdeb 		  INC	  COLCRS+1
+25ed fded DRAW7:  LDX	  #2
+25ef fdef 		  JSR	  SUBEND
+25f2 fdf2 DRAW8:  JSR	  RANGE
+25f5 fdf5 		  JSR	  OUTPLT
+25f8 fdf8 		  LDA	  FILFLG
+25fb fdfb 		  BEQ	  DRAW9
+25fd fdfd 		  JSR	  PHACRS
+2600 fe00 		  LDA	  ATACHR
+2603 fe03 		  STA	  HOLD4
+2606 fe06 DRAW8A: LDA	  ROWCRS
+2608 fe08 		  PHA
+2609 fe09 		  JSR	  INCRSA
+260c fe0c 		  PLA
+260d fe0d 		  STA	  ROWCRS
+260f fe0f DRAW8C: JSR	  RANGE
+2612 fe12 		  JSR	  GETPLT
+2615 fe15 		  BNE	  DRAW8B
+2617 fe17 		  LDA	  FILDAT
+261a fe1a 		  STA	  ATACHR
+261d fe1d 		  JSR	  OUTPLT
+2620 fe20 		  JMP	  DRAW8A
+2623 fe23 DRAW8B: LDA	  HOLD4
+2626 fe26 		  STA	  ATACHR
+2629 fe29 		  JSR	  PLACRS
+262c fe2c DRAW9:  SEC
+262d fe2d 		  LDA	  COUNTR
+262f fe2f 		  SBC	  #1
+2631 fe31 		  STA	  COUNTR
+2633 fe33 		  LDA	  COUNTR+1
+2635 fe35 		  SBC	  #0
+2637 fe37 		  STA	  COUNTR+1
+2639 fe39 		  BMI	  DRAW10
+263b fe3b 		  JMP	  DRAW4A
+263e fe3e DRAW10: JMP	  RETUR1
+2641 fe41 ALOCAT: .BYTE	24,16,10,10,16,28,52,100,196,196,196,196
+264d fe4d NUMDLE: .BYTE	23,23,11,23,47,47,95,95,97,97,97,97
+2659 fe59 MXDMDE: .BYTE	19,19,9,19,39,39,79,79,65,65,65,65
+2665 fe65 ANCONV: .BYTE	2,6,7,8,9,$A,$B,$D,$F,$F,$F,$F
+2671 fe71 PAGETB: .BYTE	0,0,0,0,0,0,0,1,1,1,1,1
+267d fe7d DHLINE: .BYTE	2,1,1,0,0,1,1,2,2,2,2,2
+2689 fe89 COLUMN: .BYTE	40,20,20,40,80,80,160,160,64,80,80,80
+2695 fe95 NOROWS: .BYTE	24,24,12,24,48,48,96,96,192,192,192,192
+26a1 fea1 DIV2TB: .BYTE	0,0,0,2,3,2,3,2,3,1,1,1
+26ad fead DMASKT: .BYTE	$00,$FF,$F0,$0F
+26b1 feb1 		  .BYTE	$C0,$30,$0C,$03
+26b5 feb5 MASKTB: .BYTE	$80,$40,$20,$10,$08,$04,$02,$01
+26bd febd COLRTB: .BYTE	$28,$CA,$94,$46,$00
+26c2 fec2 CNTRLS: .BYTE	$1B
+26c3 fec3 		  .WORD	ESCAPE
+26c5 fec5 		  .BYTE	$1C
+26c6 fec6 		  .WORD	CRSRUP
+26c8 fec8 		  .BYTE	$1D
+26c9 fec9 		  .WORD	CRSRDN
+26cb fecb 		  .BYTE	$1E
+26cc fecc 		  .WORD	CRSRLF
+26ce fece 		  .BYTE	$1F
+26cf fecf 		  .WORD	CRSRRT
+26d1 fed1 		  .BYTE	$7D
+26d2 fed2 		  .WORD	CLRSCR
+26d4 fed4 		  .BYTE	$7E
+26d5 fed5 		  .WORD	BS
+26d7 fed7 		  .BYTE	$7F
+26d8 fed8 		  .WORD	TAB
+26da feda 		  .BYTE	$9B
+26db fedb 		  .WORD	DOCRWS
+26dd fedd 		  .BYTE	$9C
+26de fede 		  .WORD	DELLIN
+26e0 fee0 		  .BYTE	$9D
+26e1 fee1 		  .WORD	INSLIN
+26e3 fee3 		  .BYTE	$9E
+26e4 fee4 		  .WORD	CLRTAB
+26e6 fee6 		  .BYTE	$9F
+26e7 fee7 		  .WORD	SETTAB
+26e9 fee9 		  .BYTE	$FD
+26ea feea 		  .WORD	BELL
+26ec feec 		  .BYTE	$FE
+26ed feed 		  .WORD	DELCHR
+26ef feef 		  .BYTE	$FF
+26f0 fef0 		  .WORD	INSCHR
+26f2 fef2 ATAINT: .BYTE	$40,$00,$20,$60
+26f6 fef6 INTATA: .BYTE	$20,$40,$00,$60
+26fa fefa ATASCI: .BYTE	$6C,$6A,$3B,$80,$80,$6B,$2B,$2A
+2702 ff02 		  .BYTE	$6F,$80,$70,$75,$9B,$69,$2D,$3D
+270a ff0a 		  .BYTE	$76,$80,$63,$80,$80,$62,$78,$7A
+2712 ff12 		  .BYTE	$34,$80,$33,$36,$1B,$35,$32,$31
+271a ff1a 		  .BYTE	$2C,$20,$2E,$6E,$80,$6D,$2F,$81
+2722 ff22 		  .BYTE	$72,$80,$65,$79,$7F,$74,$77,$71
+272a ff2a 		  .BYTE	$39,$80,$30,$37,$7E,$38,$3C,$3E
+2732 ff32 		  .BYTE	$66,$68,$64,$80,$82,$67,$73,$61
+273a ff3a 		  .BYTE	$4C,$4A,$3A,$80,$80,$4B,$5C,$5E
+2742 ff42 		  .BYTE	$4F,$80,$50,$55,$9B,$49,$5F,$7C
+274a ff4a 		  .BYTE	$56,$80,$43,$80,$80,$42,$58,$5A
+2752 ff52 		  .BYTE	$24,$80,$23,$26,$1B,$25,$22,$21
+275a ff5a 		  .BYTE	$5B,$20,$5D,$4E,$80,$4D,$3F,$81
+2762 ff62 		  .BYTE	$52,$80,$45,$59,$9F,$54,$57,$51
+276a ff6a 		  .BYTE	$28,$80,$29,$27,$9C,$40,$7D,$9D
+2772 ff72 		  .BYTE	$46,$48,$44,$80,$83,$47,$53,$41
+277a ff7a 		  .BYTE	$0C,$0A,$7B,$80,$80,$0B,$1E,$1F
+2782 ff82 		  .BYTE	$0F,$80,$10,$15,$9B,$09,$1C,$1D
+278a ff8a 		  .BYTE	$16,$80,$03,$80,$80,$02,$18,$1A
+2792 ff92 		  .BYTE	$80,$80,$85,$80,$1B,$80,$FD,$80
+279a ff9a 		  .BYTE	$00,$20,$60,$0E,$80,$0D,$80,$81
+27a2 ffa2 		  .BYTE	$12,$80,$05,$19,$9E,$14,$17,$11
+27aa ffaa 		  .BYTE	$80,$80,$80,$80,$FE,$80,$7D,$FF
+27b2 ffb2 		  .BYTE	$06,$08,$04,$80,$84,$07,$13,$01
+27ba ffba PIRQ5:  LDA	  KBCODE
+27bd ffbd 		  CMP	  CH1
+27c0 ffc0 		  BNE	  PIRQ3
+27c2 ffc2 		  LDA	  KEYDEL
+27c5 ffc5 		  BNE	  PIRQ4
+27c7 ffc7 PIRQ3:  LDA	  KBCODE
+27ca ffca 		  CMP	  #CNTL1
+27cc ffcc 		  BNE	  PIRQ1
+27ce ffce 		  LDA	  SSFLAG
+27d1 ffd1 		  EOR	  #$FF
+27d3 ffd3 		  STA	  SSFLAG
+27d6 ffd6 		  BCS	  PIRQ4
+27d8 ffd8 PIRQ1:  STA	  CH
+27db ffdb 		  STA	  CH1
+27de ffde 		  LDA	  #3
+27e0 ffe0 		  STA	  KEYDEL
+27e3 ffe3 		  LDA	  #0
+27e5 ffe5 		  STA	  ATRACT
+27e7 ffe7 PIRQ4:  LDA	  #$30
+27e9 ffe9 		  STA	  SRTIMR
+27ec ffec PIRQ2:  PLA
+27ed ffed 		  RTI
+27ee ffee 		  .BYTE	$FF,$FF,$FF,$FF,$FF,$FF
+0014 d814 KBDSPR: .BYTE	$FFF8-CRNTPC

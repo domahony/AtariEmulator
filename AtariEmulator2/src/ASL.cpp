@@ -20,7 +20,7 @@ operator()(CPU* cpu) {
 	cpu->N = (B >> 7);
 	cpu->Z = (B == 0);
 
-	this->write(cpu, B);
+	this->write_back(cpu, B);
 
 	return 2;
 }

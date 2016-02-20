@@ -34,6 +34,12 @@ write(CPU* cpu, unsigned char val) {
 	return cpu->write(addr, value);
 }
 
+void ZeroPage::
+write_back(CPU* cpu, unsigned char val) {
+	value = val;
+	return cpu->write(addr, value);
+}
+
 unsigned char ZeroPageWithXIdx::
 read(CPU* cpu) {
 	addr = cpu->zeroPageWithXIdx();
@@ -44,6 +50,12 @@ void ZeroPageWithXIdx::
 write(CPU* cpu, unsigned char val) {
 	value = val;
 	addr = cpu->zeroPageWithXIdx();
+	cpu->write(addr, value);
+}
+
+void ZeroPageWithXIdx::
+write_back(CPU* cpu, unsigned char val) {
+	value = val;
 	cpu->write(addr, value);
 }
 
@@ -80,6 +92,12 @@ write(CPU* cpu, unsigned char val) {
 	cpu->write(addr, value);
 }
 
+void Absolute::
+write_back(CPU* cpu, unsigned char val) {
+	value = val;
+	cpu->write(addr, value);
+}
+
 unsigned char AbsoluteWithX::
 read(CPU* cpu) {
 	addr = cpu->absoluteAddressX(_tcount);
@@ -90,6 +108,12 @@ read(CPU* cpu) {
 void AbsoluteWithX::
 write(CPU* cpu, unsigned char val) {
 	addr = cpu->absoluteAddressX(_tcount);
+	value = val;
+	cpu->write(addr, value);
+}
+
+void AbsoluteWithX::
+write_back(CPU* cpu, unsigned char val) {
 	value = val;
 	cpu->write(addr, value);
 }
@@ -159,5 +183,10 @@ write(CPU* cpu, unsigned char val)
 	return cpu->setAccumulator(val);
 }
 
+void Accumulator::
+write_back(CPU* cpu, unsigned char val)
+{
+	return write(cpu, val);
+}
 
 } /* namespace cpu */
