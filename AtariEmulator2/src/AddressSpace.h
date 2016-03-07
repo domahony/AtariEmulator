@@ -22,12 +22,13 @@ namespace address {
 class AddressSpace {
 
 public:
-	AddressSpace();
+	AddressSpace(std::shared_ptr<Pokey>);
 
 	unsigned char read(const unsigned short) const;
 	void write(unsigned short, unsigned char);
 	void tick() {
 		antic->tick();
+		pokey->tick();
 	}
 
 	virtual ~AddressSpace();

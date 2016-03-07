@@ -9,14 +9,18 @@
 #include "AddressSpace.h"
 #include "ROM.h"
 #include "RAM.h"
+#include "Pokey.h"
 
 namespace address {
 
-AddressSpace::AddressSpace() :
+using std::shared_ptr;
+
+AddressSpace::AddressSpace(shared_ptr<Pokey> p) :
 		os(new ROM("/home/domahony/Projects/atariROMs/new/REVBNTSC.ROM")),
 		cartridgeA(new ROM("/home/domahony/Projects/atariROMs/REVA.ROM")),
 		ram(new RAM(0xA000)),
 		ramB(new RAM(0x8000)),
+		pokey(p),
 		antic(new ANTIC())
 {
 
@@ -29,74 +33,114 @@ AddressSpace::~AddressSpace() {
 
 unsigned char AddressSpace::read(const unsigned short addr) const {
 
+	unsigned char ret;
+	unsigned short a = addr;
+	std::string chip;
+
 	if (addr >= 0xD800) {
-		return os->read(addr - 0xD800);
+
+		ret = os->read(addr - 0xD800);
+		chip = "OS ROM";
+		//a -= 0xD800;
+
 	} else if (addr >= 0xD400) {
-		std::cout << "READ ANTIC: " << std::hex << addr - 0xd400 << std::endl;
-		return antic->read(addr - 0xD400);
+
+		ret = antic->read(addr - 0xD400);
+		chip = "CHIP ANTIC";
+		//a -= 0xd400;
+
 	} else if (addr >= 0xD300) {
-		std::cout << "READ PIA: " << std::hex << addr - 0xd300 << std::endl;
-		return pia->read(addr - 0xD300);
+
+		ret = pia->read(addr - 0xD300);
+		chip = "CHIP PIA";
+		//a -= 0xd300;
+
 	} else if (addr >= 0xD200) {
-		std::cout << "READ POKEY: " << std::hex << addr - 0xd200 << std::endl;
-		return pokey->read(addr - 0xD200);
+
+		ret = pokey->read(addr - 0xD200);
+		chip = "CHIP POKEY";
+		//a -= 0xd200;
+
 	} else if (addr >= 0xD000) {
-		std::cout << "READ GTIA: " << std::hex << addr - 0xd000 << std::endl;
-		return gtia->read(addr - 0xD000);
+
+		ret = gtia->read(addr - 0xD000);
+		chip = "CHIP GTIA";
+		//a -= 0xd000;
+
 	} else if (addr >= 0xA000) {
-		std::cout << "READ CARTA: " << std::hex << addr - 0xa000 << std::endl;
-		return cartridgeA->read(addr - 0xA000);
+
+		ret = cartridgeA->read(addr - 0xA000);
+		chip = "CHIP CARTA";
+		//a -= 0xa000;
+
 	} else if (addr >= 0x8000) {
 
 		if (cartridgeB) {
-		std::cout << "READ CARTB: " << std::hex << addr - 0x8000 << std::endl;
-			return cartridgeB->read(addr - 0x8000);
+			ret = cartridgeB->read(addr - 0x8000);
+			chip = "CHIP CARTB";
+			//a -= 0x8000;
+
 		} else {
-		std::cout << "READ RAMB: " << std::hex << addr - 0x8000 << std::endl;
-			return ramB->read(addr - 0x8000);
+			ret = ramB->read(addr - 0x8000);
+			chip = "RAMB";
+			//a -= 0x8000;
 		}
 
 
 	} else {
-		std::cout << "READ RAM: " << std::hex << addr << std::endl;
-		return ram->read(addr);
+		ret = ram->read(addr);
+		chip = "RAMB";
 	}
+
+	std::cout << chip << " READ: " << std::hex << a << " " << static_cast<unsigned short>(ret) << std::endl;
+	return ret;
 }
 
 void AddressSpace::write(unsigned short addr, unsigned char val) {
 
+	std::string chip;
+
 	if (addr >= 0xD800) {
+		chip = "OS ROM";
 		os->write(addr - 0xD800, val);
+		//addr -= 0xd800;
 	} else if (addr >= 0xD400) {
-		std::cout << "WRITE ANTIC: " << std::hex << addr - 0xd400 << std::endl;
 		antic->write(addr - 0xD400, val);
+		chip = "CHIP ANTIC";
+		//addr -= 0xd400;
 	} else if (addr >= 0xD300) {
-		std::cout << "WRITE PIA: " << std::hex << addr - 0xd300 << std::endl;
 		pia->write(addr - 0xD300, val);
+		chip = "CHIP PIA";
+		//addr -= 0xd300;
 	} else if (addr >= 0xD200) {
-		std::cout << "WRITE POKEY: " << std::hex << addr - 0xd200 << std::endl;
 		pokey->write(addr - 0xD200, val);
+		chip = "CHIP POKEY";
+		//addr -= 0xd200;
 	} else if (addr >= 0xD000) {
-		std::cout << "WRITE GTIA: " << std::hex << addr - 0xd000 << std::endl;
 		gtia->write(addr - 0xD000, val);
+		chip = "CHIP GTIA";
+		//addr -= 0xd000;
 	} else if (addr >= 0xA000) {
-		std::cout << "WRITE CARTA: " << std::hex << addr - 0xa000 << std::endl;
 		cartridgeA->write(addr - 0xA000, val);
+		chip = "CHIP CARTA";
+		//addr -= 0xa000;
 	} else if (addr >= 0x8000) {
 
 		if (cartridgeB) {
-			std::cout << "WRITE CARTB: " << std::hex << addr - 0x8000 << std::endl;
 			cartridgeB->write(addr - 0x8000, val);
+			chip = "CHIP CARTB";
+			//addr -= 0x8000;
 		} else {
-			std::cout << "WRITE RAMB: " << std::hex << addr - 0x8000 << std::endl;
 			ramB->write(addr - 0x8000, val);
+			chip = "RAMB";
+			//addr -= 0x8000;
 		}
 
-
 	} else {
-		std::cout << "WRITE RAM: " << std::hex << addr << std::endl;
 		ram->write(addr, val);
+		chip = "RAM";
 	}
+	std::cout << chip << " WRITE: " << std::hex << addr << " " << static_cast<unsigned short>(val) << std::endl;
 }
 
 } /* namespace address */

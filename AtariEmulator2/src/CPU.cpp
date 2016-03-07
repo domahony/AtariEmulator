@@ -28,10 +28,14 @@
 #include "SBC.h"
 #include "STA.h"
 #include "Transfer.h"
+#include <memory>
 
 namespace cpu {
 
-CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate), clock(hz), op(255), wait(0) {
+using std::shared_ptr;
+
+CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate), clock(hz), op(255), wait(0),
+		pokey(shared_ptr<address::Pokey>(new address::Pokey())), address_space(pokey) {
 
 	unsigned char low = read(0xFFFc);
 	unsigned char high = read(0xFFFc + 1);
@@ -228,12 +232,34 @@ CPU::~CPU() {
 }
 
 int CPU::
+execute_irq() {
+
+	std::cout << "EXECUTING INTERRUPT!!" << std::endl;
+	push((PC >> 8) & 0xFF);
+	push(PC & 0xFF);
+	push(this->get_flags());
+
+	I = true;
+
+	PC = (address_space.read(0xFFFF) << 8) | address_space.read(0xFFFE);
+
+	return 7;
+}
+
+int CPU::
 _execute()
 {
+	int ret = 0;
+	if (!I) {
+		if (pokey->IRQ()) {
+			ret = execute_irq();
+		}
+	}
+
 	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
 
-	if (pc == 0xea81) {
+	if (pc == 0xf1e6) {
 		// stuck in loop in the SEND routine in the NOTDON loop
 		// not sure why it is sending anything, needs to be traced backwards
 		int x = 1;
@@ -241,7 +267,7 @@ _execute()
 
 	OpCode *o = op[opcode];
 
-	int ret = (*o)(this);
+	ret += (*o)(this);
 	std::cout << pc << " " << o->to_string(this) << std::endl;
 
 	return ret;

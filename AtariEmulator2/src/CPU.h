@@ -179,6 +179,7 @@ private:
 	int refresh_rate;
 
 	int _execute();
+	int execute_irq();
 
 	unsigned short make_short(unsigned char low, unsigned char high) {
 		unsigned short ret = high;
@@ -207,6 +208,7 @@ private:
 
 	std::vector<OpCode*> op;
 
+	std::shared_ptr<address::Pokey> pokey;
 	address::AddressSpace address_space;
 
 	template <class T> friend class ADC;
