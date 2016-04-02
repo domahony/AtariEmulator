@@ -12,8 +12,11 @@
 namespace address {
 using namespace std;
 
-Pokey::Pokey() : reg(0xF + 1, 0x0), shiftout(0), irq(false), output_data_ready(false) {
+Pokey::Pokey() : reg(0xF + 1, 0x0), transmit_idx(0), transmit_byte_ready(false), transmit(0), recieve_idx(0), recieve(0) {
 	// TODO Auto-generated constructor stub
+
+	irqen = {0};
+	irqset = {0};
 
 	cout << "Reg Size: " << reg.size() << endl;
 }
@@ -25,32 +28,26 @@ Pokey::~Pokey() {
 void Pokey::
 tick() {
 
-	if (shiftout) {
+	if (transmit_idx) {
+		cout << "SHIFTOUT: " << transmit_idx << endl;
 
-		cout << "SHIFTOUT: " << shiftout << endl;
-		if (--shiftout == 0) {
+		/*
+		 * shift out the bit here ...
+		 */
+		--transmit_idx;
+	} else { // there is no byte being shifted out
 
-			cout << "SHIFTOUT ZERO: " << shiftout << endl;
-			if (irqen.XD) {
-				cout << "SETTING IRQ "  << endl;
-				irq = true;
-				irqset.XD = false;
+			// check to see if another byte is ready
+			if (transmit_byte_ready) {
+				// there is another byte ready
+				transmit = reg[WriteReg::SEROUT];
+				transmit_byte_ready = false;
+				irqset.ODN = (irqen.ODN) ? false : true; //signal another byte needed (if that interrupt is enabled!!
+				transmit_idx = 32; // we need to shift out 10bits really
+			} else {
+				// we've shifted everything out, no other byte is ready, so signal transmit done (XD)
+				irqset.XD = (irqen.XD) ? false : true;
 			}
-
-		}
-
-	} else {
-
-		if (output_data_ready) {
-			output_reg = reg[SEROUT];
-			output_data_ready = false;
-			shiftout = 32;
-			if (irqen.ODN) {
-				irq = true;
-				irqset.ODN = false;
-			}
-		}
-
 	}
 }
 
@@ -150,7 +147,7 @@ write(unsigned short addr, unsigned char val)
 		rname = "POTGO";
 		break;
 	case WriteReg::SEROUT:
-		output_data_ready = true;
+		transmit_byte_ready = true;
 		rname = "SEROUT";
 		break;
 	case WriteReg::IRQEN:
@@ -167,6 +164,22 @@ write(unsigned short addr, unsigned char val)
 
 	cout << "POKEY REG: " << rname << " " << hex << addr << " " << static_cast<unsigned short>(val) << endl;
 	reg[addr] = val;
+}
+
+unsigned char Pokey::
+get_enabled_irq() const
+{
+	unsigned char ret = 0;
+	if (irqen.BREAK) ret |= (1 << IRQ_T::BREAK);
+	if (irqen.K) ret |= (1 << IRQ_T::K);
+	if (irqen.ODN) ret |= (1 << IRQ_T::ODN);
+	if (irqen.SIR) ret |= (1 << IRQ_T::SIR);
+	if (irqen.T1) ret |= (1 << IRQ_T::T1);
+	if (irqen.T2) ret |= (1 << IRQ_T::T2);
+	if (irqen.T4) ret |= (1 << IRQ_T::T4);
+	if (irqen.XD) ret |= (1 << IRQ_T::XD);
+
+	return ret;
 }
 
 unsigned char Pokey::
@@ -188,14 +201,25 @@ get_irq() const
 void Pokey::
 enable_irq(unsigned char val)
 {
-	irqset.BREAK = irqen.BREAK = (val >> IRQ_T::BREAK) & 1;
-	irqset.K = irqen.K = (val >> IRQ_T::K) & 1;
-	irqset.ODN = irqen.ODN = (val >> IRQ_T::ODN) & 1;
-	irqset.SIR = irqen.SIR = (val >> IRQ_T::SIR) & 1;
-	irqset.T1 = irqen.T1 = (val >> IRQ_T::T1) & 1;
-	irqset.T2 = irqen.T2 = (val >> IRQ_T::T2) & 1;
-	irqset.T4 = irqen.T4 = (val >> IRQ_T::T4) & 1;
-	irqset.XD = irqen.XD = (val >> IRQ_T::XD) & 1;
+	// enable the interrupts
+	 irqen.BREAK = (val >> IRQ_T::BREAK) & 1;
+	 irqen.K = (val >> IRQ_T::K) & 1;
+	 irqen.ODN = (val >> IRQ_T::ODN) & 1;
+	 irqen.SIR = (val >> IRQ_T::SIR) & 1;
+	 irqen.T1 = (val >> IRQ_T::T1) & 1;
+	 irqen.T2 = (val >> IRQ_T::T2) & 1;
+	 irqen.T4 = (val >> IRQ_T::T4) & 1;
+	 irqen.XD = (val >> IRQ_T::XD) & 1;
+
+	 unsigned char inv_val = ~val;
+	 irqset.BREAK |= (inv_val >> IRQ_T::BREAK) & 1;
+	 irqset.K |= (inv_val >> IRQ_T::K) & 1;
+	 irqset.ODN |= (inv_val >> IRQ_T::ODN) & 1;
+	 irqset.SIR |= (inv_val >> IRQ_T::SIR) & 1;
+	 irqset.T1 |= (inv_val >> IRQ_T::T1) & 1;
+	 irqset.T2 |= (inv_val >> IRQ_T::T2) & 1;
+	 irqset.T4 |= (inv_val >> IRQ_T::T4) & 1;
+	 irqset.XD |= (inv_val >> IRQ_T::XD) & 1;
 
 	cout << "DECODING POKEY IRQEN VAL: " << static_cast<unsigned short>(val) << endl;
 

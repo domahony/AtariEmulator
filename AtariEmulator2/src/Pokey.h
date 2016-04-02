@@ -24,7 +24,12 @@ public:
 	void tick();
 
 	bool IRQ() {
-		return irq;
+		unsigned char en = get_enabled_irq();
+		unsigned char set = get_irq();
+
+		bool ret = en & (~set);
+
+		return ret;
 	}
 
 	enum ReadReg {
@@ -87,13 +92,21 @@ public:
 private:
 	void enable_irq(unsigned char);
 	unsigned char get_irq() const;
+
+	unsigned char get_enabled_irq() const;
+	unsigned char get_set_irq() const;
+
 	std::vector<unsigned char> reg;
 	struct IRQEN irqen;
 	struct IRQEN irqset;
-	int shiftout;
-	unsigned char output_reg;
-	bool output_data_ready;
-	bool irq;
+
+	bool transmit_byte_ready;
+	int transmit_idx;
+	unsigned char transmit;
+
+	int recieve_idx;
+	unsigned char recieve;
+
 
 };
 

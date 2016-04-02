@@ -17,8 +17,10 @@ operator() (CPU* cpu)
 	unsigned char l = cpu->pop();
 	unsigned char h = cpu->pop();
 
+	cpu->set_flags(P);
 	unsigned short PC = h << 8 | l;
 	cpu->PC = PC;
+
 
 	return 6;
 }

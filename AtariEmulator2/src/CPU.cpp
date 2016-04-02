@@ -259,9 +259,13 @@ _execute()
 	unsigned short pc = PC;
 	unsigned char opcode = read(PC++);
 
-	if (pc == 0xf1e6) {
-		// stuck in loop in the SEND routine in the NOTDON loop
-		// not sure why it is sending anything, needs to be traced backwards
+	/*
+	 * Start from ec33 -> enabling the POKEY serial input irq....
+	 */
+
+	if (pc == 0xf189) {
+		//stuck in loop at ISRODN, possible timing issue setting the CHKSUM, CHKSNT
+		//also, check the BUFR* memory locations
 		int x = 1;
 	}
 
