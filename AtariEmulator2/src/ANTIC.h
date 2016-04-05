@@ -8,6 +8,8 @@
 #ifndef ANTIC_H_
 #define ANTIC_H_
 
+#include <iostream>
+
 namespace address {
 
 class ANTIC {
@@ -41,7 +43,16 @@ public:
 		// 2,000,000 tps
 		// cpu / lps
 
+
 		int lps = 29.97 * 2 * 131.25;
+		tcount++;
+
+		if (tcount > 28933) {
+			std::cout << std::endl;
+			std::cout << "VERTICAL BLANK!!!" << std::endl;
+			std::cout << std::endl;
+			tcount = 0;
+		}
 
 		vcount_acc += lps;
 
@@ -59,6 +70,7 @@ public:
 private:
 	int vcount;
 	int vcount_acc;
+	int tcount;
 };
 
 } /* namespace address */

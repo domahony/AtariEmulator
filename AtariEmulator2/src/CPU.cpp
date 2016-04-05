@@ -263,9 +263,12 @@ _execute()
 	 * Start from ec33 -> enabling the POKEY serial input irq....
 	 */
 
-	if (pc == 0xf189) {
-		//stuck in loop at ISRODN, possible timing issue setting the CHKSUM, CHKSNT
-		//also, check the BUFR* memory locations
+	//if (pc == 0xf189) {
+	//if (pc == 0xec1b) {
+	//if (pc == 0xf2dd) { //NOWARM label
+	if (pc == 0xeb00) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
+		// f2dd is NOWARM label
+		//possible stuck in loop waiting for RECVDN flag around eaf9
 		int x = 1;
 	}
 

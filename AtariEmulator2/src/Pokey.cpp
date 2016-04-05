@@ -41,6 +41,9 @@ tick() {
 			if (transmit_byte_ready) {
 				// there is another byte ready
 				transmit = reg[WriteReg::SEROUT];
+
+				std::cout << "TRANSMIT START: " << std::hex << static_cast<unsigned short>(transmit) << std::endl;
+
 				transmit_byte_ready = false;
 				irqset.ODN = (irqen.ODN) ? false : true; //signal another byte needed (if that interrupt is enabled!!
 				transmit_idx = 32; // we need to shift out 10bits really
@@ -49,6 +52,22 @@ tick() {
 				irqset.XD = (irqen.XD) ? false : true;
 			}
 	}
+
+
+	if (!recieve_idx) {
+		recieve_idx = 16;
+	} else {
+		--recieve_idx;
+	}
+
+	if (irqen.SIR) {
+
+		if (!recieve_idx) {
+			irqset.SIR = false;
+		}
+	}
+
+
 }
 
 unsigned char Pokey::
@@ -91,6 +110,7 @@ read(unsigned short addr) const
 		break;
 	case ReadReg::SERIN:
 		ret = reg[addr];
+		ret = 0;
 		break;
 	case ReadReg::IRQST:
 		ret = get_irq();
@@ -155,6 +175,7 @@ write(unsigned short addr, unsigned char val)
 		rname = "IRQEN";
 		break;
 	case WriteReg::SKCTL:
+		write_skctl(val);
 		rname = "SKCTL";
 		break;
 	default:
@@ -164,6 +185,18 @@ write(unsigned short addr, unsigned char val)
 
 	cout << "POKEY REG: " << rname << " " << hex << addr << " " << static_cast<unsigned short>(val) << endl;
 	reg[addr] = val;
+}
+
+void Pokey::
+write_skctl(unsigned char val)
+{
+	w_skctl.ENABLE_KEYBOARD_DEBOUNCE  = (val >> W_SKCTL_T::KBD_DEBOUNCE) & 0x1;
+	w_skctl.ENABLE_KEYBOARD_SCAN  = (val >> W_SKCTL_T::KBD_SCAN) & 0x1;
+	w_skctl.FAST_POT_SCAN  = (val >> W_SKCTL_T::FAST_POT) & 0x1;
+	w_skctl.FORCE_BREAK  = (val >> W_SKCTL_T::FORCE_BREAK) & 0x1;
+	w_skctl.TWO_TONE_MODE  = (val >> W_SKCTL_T::TWO_TONE) & 0x1;
+
+	w_skctl.MODE_CTRL  = (val >> W_SKCTL_T::MODE_CTRL0) & 0x7;
 }
 
 unsigned char Pokey::

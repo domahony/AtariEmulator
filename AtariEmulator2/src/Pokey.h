@@ -89,6 +89,26 @@ public:
 		int T4;
 	};
 
+	struct W_SKCTL {
+		int ENABLE_KEYBOARD_DEBOUNCE;
+		int ENABLE_KEYBOARD_SCAN;
+		int FAST_POT_SCAN;
+		int TWO_TONE_MODE;
+		int MODE_CTRL;
+		int FORCE_BREAK;
+	};
+
+	enum W_SKCTL_T {
+		KBD_DEBOUNCE	= 0,
+		KBD_SCAN		= 1,
+		FAST_POT		= 2,
+		TWO_TONE		= 3,
+		MODE_CTRL0		= 4,
+		MODE_CTRL1		= 5,
+		MODE_CTRL2		= 6,
+		FORCE_BREAK		= 7,
+	};
+
 private:
 	void enable_irq(unsigned char);
 	unsigned char get_irq() const;
@@ -96,9 +116,12 @@ private:
 	unsigned char get_enabled_irq() const;
 	unsigned char get_set_irq() const;
 
+	void write_skctl(unsigned char);
+
 	std::vector<unsigned char> reg;
 	struct IRQEN irqen;
 	struct IRQEN irqset;
+	struct W_SKCTL w_skctl;
 
 	bool transmit_byte_ready;
 	int transmit_idx;
@@ -106,7 +129,6 @@ private:
 
 	int recieve_idx;
 	unsigned char recieve;
-
 
 };
 
