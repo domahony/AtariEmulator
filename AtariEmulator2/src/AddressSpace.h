@@ -22,7 +22,7 @@ namespace address {
 class AddressSpace {
 
 public:
-	AddressSpace(std::shared_ptr<Pokey>);
+	AddressSpace();
 
 	unsigned char read(const unsigned short) const;
 	void write(unsigned short, unsigned char);
@@ -32,6 +32,14 @@ public:
 	}
 
 	virtual ~AddressSpace();
+
+	std::shared_ptr<ANTIC> get_antic() const {
+		return antic;
+	}
+
+	std::shared_ptr<Pokey> get_pokey() const {
+		return pokey;
+	}
 
 private:
 

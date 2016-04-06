@@ -15,12 +15,12 @@ namespace address {
 
 using std::shared_ptr;
 
-AddressSpace::AddressSpace(shared_ptr<Pokey> p) :
+AddressSpace::AddressSpace() :
 		os(new ROM("/home/domahony/Projects/atariROMs/new/REVBNTSC.ROM")),
 		cartridgeA(new ROM("/home/domahony/Projects/atariROMs/REVA.ROM")),
 		ram(new RAM(0xA000)),
 		ramB(new RAM(0x8000)),
-		pokey(p),
+		pokey(new Pokey()),
 		antic(new ANTIC())
 {
 

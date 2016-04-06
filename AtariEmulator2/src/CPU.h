@@ -180,6 +180,7 @@ private:
 
 	int _execute();
 	int execute_irq();
+	int execute_nmi();
 
 	unsigned short make_short(unsigned char low, unsigned char high) {
 		unsigned short ret = high;
@@ -208,8 +209,9 @@ private:
 
 	std::vector<OpCode*> op;
 
-	std::shared_ptr<address::Pokey> pokey;
 	address::AddressSpace address_space;
+	std::shared_ptr<address::Pokey> pokey;
+	std::shared_ptr<address::ANTIC> antic;
 
 	template <class T> friend class ADC;
 	template <class T> friend class AND;

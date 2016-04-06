@@ -9,6 +9,7 @@
 #define ANTIC_H_
 
 #include <iostream>
+#include <vector>
 
 namespace address {
 
@@ -17,60 +18,41 @@ public:
 	ANTIC();
 	virtual ~ANTIC();
 
-	unsigned char read(unsigned short addr) const {
+	unsigned char read(unsigned short addr) const;
 
-		unsigned char ret = 0;
+	void write(unsigned short addr, unsigned char val);
 
-		switch (addr) {
-		case 0xB :
-			ret = vcount;
-			break;
-		default:
-			;
-		}
+	bool NMI();
 
-		return ret;
-	}
-
-	void write(unsigned short addr, unsigned char val) {
-
-	}
-
-	void tick() {
-
-		// 29.97 fps * 262.5 lines
-		// 7867.125 lps
-		// 2,000,000 tps
-		// cpu / lps
-
-
-		int lps = 29.97 * 2 * 131.25;
-		tcount++;
-
-		if (tcount > 28933) {
-			std::cout << std::endl;
-			std::cout << "VERTICAL BLANK!!!" << std::endl;
-			std::cout << std::endl;
-			tcount = 0;
-		}
-
-		vcount_acc += lps;
-
-		if (vcount_acc >= 2000000) {
-			vcount++;
-		}
-
-		if (vcount > 130) {
-			vcount = 0;
-		}
-
-		vcount_acc %= 2000000;
-	}
+	void tick();
 
 private:
 	int vcount;
 	int vcount_acc;
 	int tcount;
+
+	enum Reg {
+		DMACTL = 0x00,
+		CHACTL = 0x01,
+		DLISTL = 0x02,
+		DLISTH = 0x03,
+		HSCROL = 0x04,
+		VSCROL = 0x05,
+		PMBASE = 0x07,
+		CHBASE = 0x09,
+		WSYNC  = 0x0A,
+		VCOUNT = 0x0B,
+		PENH   = 0x0C,
+		PENV   = 0x0D,
+		NMIEN  = 0x0E,
+		NMIRES = 0x0F,
+		NMIST  = 0x0F,
+	};
+
+	std::vector<unsigned char> r_reg;
+	std::vector<unsigned char> w_reg;
+
+	bool nmi_trigger;
 };
 
 } /* namespace address */

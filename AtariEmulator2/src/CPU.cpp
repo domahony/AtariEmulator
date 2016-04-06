@@ -35,7 +35,7 @@ namespace cpu {
 using std::shared_ptr;
 
 CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate), clock(hz), op(255), wait(0),
-		pokey(shared_ptr<address::Pokey>(new address::Pokey())), address_space(pokey) {
+		address_space(), pokey(address_space.get_pokey()), antic(address_space.get_antic()) {
 
 	unsigned char low = read(0xFFFc);
 	unsigned char high = read(0xFFFc + 1);
@@ -247,13 +247,35 @@ execute_irq() {
 }
 
 int CPU::
+execute_nmi() {
+
+	std::cout << "EXECUTING NMI!!" << std::endl;
+	push((PC >> 8) & 0xFF);
+	push(PC & 0xFF);
+	push(this->get_flags());
+
+	I = true;
+
+	PC = (address_space.read(0xFFFB) << 8) | address_space.read(0xFFFA);
+
+	return 7;
+}
+
+int CPU::
 _execute()
 {
 	int ret = 0;
-	if (!I) {
-		if (pokey->IRQ()) {
-			ret = execute_irq();
+
+	if (antic->NMI()) {
+		ret = execute_nmi();
+	} else {
+
+		if (!I) {
+			if (pokey->IRQ()) {
+				ret = execute_irq();
+			}
 		}
+
 	}
 
 	unsigned short pc = PC;
