@@ -6,10 +6,11 @@
  */
 
 #include "ANTIC.h"
+#include "AddressSpace.h"
 
 namespace address {
 
-ANTIC::ANTIC() : vcount(0), vcount_acc(0), r_reg(15, 0), w_reg(15, 0), nmi_trigger(false)
+ANTIC::ANTIC() : vcount(0), vcount_acc(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0)
 {
 	// TODO Auto-generated constructor stub
 
@@ -19,14 +20,15 @@ bool ANTIC::
 NMI()
 {
 	// only trigger nmi once...
-	bool ret = nmi_trigger;
-	nmi_trigger = false;
+
+	bool ret = (nmi_trigger & 0x1);
+	nmi_trigger = nmi_trigger >> 1;
 
 	return ret;
 }
 
 void ANTIC::
-tick()
+tick(AddressSpace *address_space)
 {
 	// 29.97 fps * 262.5 lines
 	// 7867.125 lps
@@ -47,6 +49,11 @@ tick()
 	}
 	*/
 
+	if ((w_reg[Reg::DMACTL] >> 5) & 0x1) {
+		//DMA is enabled
+		do_dma(address_space);
+	}
+
 	vcount_acc += lps;
 
 	if (vcount_acc >= 1790000) {
@@ -61,13 +68,69 @@ tick()
 		tcount = 0;
 		vcount = 0;
 
+		//the code needs figure out what to draw at this point, and update the opengl context
+		//the code needs to trigger an opengl screen swap too
+
 		if ((w_reg[Reg::NMIEN] >> 6) & 0x1) {
 			r_reg[Reg::NMIST] |= (1 << 6);
-			nmi_trigger = true;
+			nmi_trigger = 1; //trigger nmi on the next tick, for 1 tick
 		}
 	}
 
 	vcount_acc %= 1790000;
+}
+
+void ANTIC::
+do_dma(AddressSpace* as)
+{
+	unsigned short addr = (w_reg[Reg::DLISTH] << 8) | w_reg[Reg::DLISTL];
+
+	unsigned short addrl = w_reg[Reg::DLISTL];
+	unsigned short addrh = w_reg[Reg::DLISTH];
+
+	std::cout << "Display List ADDR: " << addr << std::endl;
+
+	unsigned short mem_pc;
+
+	//need some way to break of this loop
+
+	while (true) {
+
+		unsigned char val = as->read(addr);
+
+		if ((val & 0xF) == 0) {
+
+			// blank
+			unsigned short num_blank_lines = (val >> 4) & 0x7;
+
+		} else if ((val & 0xF) == 1) {
+
+				unsigned char l = as->read(++addr);
+				unsigned char h = as->read(++addr);
+				addr = (h << 8) | l;
+
+				bool wait_for_vblank = (val >> 6) & 0x1;
+
+
+		} else {
+
+			unsigned short mode = (val & 0xF);
+			bool hscroll = (val >> 4) & 0x1;
+			bool vscroll = (val >> 5) & 0x1;
+
+			if ((val >> 6) & 0x1) {
+
+				unsigned char l = as->read(++addr);
+				unsigned char h = as->read(++addr);
+				mem_pc = (h << 8) | l;
+
+			}
+
+			unsigned char data = as->read(mem_pc);
+		}
+
+	}
+
 }
 
 ANTIC::~ANTIC() {
@@ -97,17 +160,67 @@ read(unsigned short addr) const
 void ANTIC::
 write(unsigned short addr, unsigned char val)
 {
-		switch (addr) {
-		case Reg::NMIEN :
-			w_reg[Reg::NMIEN] = val;
-			break;
-		case Reg::NMIRES :
-			r_reg[Reg::NMIST] &= val;
-			break;
-		default:
-			;
-		}
 
+	switch (addr) {
+	case DMACTL:
+		std::cout << "ANTIC Writing DMACTL " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case CHACTL:
+		std::cout << "ANTIC Writing CHACTL " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case DLISTL:
+		std::cout << "ANTIC Writing DLISTL " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case DLISTH:
+		std::cout << "ANTIC Writing DLISTH " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case HSCROL:
+		std::cout << "ANTIC Writing HSCROL " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case VSCROL:
+		std::cout << "ANTIC Writing VSCROL " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case PMBASE:
+		std::cout << "ANTIC Writing PMBASE " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case CHBASE:
+		std::cout << "ANTIC Writing CHBASE " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case WSYNC:
+		std::cout << "ANTIC Writing WSYNC " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case VCOUNT:
+		std::cout << "ANTIC Writing VCOUNT " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case PENH:
+		std::cout << "ANTIC Writing PENH " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case PENV:
+		std::cout << "ANTIC Writing PENV " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[addr] = val;
+		break;
+	case Reg::NMIEN :
+		std::cout << "ANTIC Writing NMIEN " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		w_reg[Reg::NMIEN] = val;
+		break;
+	case Reg::NMIRES :
+		std::cout << "ANTIC Writing NMIRES " << std::hex << static_cast<unsigned short>(val) << std::endl;
+		r_reg[Reg::NMIST] &= val;
+		break;
+	default:
+		;
+	}
 }
 
 } /* namespace address */

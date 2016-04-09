@@ -313,11 +313,11 @@ ticks_per_second()
 bool CPU::
 execute()
 {
-	while (acc < hz) {
+	while (acc < hz) { // not sure if we need this loop??
 
 		acc += refresh_rate;
 
-		if (clock.tick()) { //clock.tick(wait); ???
+		if (clock.tick()) { // not sure what this doing?
 			if (--wait <= 0) {
 				wait = _execute();
 			}

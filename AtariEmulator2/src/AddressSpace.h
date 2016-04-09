@@ -27,7 +27,7 @@ public:
 	unsigned char read(const unsigned short) const;
 	void write(unsigned short, unsigned char);
 	void tick() {
-		antic->tick();
+		antic->tick(this);
 		pokey->tick();
 	}
 

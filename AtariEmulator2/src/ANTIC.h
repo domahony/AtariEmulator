@@ -13,6 +13,8 @@
 
 namespace address {
 
+class AddressSpace;
+
 class ANTIC {
 public:
 	ANTIC();
@@ -24,7 +26,7 @@ public:
 
 	bool NMI();
 
-	void tick();
+	void tick(AddressSpace*);
 
 private:
 	int vcount;
@@ -52,7 +54,10 @@ private:
 	std::vector<unsigned char> r_reg;
 	std::vector<unsigned char> w_reg;
 
-	bool nmi_trigger;
+	unsigned char nmi_trigger;
+
+	void do_dma(AddressSpace *);
+
 };
 
 } /* namespace address */
