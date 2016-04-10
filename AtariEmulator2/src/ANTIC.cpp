@@ -10,7 +10,7 @@
 
 namespace address {
 
-ANTIC::ANTIC() : vcount(0), vcount_acc(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0)
+ANTIC::ANTIC() : vcount(0), vcount_acc(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0), vblank(false)
 {
 	// TODO Auto-generated constructor stub
 
@@ -49,10 +49,6 @@ tick(AddressSpace *address_space)
 	}
 	*/
 
-	if ((w_reg[Reg::DMACTL] >> 5) & 0x1) {
-		//DMA is enabled
-		do_dma(address_space);
-	}
 
 	vcount_acc += lps;
 
@@ -67,7 +63,12 @@ tick(AddressSpace *address_space)
 		std::cout << std::endl;
 		tcount = 0;
 		vcount = 0;
+		vblank = true;
 
+		if ((w_reg[Reg::DMACTL] >> 5) & 0x1) {
+			//DMA is enabled
+			do_dma(address_space);
+		}
 		//the code needs figure out what to draw at this point, and update the opengl context
 		//the code needs to trigger an opengl screen swap too
 
@@ -90,26 +91,31 @@ do_dma(AddressSpace* as)
 
 	std::cout << "Display List ADDR: " << addr << std::endl;
 
+	std::vector<std::vector<unsigned short>> screen;
+
 	unsigned short mem_pc;
 
-	//need some way to break of this loop
+	//need some way to break out of this loop
 
 	while (true) {
 
 		unsigned char val = as->read(addr);
+		bool wait_for_vblank = false;
+		unsigned char data = 0x0;
 
 		if ((val & 0xF) == 0) {
 
 			// blank
 			unsigned short num_blank_lines = (val >> 4) & 0x7;
+			++addr;
 
 		} else if ((val & 0xF) == 1) {
 
-				unsigned char l = as->read(++addr);
-				unsigned char h = as->read(++addr);
-				addr = (h << 8) | l;
+			unsigned char l = as->read(++addr);
+			unsigned char h = as->read(++addr);
+			addr = (h << 8) | l;
 
-				bool wait_for_vblank = (val >> 6) & 0x1;
+			wait_for_vblank = (val >> 6) & 0x1;
 
 
 		} else {
@@ -124,11 +130,32 @@ do_dma(AddressSpace* as)
 				unsigned char h = as->read(++addr);
 				mem_pc = (h << 8) | l;
 
+			} else {
+				++addr;
 			}
 
-			unsigned char data = as->read(mem_pc);
+			std::vector<unsigned short> line;
+
+			unsigned short buf[40];
+			for (int i = 0; i < 40; i++) {
+				line.push_back(as->read(mem_pc++));
+			}
+
+			screen.push_back(line);
 		}
 
+		if (wait_for_vblank) {
+			break;
+		}
+
+	}
+
+	for (auto i = screen.begin(); i != screen.end(); ++i) {
+
+		for (auto j = i->begin(); j != i->end(); ++j) {
+			std::cout << *j << " ";
+		}
+		std::cout << std::endl;
 	}
 
 }

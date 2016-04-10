@@ -288,7 +288,8 @@ _execute()
 	//if (pc == 0xf189) {
 	//if (pc == 0xec1b) {
 	//if (pc == 0xf2dd) { //NOWARM label
-	if (pc == 0xeb00) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
+	//if (pc == 0xeb00) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
+	if (pc == 0xf917) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
 		// f2dd is NOWARM label
 		//possible stuck in loop waiting for RECVDN flag around eaf9
 		int x = 1;

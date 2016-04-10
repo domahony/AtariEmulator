@@ -22,7 +22,7 @@ operator() (CPU* cpu)
 		t = cpu->BCD(cpu->ACC) - cpu->BCD(M) - (cpu->C ? 1 : 0);
 		cpu->V = (t > 99 || t < 0);
 	} else {
-		t = cpu->ACC - M - (cpu->C ? 1 : 0);
+		t = cpu->ACC - M - (cpu->C ? 0 : 1);
 		cpu->V = (t > 127 || t < -128);
 	}
 

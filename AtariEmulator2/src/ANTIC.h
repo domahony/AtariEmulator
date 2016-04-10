@@ -55,6 +55,7 @@ private:
 	std::vector<unsigned char> w_reg;
 
 	unsigned char nmi_trigger;
+	bool vblank;
 
 	void do_dma(AddressSpace *);
 

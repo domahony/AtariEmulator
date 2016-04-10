@@ -15,14 +15,16 @@ namespace cpu {
 
 class BranchOp : public OpCode {
 public:
-	BranchOp() : addr(0), bit(0), offset(0), flags(0) {}
+	BranchOp() : addr(0), bit(0), offset(0), flags(0), jumping(false) {}
 	virtual ~BranchOp();
 
 	virtual std::string _mnemonic() = 0;
 
 	std::string mnemonic() {
 		std::stringstream ret;
-		ret << _mnemonic() << " " << (bit ? "1":"0") << " " << std::hex << offset << " " << offset + addr;
+		ret << _mnemonic() << " " << (bit ? "1":"0") << " "
+				<< std::hex << offset << " " << offset + addr
+				<< (jumping ? "JUMPING" : " NO JUMP");
 		return ret.str();
 	}
 
@@ -31,6 +33,7 @@ protected:
 	char offset;
 	bool bit;
 	unsigned char flags;
+	bool jumping;
 
 };
 

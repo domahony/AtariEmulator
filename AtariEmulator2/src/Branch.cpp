@@ -22,6 +22,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -46,6 +47,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -70,6 +72,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -94,6 +97,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -118,6 +122,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -142,6 +147,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -165,6 +171,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
@@ -188,6 +195,7 @@ operator()(CPU* cpu)
 		ret++;
 		unsigned short opc = addr;
 		unsigned short npc = opc + offset;
+		jumping = true;
 
 		if ((opc >> 8) != (npc >> 8)) {
 			ret++;
