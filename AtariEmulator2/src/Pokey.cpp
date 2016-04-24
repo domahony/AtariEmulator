@@ -12,7 +12,8 @@
 namespace address {
 using namespace std;
 
-Pokey::Pokey() : reg(0xF + 1, 0x0), transmit_idx(0), transmit_byte_ready(false), transmit(0), recieve_idx(0), recieve(0) {
+Pokey::Pokey() : reg(0xF + 1, 0x0), transmit_idx(0), transmit_byte_ready(false),
+		transmit(0), recieve_idx(0), recieve(0), irq_trigger(0) {
 	// TODO Auto-generated constructor stub
 
 	irqen = {0};
@@ -45,8 +46,11 @@ tick() {
 				std::cout << "TRANSMIT START: " << std::hex << static_cast<unsigned short>(transmit) << std::endl;
 
 				transmit_byte_ready = false;
-				irqset.ODN = (irqen.ODN) ? false : true; //signal another byte needed (if that interrupt is enabled!!
+				// CHECK - this interrupt is being fired too early.  The main thread hasn't written to the checksum yet
+				// look at the docs to see if you can figure out the timing of it.
+				irqset.ODN = (irqen.ODN) ? false : true; //signal another byte needed (if that interrupt is enabled!!)
 				transmit_idx = 32; // we need to shift out 10bits really
+
 			} else {
 				// we've shifted everything out, no other byte is ready, so signal transmit done (XD)
 				irqset.XD = (irqen.XD) ? false : true;
@@ -168,6 +172,7 @@ write(unsigned short addr, unsigned char val)
 		break;
 	case WriteReg::SEROUT:
 		transmit_byte_ready = true;
+		irq_trigger = 1;
 		rname = "SEROUT";
 		break;
 	case WriteReg::IRQEN:

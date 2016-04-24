@@ -289,16 +289,38 @@ _execute()
 	//if (pc == 0xec1b) {
 	//if (pc == 0xf2dd) { //NOWARM label
 	//if (pc == 0xeb00) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
-	if (pc == 0xf917) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
+	//if (pc == 0xf917) { // NTBRK1 label; need to verify receiv flow;  ensure SIR interrupt is reset
+	//if (pc == 0xf19e) {
+	//if (pc == 0xf23f) {
+	//if (pc == 0xf1e4) {
+	//if (pc == 0xf1fc) {
+	//if (pc == 0xec8a || pc == 0xea90 || pc == 0xeaa2) { //at 0xeaa2, the first LDA CHKSNT should not cause a branch!!
+	if (pc == 0xea74 || pc == 0xea7f || pc == 0xeac6 || pc == 0xea90 || pc == 0xeacf) { //at 0xeaca, the first LDA CHKSNT should not cause a branch!!
+		// 4 databytes are set at 0x23a,0x23b,0x23c,0x23d
+		//CDEVIC
+		//CCOMND
+		//CAUX1
+		//CAUX2
+		//eac6 is the ADC CHKSUM command -to be verified! //ea6b is the start of the SEND routine
 		// f2dd is NOWARM label
-		//possible stuck in loop waiting for RECVDN flag around eaf9
+
+		// 0xec97 LDY #CTIMLO immediately after SEND routine (sending STATUS)
+
+		//ea74: store zero to CHKSUM
+		//ea7f: store non-zero to CHKSUM (first byte)
+		//eac6: ADC chksum
+		//eaca: STA chksum
+		//
+
 		int x = 1;
+		address_space.dump_ram();
 	}
 
 	OpCode *o = op[opcode];
 
 	ret += (*o)(this);
 	std::cout << pc << " " << o->to_string(this) << std::endl;
+
 
 	return ret;
 

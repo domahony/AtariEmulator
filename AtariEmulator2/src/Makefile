@@ -101,7 +101,7 @@ am_ae_OBJECTS = AtariEmulator2.$(OBJEXT) Video.$(OBJEXT) CPU.$(OBJEXT) \
 	EOR.$(OBJEXT) INC.$(OBJEXT) JMP.$(OBJEXT) LDA.$(OBJEXT) \
 	Shift.$(OBJEXT) NOP.$(OBJEXT) ORA.$(OBJEXT) PHA.$(OBJEXT) \
 	RTI.$(OBJEXT) RTS.$(OBJEXT) SBC.$(OBJEXT) STA.$(OBJEXT) \
-	Transfer.$(OBJEXT) ANTIC.$(OBJEXT)
+	Transfer.$(OBJEXT) ANTIC.$(OBJEXT) Logging.$(OBJEXT)
 ae_OBJECTS = $(am_ae_OBJECTS)
 am__DEPENDENCIES_1 =
 ae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -265,10 +265,10 @@ top_srcdir = ..
 AM_CXXFLAGS = -std=c++11 $(SDL_CFLAGS)
 ae_SOURCES = AtariEmulator2.cpp Video.cpp CPU.cc Clock.cpp Clock2.cpp ADC.cpp OpCode.cpp CMP.cpp AND.cpp AddressSpace.cpp \
 ROM.cpp RAM.cpp Pokey.cpp PIA.cpp ASL.cpp Branch.cpp BIT.cpp BRK.cpp SetFlags.cpp DEC.cpp EOR.cpp INC.cpp JMP.cpp LDA.cpp \
-Shift.cpp NOP.cpp ORA.cpp PHA.cpp RTI.cpp RTS.cpp SBC.cpp STA.cpp Transfer.cpp ANTIC.cpp
+Shift.cpp NOP.cpp ORA.cpp PHA.cpp RTI.cpp RTS.cpp SBC.cpp STA.cpp Transfer.cpp ANTIC.cpp Logging.cpp
 
-ae_LDFLAGS = $(SDL_LDFLAGS) $(GL_LDFLAGS)
-ae_LDADD = $(SDL_LDFLAGS) $(GL_LDFLAGS)
+ae_LDFLAGS = $(SDL_LDFLAGS) $(GL_LDFLAGS) -lboost_system -lpthread -lboost_log -lboost_thread
+ae_LDADD = $(SDL_LDFLAGS) $(GL_LDFLAGS) -lboost_system -lpthread -lboost_log -lboost_thread
 all: all-am
 
 .SUFFIXES:
@@ -374,6 +374,7 @@ include ./$(DEPDIR)/EOR.Po
 include ./$(DEPDIR)/INC.Po
 include ./$(DEPDIR)/JMP.Po
 include ./$(DEPDIR)/LDA.Po
+include ./$(DEPDIR)/Logging.Po
 include ./$(DEPDIR)/NOP.Po
 include ./$(DEPDIR)/ORA.Po
 include ./$(DEPDIR)/OpCode.Po

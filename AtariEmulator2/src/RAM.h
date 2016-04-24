@@ -9,6 +9,7 @@
 #define RAM_H_
 
 #include <vector>
+#include <string>
 
 namespace address {
 
@@ -26,6 +27,8 @@ public:
 	void write(unsigned short addr, unsigned char val) {
 		ram[addr] = val;
 	}
+
+	void dump(const std::string& fname) const;
 
 private:
 	RAM();

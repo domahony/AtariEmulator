@@ -11,12 +11,15 @@
 #include <iostream>
 #include "Video.h"
 #include "CPU.h"
+#include "Logging.h"
 
 int main(int argc, char **argv)
 {
 	video::Video video;
 	cpu::CPU cpu(2 * 1000 * 1000 * 20, video.get_refresh_rate());
 	bool quit = false;
+
+	LOG::init();
 
 	while( !quit ) {
 

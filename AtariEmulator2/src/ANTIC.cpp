@@ -150,6 +150,7 @@ do_dma(AddressSpace* as)
 
 	}
 
+	return;
 	for (auto i = screen.begin(); i != screen.end(); ++i) {
 
 		for (auto j = i->begin(); j != i->end(); ++j) {

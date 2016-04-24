@@ -31,6 +31,14 @@ AddressSpace::~AddressSpace() {
 
 }
 
+void AddressSpace::
+dump_ram()
+{
+	ram->dump("/tmp/ram1.bin");
+	ramB->dump("/tmp/ramB.bin");
+
+}
+
 unsigned char AddressSpace::read(const unsigned short addr) const {
 
 	unsigned char ret;
@@ -66,21 +74,24 @@ unsigned char AddressSpace::read(const unsigned short addr) const {
 		ret = gtia->read(addr - 0xD000);
 		chip = "CHIP GTIA";
 		//a -= 0xd000;
-
+	} else if (addr >= 0xC000)	 {
+		return 0x0;
 	} else if (addr >= 0xA000) {
 
-		ret = cartridgeA->read(addr - 0xA000);
+		ret = cartridgeA->read(addr - 0xA000); //!!!!!CONSIDER SHIFTING this up by 0x1000 (4K)
 		chip = "CHIP CARTA";
 		//a -= 0xa000;
 
 	} else if (addr >= 0x8000) {
 
 		if (cartridgeB) {
+
 			ret = cartridgeB->read(addr - 0x8000);
 			chip = "CHIP CARTB";
 			//a -= 0x8000;
 
 		} else {
+
 			ret = ramB->read(addr - 0x8000);
 			chip = "RAMB";
 			//a -= 0x8000;
@@ -89,7 +100,7 @@ unsigned char AddressSpace::read(const unsigned short addr) const {
 
 	} else {
 		ret = ram->read(addr);
-		chip = "RAMB";
+		chip = "RAM";
 	}
 
 	std::cout << chip << " READ: " << std::hex << a << " " << static_cast<unsigned short>(ret) << std::endl;
@@ -120,6 +131,8 @@ void AddressSpace::write(unsigned short addr, unsigned char val) {
 		gtia->write(addr - 0xD000, val);
 		chip = "CHIP GTIA";
 		//addr -= 0xd000;
+	} else if (addr >= 0xC000) {
+
 	} else if (addr >= 0xA000) {
 		cartridgeA->write(addr - 0xA000, val);
 		chip = "CHIP CARTA";

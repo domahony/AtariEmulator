@@ -24,6 +24,12 @@ public:
 	void tick();
 
 	bool IRQ() {
+
+		if (irq_trigger > 0) {
+			--irq_trigger;
+			return false;
+		}
+
 		unsigned char en = get_enabled_irq();
 		unsigned char set = get_irq();
 
@@ -129,6 +135,8 @@ private:
 
 	int recieve_idx;
 	unsigned char recieve;
+
+	int irq_trigger;
 
 };
 

@@ -41,6 +41,8 @@ public:
 		return pokey;
 	}
 
+	void dump_ram();
+
 private:
 
 	std::shared_ptr<RAM> ram;

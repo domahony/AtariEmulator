@@ -47,8 +47,12 @@ operator()(CPU* cpu) {
   P.N = t.7
   P.C = (A>=M) ? 1:0
   P.Z = (t==0) ? 1:0
-	 */
 
+	  t = X - M
+	  P.N = t.7
+	  P.C = (X>=M) ? 1:0
+	  P.Z = (t==0) ? 1:0
+	 */
 	unsigned char M = this->read(cpu);
 	unsigned char t = cpu->X - M;
 
