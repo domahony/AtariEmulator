@@ -5,6 +5,7 @@
  *      Author: domahony
  */
 
+#include "types.h"
 #include <iostream>
 #include "Video.h"
 #include <SDL.h>
@@ -15,7 +16,25 @@ namespace video {
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-Video::Video() {
+static GLuint
+init_vbo() {
+
+	GLuint b;
+	glGenBuffers(1, &b);
+
+	return b;
+}
+
+static GLuint
+init_vao() {
+
+	GLuint b;
+	glGenVertexArrays(1, &b);
+
+	return b;
+}
+
+Video::Video() : vbo(init_vbo()), vao(init_vao()), buffer_size(0) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -38,6 +57,14 @@ Video::Video() {
 
 	refresh_rate = mode.refresh_rate;
 	std::cout << "HZ: " << mode.refresh_rate << std::endl;
+}
+
+void Video::
+set_frame_buffer(int size, unsigned short* buf)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, size, buf);
 }
 
 Video::~Video() {

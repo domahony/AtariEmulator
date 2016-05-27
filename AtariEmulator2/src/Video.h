@@ -28,10 +28,16 @@ public:
 		return refresh_rate;
 	}
 
+	void set_frame_buffer(int, unsigned short*);
+
 private:
 	SDL_Window* gWindow;
 	SDL_GLContext gContext;
 	int refresh_rate;
+
+	GLuint vbo;
+	GLuint vao;
+	unsigned int buffer_size;
 };
 
 } /* namespace video */

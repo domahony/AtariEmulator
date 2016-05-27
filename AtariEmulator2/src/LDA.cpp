@@ -98,6 +98,6 @@ template class LDY<Immediate>;
 template class LDY<ZeroPage>;
 template class LDY<ZeroPageWithXIdx>;
 template class LDY<Absolute>;
-template class LDY<AbsoluteWithY>;
+template class LDY<AbsoluteWithX>;
 
 } /* namespace cpu */

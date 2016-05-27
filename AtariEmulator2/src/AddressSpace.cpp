@@ -11,17 +11,21 @@
 #include "RAM.h"
 #include "Pokey.h"
 
+namespace video {
+	class Video;
+}
+
 namespace address {
 
 using std::shared_ptr;
 
-AddressSpace::AddressSpace() :
+AddressSpace::AddressSpace(video::Video* v) :
 		os(new ROM("/home/domahony/Projects/atariROMs/new/REVBNTSC.ROM")),
 		cartridgeA(new ROM("/home/domahony/Projects/atariROMs/REVA.ROM")),
 		ram(new RAM(0xA000)),
 		ramB(new RAM(0x8000)),
 		pokey(new Pokey()),
-		antic(new ANTIC())
+		antic(new ANTIC(v))
 {
 
 
@@ -103,7 +107,7 @@ unsigned char AddressSpace::read(const unsigned short addr) const {
 		chip = "RAM";
 	}
 
-	std::cout << chip << " READ: " << std::hex << a << " " << static_cast<unsigned short>(ret) << std::endl;
+	//std::cout << chip << " READ: " << std::hex << a << " " << static_cast<unsigned short>(ret) << std::endl;
 	return ret;
 }
 
@@ -153,7 +157,7 @@ void AddressSpace::write(unsigned short addr, unsigned char val) {
 		ram->write(addr, val);
 		chip = "RAM";
 	}
-	std::cout << chip << " WRITE: " << std::hex << addr << " " << static_cast<unsigned short>(val) << std::endl;
+	//std::cout << chip << " WRITE: " << std::hex << addr << " " << static_cast<unsigned short>(val) << std::endl;
 }
 
 } /* namespace address */

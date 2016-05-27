@@ -11,13 +11,17 @@
 #include <iostream>
 #include <vector>
 
+namespace video {
+ class Video;
+}
+
 namespace address {
 
 class AddressSpace;
 
 class ANTIC {
 public:
-	ANTIC();
+	ANTIC(video::Video*);
 	virtual ~ANTIC();
 
 	unsigned char read(unsigned short addr) const;
@@ -27,6 +31,7 @@ public:
 	bool NMI();
 
 	void tick(AddressSpace*);
+
 
 private:
 	int vcount;
@@ -58,6 +63,10 @@ private:
 	bool vblank;
 
 	void do_dma(AddressSpace *);
+
+	void do_char(unsigned char, AddressSpace *, int, int, std::vector<unsigned short>&);
+
+	video::Video *video;
 
 };
 

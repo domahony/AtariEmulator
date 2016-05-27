@@ -16,7 +16,7 @@
 int main(int argc, char **argv)
 {
 	video::Video video;
-	cpu::CPU cpu(2 * 1000 * 1000 * 20, video.get_refresh_rate());
+	cpu::CPU cpu(2 * 1000 * 1000 * 20, video.get_refresh_rate(), &video);
 	bool quit = false;
 
 	LOG::init();
