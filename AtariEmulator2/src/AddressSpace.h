@@ -17,12 +17,16 @@
 #include "PIA.h"
 #include "ANTIC.h"
 
+namespace video {
+	class Video;
+}
+
 namespace address {
 
 class AddressSpace {
 
 public:
-	AddressSpace();
+	AddressSpace(video::Video*);
 
 	unsigned char read(const unsigned short) const;
 	void write(unsigned short, unsigned char);

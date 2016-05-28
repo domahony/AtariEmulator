@@ -11,13 +11,17 @@
 #include <iostream>
 #include <vector>
 
+namespace video {
+ class Video;
+}
+
 namespace address {
 
 class AddressSpace;
 
 class ANTIC {
 public:
-	ANTIC();
+	ANTIC(video::Video*);
 	virtual ~ANTIC();
 
 	unsigned char read(unsigned short addr) const;
@@ -28,16 +32,11 @@ public:
 
 	void tick(AddressSpace*);
 
+
 private:
 	int vcount;
 	int vcount_acc;
 	int tcount;
-
-	std::vector<unsigned char> r_reg;
-	std::vector<unsigned char> w_reg;
-
-	unsigned char nmi_trigger;
-	bool vblank;
 
 	enum Reg {
 		DMACTL = 0x00,
@@ -57,7 +56,17 @@ private:
 		NMIST  = 0x0F,
 	};
 
+	std::vector<unsigned char> r_reg;
+	std::vector<unsigned char> w_reg;
+
+	unsigned char nmi_trigger;
+	bool vblank;
+
 	void do_dma(AddressSpace *);
+
+	void do_char(unsigned char, AddressSpace *, int, int, std::vector<unsigned short>&);
+
+	video::Video *video;
 
 };
 

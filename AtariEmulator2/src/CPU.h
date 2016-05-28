@@ -14,11 +14,15 @@
 #include "AddressSpace.h"
 #include <vector>
 
+namespace video {
+	class Video;
+}
+
 namespace cpu {
 
 class CPU {
 public:
-	CPU(int hz, int refresh_rate);
+	CPU(int hz, int refresh_rate, video::Video*);
 	virtual ~CPU();
 
 	void breakpoint();
@@ -152,6 +156,18 @@ public:
 		return ACC;
 	}
 
+	unsigned char
+	getX()
+	{
+		return X;
+	}
+
+	unsigned char
+	getY()
+	{
+		return Y;
+	}
+
 	unsigned short
 	getPC() const
 	{
@@ -273,6 +289,8 @@ private:
 	friend class TXA;
 	friend class TXS;
 	friend class TYA;
+
+	friend std::string dbg_flags(const CPU*);
 };
 
 } /* namespace cpu */

@@ -5,7 +5,9 @@
  *      Author: domahony
  */
 
+#include "types.h"
 #include <iostream>
+#include <vector>
 #include "Video.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -15,7 +17,29 @@ namespace video {
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-Video::Video() {
+static GLuint
+init_vbo() {
+
+	GLuint b;
+	glGenBuffers(1, &b);
+	glBindBuffer(GL_ARRAY_BUFFER, b);
+
+	std::vector<unsigned char> buf(7680);
+	glBufferData(GL_ARRAY_BUFFER, buf.size(), &buf.front(), GL_DYNAMIC_DRAW);
+
+	return b;
+}
+
+static GLuint
+init_vao() {
+
+	GLuint b;
+	glGenVertexArrays(1, &b);
+
+	return b;
+}
+
+Video::Video() : buffer_size(0) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -31,6 +55,11 @@ Video::Video() {
 			SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
 	gContext =  SDL_GL_CreateContext( gWindow );
 
+	vbo = init_vbo();
+	/*
+	vao = init_vao();
+	*/
+
 	SDL_GL_SetSwapInterval( 1 );
 
 	SDL_DisplayMode mode;
@@ -38,6 +67,14 @@ Video::Video() {
 
 	refresh_rate = mode.refresh_rate;
 	std::cout << "HZ: " << mode.refresh_rate << std::endl;
+}
+
+void Video::
+set_frame_buffer(int size, unsigned short* buf)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, size, buf);
 }
 
 Video::~Video() {

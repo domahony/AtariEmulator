@@ -59,7 +59,7 @@ tick() {
 
 
 	if (!recieve_idx) {
-		recieve_idx = 16;
+		recieve_idx = 1024 * 10;
 	} else {
 		--recieve_idx;
 	}
@@ -67,7 +67,10 @@ tick() {
 	if (irqen.SIR) {
 
 		if (!recieve_idx) {
+
 			irqset.SIR = false;
+			reg[ReadReg::SERIN] = 0x45;
+
 		}
 	}
 
@@ -114,7 +117,6 @@ read(unsigned short addr) const
 		break;
 	case ReadReg::SERIN:
 		ret = reg[addr];
-		ret = 0;
 		break;
 	case ReadReg::IRQST:
 		ret = get_irq();
@@ -166,6 +168,9 @@ write(unsigned short addr, unsigned char val)
 		break;
 	case WriteReg::SKREST:
 		rname = "SKREST";
+		//reg[WriteReg::SKREST] |= 0xE0;
+		recieve_idx = 1024 * 10;
+		reg[ReadReg::SKSTAT] |= 0xE0;
 		break;
 	case WriteReg::POTGO:
 		rname = "POTGO";
@@ -185,7 +190,9 @@ write(unsigned short addr, unsigned char val)
 		break;
 	default:
 		rname = "UNDEFINED WRITE to REG!!";
-		break;
+		cout << "POKEY REG: " << rname << " " << hex << addr << " " << static_cast<unsigned short>(val) << endl;
+		return;
+		//break;
 	}
 
 	cout << "POKEY REG: " << rname << " " << hex << addr << " " << static_cast<unsigned short>(val) << endl;

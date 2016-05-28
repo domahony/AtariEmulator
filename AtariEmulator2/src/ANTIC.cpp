@@ -11,6 +11,7 @@
 
 namespace address {
 
+
 ANTIC::ANTIC(video::Video* v) : vcount(0), vcount_acc(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0), vblank(false), video(v)
 {
 	// TODO Auto-generated constructor stub

@@ -34,8 +34,30 @@ namespace cpu {
 
 using std::shared_ptr;
 
-CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate), clock(hz), op(255), wait(0),
-		address_space(), pokey(address_space.get_pokey()), antic(address_space.get_antic()) {
+std::string
+dbg_flags(const CPU* cpu) {
+
+	std::stringstream ret;
+
+	ret << std::hex
+			<< " " << cpu->N
+			<< " " << cpu->V
+			<< " -"
+			<< " " << cpu->B
+			<< " " << cpu->D
+			<< " " << cpu->I
+			<< " " << cpu->Z
+			<< " " << cpu->C
+			<< " " << static_cast<unsigned short>(cpu->ACC)
+			<< " " << static_cast<unsigned short>(cpu->X)
+			<< " " << static_cast<unsigned short>(cpu->Y);
+
+	return ret.str();
+
+}
+
+CPU::CPU(int hz, int refresh_rate, video::Video* video) : acc(0), hz(hz), refresh_rate(refresh_rate), clock(hz), op(255), wait(0),
+		address_space(video), pokey(address_space.get_pokey()), antic(address_space.get_antic()) {
 
 	unsigned char low = read(0xFFFc);
 	unsigned char high = read(0xFFFc + 1);
@@ -151,7 +173,7 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 	op[0xA4] = new LDY<ZeroPage>();
 	op[0xB4] = new LDY<ZeroPageWithXIdx>();
 	op[0xAC] = new LDY<Absolute>();
-	op[0xBC] = new LDY<AbsoluteWithY>();
+	op[0xBC] = new LDY<AbsoluteWithX>();
 
 	op[0x4A] = new LSR<Accumulator>();
 	op[0x46] = new LSR<ZeroPage>();
@@ -192,7 +214,7 @@ CPU::CPU(int hz, int refresh_rate) : acc(0), hz(hz), refresh_rate(refresh_rate),
 
 	op[0xE9] = new SBC<Immediate>();
 	op[0xE5] = new SBC<ZeroPage>();
-	op[0x75] = new SBC<ZeroPageWithXIdx>();
+	op[0xF5] = new SBC<ZeroPageWithXIdx>();
 	op[0xED] = new SBC<Absolute>();
 	op[0xFD] = new SBC<AbsoluteWithX>();
 	op[0xF9] = new SBC<AbsoluteWithY>();
@@ -295,7 +317,21 @@ _execute()
 	//if (pc == 0xf1e4) {
 	//if (pc == 0xf1fc) {
 	//if (pc == 0xec8a || pc == 0xea90 || pc == 0xeaa2) { //at 0xeaa2, the first LDA CHKSNT should not cause a branch!!
-	if (pc == 0xea74 || pc == 0xea7f || pc == 0xeac6 || pc == 0xea90 || pc == 0xeacf) { //at 0xeaca, the first LDA CHKSNT should not cause a branch!!
+	//if (pc == 0xea74 || pc == 0xea7f || pc == 0xeac6 || pc == 0xea90 || pc == 0xeacf) { //at 0xeaca, the first LDA CHKSNT should not cause a branch!!
+	//if (pc == 0xea1a) { // WAIT
+	//if (pc == 0xeb0f) { // ISRSIR
+	//if (pc == 0xec1b) { // RECVEN
+	//if (pc == 0xe9bf) { // BADCOM label: except 7 retries?
+	//if (pc == 0xf20f) { // JMP (CARTCS)
+	if (pc == 0xa8a1) { // JMP (CARTCS)
+
+		/*
+		IN THE WAIT: routine, everything looks good upto the RECVEN: routine.
+		Need to ensure the interrupt writes an appropriate byte (NAK I think??)
+		Seems to correctly read SERIN from POKEY, however, another interrupt is pending immediately after
+		perhaps the ISRISN interrupt fires too fast?
+		*/
+
 		// 4 databytes are set at 0x23a,0x23b,0x23c,0x23d
 		//CDEVIC
 		//CCOMND
@@ -318,8 +354,12 @@ _execute()
 
 	OpCode *o = op[opcode];
 
+	if (!o) {
+		std::cout << "XXXX " << std::hex << static_cast<unsigned short>(opcode) << " " << std::endl;
+	}
+
 	ret += (*o)(this);
-	std::cout << pc << " " << o->to_string(this) << std::endl;
+	//std::cout << pc << " " << o->to_string(this) << " " << dbg_flags(this) << std::endl;
 
 
 	return ret;
