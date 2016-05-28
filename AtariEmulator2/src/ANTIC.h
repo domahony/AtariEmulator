@@ -33,6 +33,12 @@ private:
 	int vcount_acc;
 	int tcount;
 
+	std::vector<unsigned char> r_reg;
+	std::vector<unsigned char> w_reg;
+
+	unsigned char nmi_trigger;
+	bool vblank;
+
 	enum Reg {
 		DMACTL = 0x00,
 		CHACTL = 0x01,
@@ -50,12 +56,6 @@ private:
 		NMIRES = 0x0F,
 		NMIST  = 0x0F,
 	};
-
-	std::vector<unsigned char> r_reg;
-	std::vector<unsigned char> w_reg;
-
-	unsigned char nmi_trigger;
-	bool vblank;
 
 	void do_dma(AddressSpace *);
 

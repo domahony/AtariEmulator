@@ -10,7 +10,7 @@
 
 namespace address {
 
-ANTIC::ANTIC() : vcount(0), vcount_acc(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0), vblank(false)
+ANTIC::ANTIC() : vcount(0), vcount_acc(0), tcount(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0), vblank(false)
 {
 	// TODO Auto-generated constructor stub
 
