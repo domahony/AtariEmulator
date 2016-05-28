@@ -21,6 +21,10 @@ init_vbo() {
 
 	GLuint b;
 	glGenBuffers(1, &b);
+	glBindBuffer(GL_ARRAY_BUFFER, b);
+
+	std::vector<unsigned char> buf(7680);
+	glBufferData(GL_ARRAY_BUFFER, buf.size(), &buf.front(), GL_DYNAMIC_DRAW);
 
 	return b;
 }
@@ -34,7 +38,7 @@ init_vao() {
 	return b;
 }
 
-Video::Video() : vbo(init_vbo()), vao(init_vao()), buffer_size(0) {
+Video::Video() : buffer_size(0) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -49,6 +53,9 @@ Video::Video() : vbo(init_vbo()), vao(init_vao()), buffer_size(0) {
 			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
 	gContext =  SDL_GL_CreateContext( gWindow );
+
+	vbo = init_vbo();
+	vao = init_vao();
 
 	SDL_GL_SetSwapInterval( 1 );
 
