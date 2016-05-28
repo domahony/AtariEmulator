@@ -7,10 +7,11 @@
 
 #include "ANTIC.h"
 #include "AddressSpace.h"
+#include "Video.h"
 
 namespace address {
 
-ANTIC::ANTIC() : vcount(0), vcount_acc(0), tcount(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0), vblank(false)
+ANTIC::ANTIC(video::Video* v) : vcount(0), vcount_acc(0), r_reg(16, 0), w_reg(16, 0), nmi_trigger(0), vblank(false), video(v)
 {
 	// TODO Auto-generated constructor stub
 
@@ -124,14 +125,24 @@ do_dma(AddressSpace* as)
 			bool hscroll = (val >> 4) & 0x1;
 			bool vscroll = (val >> 5) & 0x1;
 
+			std::cout << "SCREEN MODE: " << std::hex << mode;
+
 			if ((val >> 6) & 0x1) {
 
 				unsigned char l = as->read(++addr);
 				unsigned char h = as->read(++addr);
 				mem_pc = (h << 8) | l;
+				std::cout << " LMS: " << std::hex
+						<< static_cast<unsigned short>(l) << " "
+						<< static_cast<unsigned short>(h) << " "
+						<< mem_pc << std::endl;
+				++addr;
 
 			} else {
+
+				std::cout << std::endl;
 				++addr;
+
 			}
 
 			std::vector<unsigned short> line;
@@ -144,21 +155,66 @@ do_dma(AddressSpace* as)
 			screen.push_back(line);
 		}
 
+
 		if (wait_for_vblank) {
 			break;
 		}
 
 	}
 
-	return;
+	std::vector<unsigned short> buf;
+	//return;
+	std::cout << "SCREEN BEGIN" << std::endl;
+	int y = 0;
 	for (auto i = screen.begin(); i != screen.end(); ++i) {
 
+		int x = 0;
 		for (auto j = i->begin(); j != i->end(); ++j) {
-			std::cout << *j << " ";
+
+			std::cout << std::hex << *j << " ";
+			if (*j) {
+				do_char(*j, as, x, y, buf);
+			}
+
+			x += 8;
+		}
+		std::cout << std::endl;
+		y += 8;
+	}
+
+	video->set_frame_buffer(buf.size(), &buf[0]);
+
+	std::cout << "SCREEN END" << std::endl;
+
+}
+
+void ANTIC::
+do_char(unsigned char c, AddressSpace* as, int x, int y, std::vector<unsigned short>& buf)
+{
+	unsigned short chbase = (w_reg[Reg::CHBASE] << 8);
+	chbase += (c * 8);
+
+	std::cout << std::hex << "Char Base: " << chbase << std::endl;
+
+	for (unsigned short i = 0; i < 8; i++) {
+
+		auto line = as->read(chbase + i);
+
+		for (int j = 0; j < 8; j++) {
+			std::cout << ((line & 0x80) ? "X" : " ");
+
+			if (line & 0x80) {
+				buf.push_back(x + j);
+				buf.push_back(y + i);
+				buf.push_back(0xFF);
+				buf.push_back(0xFF);
+				buf.push_back(0xFF);
+			}
+
+			line = line << 1;
 		}
 		std::cout << std::endl;
 	}
-
 }
 
 ANTIC::~ANTIC() {
@@ -244,7 +300,8 @@ write(unsigned short addr, unsigned char val)
 		break;
 	case Reg::NMIRES :
 		std::cout << "ANTIC Writing NMIRES " << std::hex << static_cast<unsigned short>(val) << std::endl;
-		r_reg[Reg::NMIST] &= val;
+		//r_reg[Reg::NMIST] &= val;
+		r_reg[Reg::NMIST] = 0;
 		break;
 	default:
 		;
