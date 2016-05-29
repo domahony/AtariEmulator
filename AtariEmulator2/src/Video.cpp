@@ -25,7 +25,6 @@ init_vbo(std::vector<GLshort>& buf) {
 	glBindBuffer(GL_ARRAY_BUFFER, b);
 
 	/*
-	/*
 	buf.push_back(0);
 	buf.push_back(0);
 	buf.push_back(10);
@@ -38,7 +37,6 @@ init_vbo(std::vector<GLshort>& buf) {
 	glVertexPointer(2, GL_SHORT, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	*/
 
 	return b;
 }
