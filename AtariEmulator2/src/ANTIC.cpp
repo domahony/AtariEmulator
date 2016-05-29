@@ -164,17 +164,18 @@ do_dma(AddressSpace* as)
 	}
 
 	std::vector<unsigned short> buf;
+	int npixels = 0;
 	//return;
 	std::cout << "SCREEN BEGIN" << std::endl;
 	int y = 0;
+	int x = 0;
 	for (auto i = screen.begin(); i != screen.end(); ++i) {
 
-		int x = 0;
 		for (auto j = i->begin(); j != i->end(); ++j) {
 
 			std::cout << std::hex << *j << " ";
 			if (*j) {
-				do_char(*j, as, x, y, buf);
+				do_char(*j, as, x, y, buf, npixels);
 			}
 
 			x += 8;
@@ -190,12 +191,13 @@ do_dma(AddressSpace* as)
 }
 
 void ANTIC::
-do_char(unsigned char c, AddressSpace* as, int x, int y, std::vector<unsigned short>& buf)
+do_char(unsigned char c, AddressSpace* as, int x, int y, std::vector<unsigned short>& buf, int& npixels)
 {
 	unsigned short chbase = (w_reg[Reg::CHBASE] << 8);
 	chbase += (c * 8);
 
 	std::cout << std::hex << "Char Base: " << chbase << std::endl;
+	std::cout << std::dec << "Starting Char at X: " << x << std::endl;
 
 	for (unsigned short i = 0; i < 8; i++) {
 
@@ -207,9 +209,9 @@ do_char(unsigned char c, AddressSpace* as, int x, int y, std::vector<unsigned sh
 			if (line & 0x80) {
 				buf.push_back(x + j);
 				buf.push_back(y + i);
-				buf.push_back(0xFF);
-				buf.push_back(0xFF);
-				buf.push_back(0xFF);
+				//buf.push_back(0xFF);
+				//buf.push_back(0xFF);
+				//buf.push_back(0xFF);
 			}
 
 			line = line << 1;

@@ -10,6 +10,7 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <vector>
 
 namespace video {
 
@@ -34,6 +35,8 @@ private:
 	SDL_Window* gWindow;
 	SDL_GLContext gContext;
 	int refresh_rate;
+
+	std::vector<GLshort> buf;
 
 	GLuint vbo;
 	GLuint vao;
