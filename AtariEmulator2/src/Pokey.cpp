@@ -190,7 +190,9 @@ write(unsigned short addr, unsigned char val)
 		break;
 	default:
 		rname = "UNDEFINED WRITE to REG!!";
-		break;
+		cout << "POKEY REG: " << rname << " " << hex << addr << " " << static_cast<unsigned short>(val) << endl;
+		return;
+		//break;
 	}
 
 	cout << "POKEY REG: " << rname << " " << hex << addr << " " << static_cast<unsigned short>(val) << endl;

@@ -10,6 +10,7 @@
 
 #define GL_GLEXT_PROTOTYPES 1
 #define GL3_PROTOTYPES 1
-#include <GL/gl.h>
+#include <SDL_opengl.h>
+//#include <GL/gl.h>
 
 #endif /* TYPES_H_ */

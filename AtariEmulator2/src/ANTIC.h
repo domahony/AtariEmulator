@@ -64,7 +64,7 @@ private:
 
 	void do_dma(AddressSpace *);
 
-	void do_char(unsigned char, AddressSpace *, int, int, std::vector<unsigned short>&);
+	void do_char(unsigned char, AddressSpace *, int, int, std::vector<unsigned short>&, int&);
 
 	video::Video *video;
 
