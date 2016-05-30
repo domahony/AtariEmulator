@@ -168,9 +168,9 @@ do_dma(AddressSpace* as)
 	//return;
 	std::cout << "SCREEN BEGIN" << std::endl;
 	int y = 0;
-	int x = 0;
 	for (auto i = screen.begin(); i != screen.end(); ++i) {
 
+		int x = 0;
 		for (auto j = i->begin(); j != i->end(); ++j) {
 
 			std::cout << std::hex << *j << " ";
