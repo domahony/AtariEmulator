@@ -105,6 +105,8 @@ do_dma(AddressSpace* as)
 		bool wait_for_vblank = false;
 		unsigned char data = 0x0;
 
+		std::cout << "DL VAL: " << std::hex << static_cast<unsigned short>(val) << std::endl;
+
 		if ((val & 0xF) == 0) {
 
 			// blank
@@ -171,6 +173,7 @@ do_dma(AddressSpace* as)
 	for (auto i = screen.begin(); i != screen.end(); ++i) {
 
 		int x = 0;
+		std::cout << std::dec << y << ": ";
 		for (auto j = i->begin(); j != i->end(); ++j) {
 
 			std::cout << std::hex << *j << " ";
