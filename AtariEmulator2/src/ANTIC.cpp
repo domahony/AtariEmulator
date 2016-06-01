@@ -93,12 +93,13 @@ do_dma(AddressSpace* as)
 
 	std::cout << "Display List ADDR: " << addr << std::endl;
 
-	std::vector<std::vector<unsigned short>> screen;
+	std::vector<std::vector<unsigned char>> screen;
 
 	unsigned short mem_pc;
 
 	//need some way to break out of this loop
 
+	int lineno = 0;
 	while (true) {
 
 		unsigned char val = as->read(addr);
@@ -148,11 +149,15 @@ do_dma(AddressSpace* as)
 
 			}
 
-			std::vector<unsigned short> line;
+			std::vector<unsigned char> line;
 
-			unsigned short buf[40];
+			std::cout << "LINE NO: " << std::dec << lineno++ << std::endl;
 			for (int i = 0; i < 40; i++) {
-				line.push_back(as->read(mem_pc++));
+				std::cout << "LINE MEM: " << std::hex << mem_pc;
+				auto data = as->read(mem_pc++);
+				std::cout << " " << std::hex << static_cast<unsigned short>(data) << std::endl;
+
+				line.push_back(data);
 			}
 
 			screen.push_back(line);
@@ -176,7 +181,7 @@ do_dma(AddressSpace* as)
 		std::cout << std::dec << y << ": ";
 		for (auto j = i->begin(); j != i->end(); ++j) {
 
-			std::cout << std::hex << *j << " ";
+			std::cout << std::hex << static_cast<unsigned short>(*j) << " ";
 			if (*j) {
 				do_char(*j, as, x, y, buf, npixels);
 			}

@@ -85,6 +85,7 @@ Video::Video() : buffer_size(0), vao(0), buf(640 * 480) {
 void Video::
 set_frame_buffer(int size, unsigned short* buf)
 {
+	glClear( GL_COLOR_BUFFER_BIT );
 	//glColor3b(0xff, 0, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
