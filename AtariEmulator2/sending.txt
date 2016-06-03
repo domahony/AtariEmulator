@@ -1,0 +1,43 @@
+
+BOOT
+Set up STATUS command (STATC) 
+DSKINV (vector through e453)
+DSKIF 
+Set up serial bus stuff for the disk drive, 
+Check for STATC; write to buffers
+SIOV (vector through e459)
+SIO
+Prep for sending a command frame
+SENDIN
+
+SEND: Serial bus send routine
+1.) Enables sending in Pokey (SENDEN routine)
+2.) Clears the XMTDON flag
+3.) Puts the first byte (BUFRLO) in SEROUT
+4.) Initializes CHKSUM with the first byte
+5.) Spins on NOTDON loop checking BRKKEY and XMTDON memory locations
+
+SENDEN: Enable Sending
+1.) Set SKCTL to 0000 0111 (0x7) 
+2.) A = POKMSK & 1100 0111 (mask off bits 3,4,5 from IRQEN/POKMSK)
+3.) A |= 0001 0000 (set bit 4,  Output Data Needed Interrupt (ODN))
+4.) Write to POKMSK and IRQEN 
+5.) Write 0010 1000 to AUDCTL (set ch3/ch4 to 1.79mhz; set speed of shift reg?)
+6.) Store other values to AUDC1, 2, 3)
+
+ISRODN: Output Data Needed Interrupt
+Triggered by Pokey when the byte has been shifted out
+1.) Increment BUFRLO
+2.) Check if passed the end of the buffer or not
+3.) Not Passed the End
+3a.) Write (BUFRLO) to SEROUT 
+3b.) Add (BUFRLO) to CHKSUM
+3c.) Return from Interrupt (RTI)
+4.) Passed the End
+4a.) If the checksum hasn't been sent, then write CHKSUM to SEROUT 
+4b.) Return from Interrupt (RTI)
+Otherwise, 
+4c.) Set POKMSK and IRQEN to POKMSK |= 0000 1000 (set bit 3) 
+4d.) Return from Interrupt (RTI)
+
+

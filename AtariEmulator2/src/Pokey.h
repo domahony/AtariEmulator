@@ -9,6 +9,7 @@
 #define POKEY_H_
 
 #include <vector>
+#include <iostream>
 
 namespace address {
 
@@ -22,21 +23,6 @@ public:
 	void write(unsigned short addr, unsigned char val);
 
 	void tick();
-
-	bool IRQ() {
-
-		if (irq_trigger > 0) {
-			--irq_trigger;
-			return false;
-		}
-
-		unsigned char en = get_enabled_irq();
-		unsigned char set = get_irq();
-
-		bool ret = en & (~set);
-
-		return ret;
-	}
 
 	enum ReadReg {
 		POT0=	0x00,
@@ -114,6 +100,57 @@ public:
 		MODE_CTRL2		= 6,
 		FORCE_BREAK		= 7,
 	};
+	bool IRQ() {
+
+		if (irq_trigger > 0) {
+			--irq_trigger;
+			return false;
+		}
+
+		unsigned char en = get_enabled_irq();
+		unsigned char set = get_irq();
+
+		bool ret = en & (~set);
+
+		for (auto i = 0; i < 8; i++) {
+
+			if (1 << i & (en & (~set))) {
+
+				switch (i) {
+				case IRQ_T::BREAK:
+					std::cout << "POKEY IRQ BREAK" << std::endl;
+					break;
+				case IRQ_T::K:
+					std::cout << "POKEY IRQ K" << std::endl;
+					break;
+				case IRQ_T::ODN:
+					std::cout << "POKEY IRQ ODN" << std::endl;
+					break;
+				case IRQ_T::SIR:
+					std::cout << "POKEY IRQ SIR" << std::endl;
+					break;
+				case IRQ_T::T1:
+					std::cout << "POKEY IRQ T1" << std::endl;
+					break;
+				case IRQ_T::T2:
+					std::cout << "POKEY IRQ T2" << std::endl;
+					break;
+				case IRQ_T::T4:
+					std::cout << "POKEY IRQ T4" << std::endl;
+					break;
+				case IRQ_T::XD:
+					std::cout << "POKEY IRQ XD" << std::endl;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		return ret;
+
+	}
+
 
 private:
 	void enable_irq(unsigned char);
