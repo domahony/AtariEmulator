@@ -271,28 +271,28 @@ enable_irq(unsigned char val)
 	for (int i = 0; i < 8; i++) {
 		switch (i) {
 		case IRQ_T::BREAK:
-			cout << "IRQEN BREAK: " << irqen.BREAK << endl;
+			cout << "POKEY IRQEN BREAK: " << irqen.BREAK << endl;
 			break;
 		case IRQ_T::K:
-			cout << "IRQEN K: " << irqen.K << endl;
+			cout << "POKEY IRQEN K: " << irqen.K << endl;
 			break;
 		case IRQ_T::ODN:
-			cout << "IRQEN ODN: " << irqen.ODN << endl;
+			cout << "POKEY IRQEN ODN: " << irqen.ODN << endl;
 			break;
 		case IRQ_T::SIR:
-			cout << "IRQEN SIR: " << irqen.SIR << endl;
+			cout << "POKEY IRQEN SIR: " << irqen.SIR << endl;
 			break;
 		case IRQ_T::T1:
-			cout << "IRQEN T1: " << irqen.T1 << endl;
+			cout << "POKEY IRQEN T1: " << irqen.T1 << endl;
 			break;
 		case IRQ_T::T2:
-			cout << "IRQEN T2: " << irqen.T2 << endl;
+			cout << "POKEY IRQEN T2: " << irqen.T2 << endl;
 			break;
 		case IRQ_T::T4:
-			cout << "IRQEN T4: " << irqen.T4 << endl;
+			cout << "POKEY IRQEN T4: " << irqen.T4 << endl;
 			break;
 		case IRQ_T::XD:
-			cout << "IRQEN XD: " << irqen.XD << endl;
+			cout << "POKEY IRQEN XD: " << irqen.XD << endl;
 			break;
 		}
 	}

@@ -57,7 +57,7 @@ dbg_flags(const CPU* cpu) {
 }
 
 CPU::CPU(int hz, int refresh_rate, video::Video* video) : acc(0), hz(hz), refresh_rate(refresh_rate), clock(hz), op(255), wait(0),
-		address_space(video), pokey(address_space.get_pokey()), antic(address_space.get_antic()) {
+		address_space(video), pokey(address_space.get_pokey()), antic(address_space.get_antic()), tick_count(0) {
 
 	unsigned char low = read(0xFFFc);
 	unsigned char high = read(0xFFFc + 1);
@@ -358,8 +358,9 @@ _execute()
 		std::cout << "XXXX " << std::hex << static_cast<unsigned short>(opcode) << " " << std::endl;
 	}
 
+	std::cout << std::hex << pc << " " << o->to_string(this) << " " << dbg_flags(this)
+			<< " " << std::dec << tick_count << std::endl;
 	ret += (*o)(this);
-	//std::cout << pc << " " << o->to_string(this) << " " << dbg_flags(this) << std::endl;
 
 
 	return ret;
@@ -381,6 +382,7 @@ execute()
 		acc += refresh_rate;
 
 		if (clock.tick()) { // not sure what this doing?
+			tick_count++;
 			if (--wait <= 0) {
 				wait = _execute();
 			}
