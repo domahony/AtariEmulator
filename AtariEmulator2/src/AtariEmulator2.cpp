@@ -34,9 +34,9 @@ int main(int argc, char **argv)
 			}
 		}
 
-		std::cout << std::fixed << "Ticks Per Second: " << cpu.ticks_per_second() << std::endl;
+		//std::cout << std::fixed << "Ticks Per Second: " << cpu.ticks_per_second() << std::endl;
 		//video.swapWindow();
 	}
 
-	std::cout << std::fixed << "Ticks Per Second: " << cpu.ticks_per_second() << std::endl;
+	//std::cout << std::fixed << "Ticks Per Second: " << cpu.ticks_per_second() << std::endl;
 }
