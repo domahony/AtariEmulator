@@ -223,6 +223,8 @@ private:
 	unsigned char Y;
 	bool N,V,B,D,I,Z,C;
 
+	unsigned long tick_count;
+
 	std::vector<OpCode*> op;
 
 	address::AddressSpace address_space;

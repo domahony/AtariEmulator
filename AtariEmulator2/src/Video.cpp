@@ -63,7 +63,7 @@ Video::Video() : buffer_size(0), vao(0), buf(640 * 480) {
 	//Create window
 	gWindow = SDL_CreateWindow( "SDL Tutorial",
 			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-			SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+			SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | /*SDL_WINDOW_SHOWN*/ SDL_WINDOW_HIDDEN );
 	gContext =  SDL_GL_CreateContext( gWindow );
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
