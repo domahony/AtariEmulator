@@ -43,7 +43,7 @@ dbg_flags(const CPU* cpu) {
 			<< " " << cpu->N
 			<< " " << cpu->V
 			<< " -"
-			<< " " << cpu->B
+			//<< " " << cpu->B
 			<< " " << cpu->D
 			<< " " << cpu->I
 			<< " " << cpu->Z
