@@ -323,7 +323,8 @@ _execute()
 	//if (pc == 0xec1b) { // RECVEN
 	//if (pc == 0xe9bf) { // BADCOM label: except 7 retries?
 	//if (pc == 0xf20f) { // JMP (CARTCS)
-	if (pc == 0xa8a1) { // JMP (CARTCS)
+	//if (pc == 0xa8a1) { // JMP (CARTCS)
+	if (pc == 0xf2c5) { // JMP (CARTCS)
 
 		/*
 		IN THE WAIT: routine, everything looks good upto the RECVEN: routine.
