@@ -25,6 +25,8 @@ public:
 		SDL_GL_SwapWindow(gWindow);
 	}
 
+	void resize(int x, int y);
+
 	int get_refresh_rate() const {
 		return refresh_rate;
 	}
@@ -41,6 +43,8 @@ private:
 	GLuint vbo;
 	GLuint vao;
 	unsigned int buffer_size;
+	int size_x;
+	int size_y;
 };
 
 } /* namespace video */
