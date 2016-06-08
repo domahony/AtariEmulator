@@ -113,33 +113,6 @@ set_frame_buffer(int size, unsigned short* buf)
 	//glScalef(1.f/(size_x/2.f), -1.f/(size_y/2.f), 1);
 	glDrawArrays(GL_POINTS, 0, size);
 
-
-	/*
-	glBegin(GL_POINTS);
-		glColor3f(1,1,1);
-		glVertex2f(630, 470);
-		glColor3f(1,0,0);
-		glVertex2f(1, 1);
-	glEnd();
-	*/
-
-	/*
-	glBegin(GL_POINTS);
-	glColor3f(1,1,1);
-	glVertex2f(.5, .5);
-	glColor3f(0,1,1);
-	glVertex2f(.1, .1);
-	glColor3f(1,0,0);
-	glVertex2f(.9, .1);
-	glVertex2f(.99, .1);
-	glVertex2f(.99, .5);
-	glVertex2f(.99, .8);
-	glColor3f(0,1,0);
-	glVertex2f(.99, -.8);
-	glEnd();
-	*/
-	//glFlush();
-
 	SDL_GL_SwapWindow(gWindow);
 
 	/*
