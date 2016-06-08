@@ -109,8 +109,8 @@ set_frame_buffer(int size, unsigned short* buf)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(-1, 1, 0);
-	//glScalef(1.f/320, -1.f/240, 1);
-	glScalef(1.f/(size_x/2.f), -1.f/(size_y/2.f), 1);
+	glScalef(1.f/320, -1.f/240, 1);
+	//glScalef(1.f/(size_x/2.f), -1.f/(size_y/2.f), 1);
 	glDrawArrays(GL_POINTS, 0, size);
 
 

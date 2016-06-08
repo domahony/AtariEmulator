@@ -28,9 +28,15 @@ int main(int argc, char **argv)
 		SDL_Event e;
 		while( SDL_PollEvent( &e ) != 0 )
 		{
-			if( e.type == SDL_QUIT )
-			{
+
+			switch (e.type) {
+			case SDL_QUIT:
 				quit = true;
+				break;
+			case SDL_WINDOWEVENT:
+				if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+					video.resize(e.window.data1, e.window.data2);
+				break;
 			}
 		}
 
