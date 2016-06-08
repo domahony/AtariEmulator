@@ -14,8 +14,8 @@
 
 namespace video {
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 800; //640;
+const int SCREEN_HEIGHT = 600; //480;
 
 static GLuint
 init_vbo(std::vector<GLshort>& buf) {
@@ -50,7 +50,7 @@ init_vao() {
 	return b;
 }
 
-Video::Video() : buffer_size(0), vao(0), buf(640 * 480) {
+Video::Video() : buffer_size(0), vao(0), buf(640 * 480), size_x(SCREEN_WIDTH), size_y(SCREEN_HEIGHT) {
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -63,10 +63,14 @@ Video::Video() : buffer_size(0), vao(0), buf(640 * 480) {
 	//Create window
 	gWindow = SDL_CreateWindow( "SDL Tutorial",
 			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-			SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | /**/SDL_WINDOW_SHOWN/**/ /*SDL_WINDOW_HIDDEN*/ );
+			SCREEN_WIDTH, SCREEN_HEIGHT,
+			SDL_WINDOW_OPENGL
+				| /**/SDL_WINDOW_SHOWN/**/ /*SDL_WINDOW_HIDDEN*/
+				| SDL_WINDOW_RESIZABLE);
+
 	gContext =  SDL_GL_CreateContext( gWindow );
 
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glViewport(0, 0, size_x, size_y);
 
 	vbo = init_vbo(buf);
 	/*
@@ -83,6 +87,15 @@ Video::Video() : buffer_size(0), vao(0), buf(640 * 480) {
 }
 
 void Video::
+resize(int x, int y)
+{
+	size_x = x;
+	size_y = y;
+
+	glViewport(0, 0, size_x, size_y);
+}
+
+void Video::
 set_frame_buffer(int size, unsigned short* buf)
 {
 	glClear( GL_COLOR_BUFFER_BIT );
@@ -96,7 +109,8 @@ set_frame_buffer(int size, unsigned short* buf)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(-1, 1, 0);
-	glScalef(1.f/320, -1.f/240, 1);
+	//glScalef(1.f/320, -1.f/240, 1);
+	glScalef(1.f/(size_x/2.f), -1.f/(size_y/2.f), 1);
 	glDrawArrays(GL_POINTS, 0, size);
 
 
