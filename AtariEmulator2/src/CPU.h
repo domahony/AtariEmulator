@@ -174,6 +174,18 @@ public:
 		return PC;
 	}
 
+	unsigned short
+	getSP() const
+	{
+		return SP;
+	}
+
+	unsigned char
+	getFlags() const
+	{
+		return get_flags();
+	}
+
 	void
 	setPC(unsigned short val)
 	{

@@ -101,7 +101,8 @@ am_ae_OBJECTS = AtariEmulator2.$(OBJEXT) Video.$(OBJEXT) CPU.$(OBJEXT) \
 	EOR.$(OBJEXT) INC.$(OBJEXT) JMP.$(OBJEXT) LDA.$(OBJEXT) \
 	Shift.$(OBJEXT) NOP.$(OBJEXT) ORA.$(OBJEXT) PHA.$(OBJEXT) \
 	RTI.$(OBJEXT) RTS.$(OBJEXT) SBC.$(OBJEXT) STA.$(OBJEXT) \
-	Transfer.$(OBJEXT) ANTIC.$(OBJEXT) Logging.$(OBJEXT)
+	Transfer.$(OBJEXT) ANTIC.$(OBJEXT) Logging.$(OBJEXT) \
+	Debugger.$(OBJEXT) DBGCommand.$(OBJEXT) BreakPoint.$(OBJEXT)
 ae_OBJECTS = $(am_ae_OBJECTS)
 am__DEPENDENCIES_1 =
 ae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -163,17 +164,17 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing aclocal-1.14
+ACLOCAL = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing autoconf
-AUTOHEADER = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing autoheader
-AUTOMAKE = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing automake-1.14
+AUTOCONF = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing autoconf
+AUTOHEADER = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing autoheader
+AUTOMAKE = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing automake-1.14
 AWK = gawk
 CPPFLAGS = 
-CXX = g++
+CXX = g++-4.9
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -ggdb3
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"AtariEmulator2\" -DPACKAGE_TARNAME=\"atariemulator2\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"AtariEmulator2\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"atariemulator2\" -DVERSION=\"1.0\"
 DEPDIR = .deps
@@ -191,7 +192,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/missing makeinfo
+MAKEINFO = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = atariemulator2
@@ -202,17 +203,17 @@ PACKAGE_TARNAME = atariemulator2
 PACKAGE_URL = 
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
-SDL_CFLAGS = -I/usr/local/include/SDL2 -D_REENTRANT
-SDL_LDFLAGS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lSDL2
+SDL_CFLAGS = -I/usr/include/SDL2 -D_REENTRANT
+SDL_LDFLAGS = -L/usr/lib/x86_64-linux-gnu -lSDL2
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = 
 VERSION = 1.0
-abs_builddir = /home/domahony/git/AtariEmulator2/AtariEmulator2/src
-abs_srcdir = /home/domahony/git/AtariEmulator2/AtariEmulator2/src
-abs_top_builddir = /home/domahony/git/AtariEmulator2/AtariEmulator2
-abs_top_srcdir = /home/domahony/git/AtariEmulator2/AtariEmulator2
-ac_ct_CXX = g++
+abs_builddir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/src
+abs_srcdir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/src
+abs_top_builddir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2
+abs_top_srcdir = /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2
+ac_ct_CXX = 
 am__include = include
 am__leading_dot = .
 am__quote = 
@@ -238,7 +239,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/domahony/git/AtariEmulator2/AtariEmulator2/install-sh
+install_sh = ${SHELL} /DATA1/users/domahony/git/AtariEmulator/AtariEmulator2/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -265,7 +266,7 @@ top_srcdir = ..
 AM_CXXFLAGS = -std=c++11 $(SDL_CFLAGS)
 ae_SOURCES = AtariEmulator2.cpp Video.cpp CPU.cpp Clock.cpp Clock2.cpp ADC.cpp OpCode.cpp CMP.cpp AND.cpp AddressSpace.cpp \
 ROM.cc RAM.cpp Pokey.cpp PIA.cpp ASL.cpp Branch.cpp BIT.cpp BRK.cpp SetFlags.cpp DEC.cpp EOR.cpp INC.cpp JMP.cpp LDA.cpp \
-Shift.cpp NOP.cpp ORA.cpp PHA.cpp RTI.cpp RTS.cpp SBC.cpp STA.cpp Transfer.cpp ANTIC.cpp Logging.cpp
+Shift.cpp NOP.cpp ORA.cpp PHA.cpp RTI.cpp RTS.cpp SBC.cpp STA.cpp Transfer.cpp ANTIC.cpp Logging.cpp Debugger.cpp DBGCommand.cpp BreakPoint.cpp
 
 ae_LDFLAGS = $(SDL_LDFLAGS) $(GL_LDFLAGS) -lboost_system -lpthread -lboost_log -lboost_thread
 ae_LDADD = $(SDL_LDFLAGS) $(GL_LDFLAGS) -lboost_system -lpthread -lboost_log -lboost_thread
@@ -365,11 +366,14 @@ include ./$(DEPDIR)/AtariEmulator2.Po
 include ./$(DEPDIR)/BIT.Po
 include ./$(DEPDIR)/BRK.Po
 include ./$(DEPDIR)/Branch.Po
+include ./$(DEPDIR)/BreakPoint.Po
 include ./$(DEPDIR)/CMP.Po
 include ./$(DEPDIR)/CPU.Po
 include ./$(DEPDIR)/Clock.Po
 include ./$(DEPDIR)/Clock2.Po
+include ./$(DEPDIR)/DBGCommand.Po
 include ./$(DEPDIR)/DEC.Po
+include ./$(DEPDIR)/Debugger.Po
 include ./$(DEPDIR)/EOR.Po
 include ./$(DEPDIR)/INC.Po
 include ./$(DEPDIR)/JMP.Po

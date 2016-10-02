@@ -359,8 +359,10 @@ _execute()
 		std::cout << "XXXX " << std::hex << static_cast<unsigned short>(opcode) << " " << std::endl;
 	}
 
+	/*
 	std::cout << std::hex << pc << " " << o->to_string(this) << " " << dbg_flags(this)
 			<< " " << std::dec << tick_count << std::endl;
+	*/
 	ret += (*o)(this);
 
 
@@ -375,6 +377,22 @@ ticks_per_second()
 	return clock.ticks_per_second();
 }
 
+bool CPU::
+execute()
+{
+	bool ret = false;
+	if (wait--) {
+		ret = false;
+	} else {
+		wait = _execute();
+		ret = true;
+	}
+
+	address_space.tick();
+	return true;
+}
+
+#if 0
 bool CPU::
 execute()
 {
@@ -404,6 +422,7 @@ execute()
 	}
 	*/
 }
+#endif
 
 unsigned char CPU::
 read(unsigned short addr) const {

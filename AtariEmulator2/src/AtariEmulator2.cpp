@@ -12,6 +12,9 @@
 #include "Video.h"
 #include "CPU.h"
 #include "Logging.h"
+#include "Debugger.h"
+#include "DBGCommand.h"
+
 
 int main(int argc, char **argv)
 {
@@ -20,11 +23,15 @@ int main(int argc, char **argv)
 	cpu::CPU cpu(1790000, video.get_refresh_rate(), &video);
 	bool quit = false;
 
+	dbg::Debugger dbg = dbg::Debugger(&cpu);
+
 	LOG::init();
 
 	while( !quit ) {
 
-		cpu.execute();
+		if (dbg.execute())
+			cpu.execute();
+
 		SDL_Event e;
 		while( SDL_PollEvent( &e ) != 0 )
 		{
