@@ -34,6 +34,14 @@ public:
 		return read(PC++);
 	}
 
+	std::string get_rom_path() const {
+		return address_space.get_rom_path();
+	}
+
+	unsigned short get_rom_offset() const {
+		return address_space.get_rom_offset();
+	}
+
 	unsigned short getIndirect() {
 		unsigned char l1 = readPCandInc();
 		unsigned char h1 = readPCandInc();

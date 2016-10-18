@@ -27,6 +27,8 @@
 #include "CPU.h"
 #include <cstdlib>
 
+#define LISTENER_FD (pfd[0].fd)
+#define DATA_FD (pfd[1].fd)
 
 namespace dbg {
 
@@ -39,7 +41,7 @@ static void cleanup() {
 	unlink(cmd_fname.c_str());
 }
 
-Debugger::Debugger(cpu::CPU* cpu) : cpu(cpu), running(false) {
+Debugger::Debugger(cpu::CPU* cpu) : cpu(cpu), state(DBGState::stopped) {
 
 	// TODO Auto-generated constructor stub
 
@@ -55,18 +57,26 @@ Debugger::Debugger(cpu::CPU* cpu) : cpu(cpu), running(false) {
 
 	json jinfo;
 	jinfo["cmd"] = dbg_cmd.str();
+	jinfo["rom"] = {
+			{"path", cpu->get_rom_path()},
+			{"offset", cpu->get_rom_offset()}
+	};
 
 	auto tmp = jinfo.dump(1);
 
 	cout << tmp << endl;
 
-	write(info_fd, tmp.c_str(), tmp.length());
+	if (write(info_fd, tmp.c_str(), tmp.length()) == -1) {
+		cerr << strerror(errno) << endl;
+		exit(-1);
+	}
+
 	close(info_fd);
 
 	cmd_fname = dbg_cmd.str();
 
 	struct sockaddr_un addr;
-	if ((pfd[0].fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+	if ((LISTENER_FD = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		cerr << strerror(errno) << endl;
 		exit(-1);
 	}
@@ -77,12 +87,12 @@ Debugger::Debugger(cpu::CPU* cpu) : cpu(cpu), running(false) {
 	addr.sun_family = AF_UNIX;
 	strncpy(addr.sun_path, cmd_fname.c_str(), sizeof(addr.sun_path)-1);
 
-	if (bind(pfd[0].fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+	if (bind(LISTENER_FD, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
 		cerr << strerror(errno) << endl;
 		exit(-1);
 	}
 
-	if (listen(pfd[0].fd, 5) == -1) {
+	if (listen(LISTENER_FD, 5) == -1) {
 		cerr << strerror(errno) << endl;
 		exit(-1);
 	}
@@ -92,23 +102,24 @@ Debugger::Debugger(cpu::CPU* cpu) : cpu(cpu), running(false) {
 	atexit(cleanup);
 }
 
-static bool read_cmd(int fd, cpu::CPU* cpu)
+void Debugger::
+handle_cmd()
 {
 
 	char cmd[256];
 	bool ret = false;
 	cout << "Data ready to read" << endl;
-	int nread = read(fd, cmd, sizeof(cmd) - 1);
+	int nread = read(DATA_FD, cmd, sizeof(cmd) - 1);
 
 	cout << "Read: " << nread << " bytes" << endl;
 
 	if (nread < 0) {
 		cerr << strerror(errno) << endl;
-		return ret;
+		return;
 	}
 
 	if (nread == 0) {
-		return ret;
+		return;
 	}
 
 	cmd[nread] = 0;
@@ -118,17 +129,24 @@ static bool read_cmd(int fd, cpu::CPU* cpu)
 	cout << "Read: '" << jcmd.dump(1) << "'" << endl;
 
 	if (jcmd["cmd"] == "run") {
-		ret = true;
+		state = DBGState::running;
 	} else if (jcmd["cmd"] == "stop") {
-		ret = false;
+		state = DBGState::stopped;
+	} else if (jcmd["cmd"] == "step") {
+		stop_conditions.push_back(std::shared_ptr<StopCondition>(new PCCount(1)));
+		state = DBGState::running;
 	}
+}
 
+void Debugger::
+write_state()
+{
 	json jdata;
 	jdata["registers"] =
 			{
 					{"ACC", cpu->getAccumulator()},
 					{"X", cpu->getX()},
-					{"Y", cpu->getX()},
+					{"Y", cpu->getY()},
 					{"FLAGS", cpu->getFlags()},
 					{"PC", cpu->getPC()},
 					{"SP", cpu->getSP()},
@@ -139,15 +157,85 @@ static bool read_cmd(int fd, cpu::CPU* cpu)
 
 	cout << "About to write '" << data.str() << "' " << data.str().length() << endl;
 
-	int nwrote = write(fd, data.str().c_str(), data.str().length());
+	int nwrote = write(DATA_FD, data.str().c_str(), data.str().length());
 
 	cout << "Wrote nbytes: " << nwrote << endl;
+}
+
+bool Debugger::
+pump_stop_conditions()
+{
+	bool ret = false;
+	cout << "Here!!" << endl;
+	for (auto i = stop_conditions.begin(); i != stop_conditions.end(); ++i) {
+		(*i)->cycle();
+
+		if ((*i)->check()) {
+			state = DBGState::stopped;
+			ret = true;
+		}
+
+		if ((*i)->expired()) {
+			i = stop_conditions.erase(i);
+		}
+		cout << "Iter!" << endl;
+	}
 
 	return ret;
 }
 
 bool Debugger::
 execute()
+{
+
+	switch (state) {
+	case DBGState::running:
+
+		if (!cpu->execute()) {
+			cout << "TICK" << endl;
+			return false;
+		}
+		// to next CPU cycle
+
+		if (pump_stop_conditions()) { // update state based on any stop conditions
+			write_state();
+		}
+
+		read_cmd(); //update state based on any new commands
+
+		break;
+
+	case DBGState::stopped:
+
+		read_cmd(); //update state and/or stop condition based on any new commands;
+		break;
+		/*
+		 * workflow for STEP
+		 * new stop condition is execute 1 instruction
+		 * state is running
+		 * next loop iteration, cpu->execute() is called (1 instruction)
+		 * pump_stop_condition() causes the 1 instruction condition to match -> state goes to stop; call changeToStop();
+		 * changeToStop() should write state back to dbg controller
+		 *
+		 * workflow for RUN cmd
+		 * set state to running
+		 * no new stop condition
+		 * * execute
+		 * * pump
+		 *  * read_cmd
+		 *
+		 *  workflow for STOP cmd (assumming already running)
+		 *  * execute a cycle
+		 *  * pump() (nothing triggers)
+		 *  * read_cmd() -> call changeToStop()
+		 */
+
+	}
+	return true;
+}
+
+void Debugger::
+read_cmd()
 {
 	pfd[0].events = POLLIN;
 	pfd[1].events = POLLIN;
@@ -158,20 +246,21 @@ execute()
 		pfd[0].fd = abs(pfd[0].fd) * -1;
 	}
 
+	bool ret = false;
+
 	//cout << "Checking for data" << endl;
 	int nready = poll(pfd, sizeof(pfd)/sizeof(struct pollfd), 0);
-
-	bool ret = running;
 
 	if (nready) {
 
 		cout << hex << pfd[1].revents << endl;
-
 		cout << "nready: " << nready << endl;
 
 		if (pfd[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
 			cerr << strerror(errno) << endl;
-			exit(-1);
+			state = DBGState::stopped;
+			//exit(-1);
+			return;
 		}
 
 		if (pfd[1].revents & (POLLERR | POLLHUP | POLLNVAL)) {
@@ -179,25 +268,22 @@ execute()
 			close(pfd[1].fd);
 			pfd[1].fd = -1 * abs(pfd[0].fd);
 			pfd[0].fd = abs(pfd[0].fd);
-			return ret;
+			state = DBGState::stopped;
+
 		}
 
 		if (pfd[0].revents & POLLIN) {
 
 			cout << "Here??" << endl;
 			pfd[1].fd = accept(pfd[0].fd, nullptr, nullptr);
-
-			ret = read_cmd(pfd[1].fd, cpu);
+			handle_cmd();
 
 		}
 
 		if (pfd[1].revents & POLLIN) {
-			ret = read_cmd(pfd[1].fd, cpu);
+			handle_cmd();
 		}
 	}
-
-	running = ret;
-	return running;
 }
 
 Debugger::~Debugger() {

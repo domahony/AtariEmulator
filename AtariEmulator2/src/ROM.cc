@@ -13,7 +13,7 @@
 
 namespace address {
 
-ROM::ROM(const string& fname) : rom() {
+ROM::ROM(const string& fname) : rom(), path(fname) {
 
 	std::ifstream testFile(fname.c_str(), std::ios::binary);
 

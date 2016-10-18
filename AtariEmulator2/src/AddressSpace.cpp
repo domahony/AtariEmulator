@@ -35,6 +35,17 @@ AddressSpace::~AddressSpace() {
 
 }
 
+std::string AddressSpace::
+get_rom_path() const
+{
+	return os->get_path();
+}
+
+unsigned short AddressSpace::
+get_rom_offset() const {
+	return 0xD800;
+}
+
 void AddressSpace::
 dump_ram()
 {

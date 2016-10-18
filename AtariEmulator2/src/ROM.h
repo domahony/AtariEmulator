@@ -30,9 +30,14 @@ public:
 
 	}
 
+	std::string get_path() const {
+		return path;
+	}
+
 private:
 	vector<unsigned char> rom;
 	unsigned int mask;
+	std::string path;
 };
 
 } /* namespace address */

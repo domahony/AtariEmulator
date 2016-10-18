@@ -47,6 +47,9 @@ public:
 
 	void dump_ram();
 
+	std::string get_rom_path() const;
+	unsigned short get_rom_offset() const;
+
 private:
 
 	std::shared_ptr<RAM> ram;

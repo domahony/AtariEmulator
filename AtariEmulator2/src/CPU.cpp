@@ -389,7 +389,7 @@ execute()
 	}
 
 	address_space.tick();
-	return true;
+	return ret;
 }
 
 #if 0
